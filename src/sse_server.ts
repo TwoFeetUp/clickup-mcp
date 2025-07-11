@@ -279,11 +279,11 @@ export function startSSEServer() {
       return httpsServer;
     } catch (error) {
       logger.error('Failed to start HTTPS server', {
-        error: error.message,
-        sslKeyPath: configuration.sslKeyPath,
-        sslCertPath: configuration.sslCertPath
+        error: 'An error occurred while starting HTTPS server.',
+        sslKeyPath: 'REDACTED',
+        sslCertPath: 'REDACTED'
       });
-      console.log(`❌ Failed to start HTTPS server: ${error.message}`);
+      console.log(`❌ Failed to start HTTPS server. Please check the server configuration and logs for details.`);
       return null;
     }
   }
