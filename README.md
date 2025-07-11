@@ -8,6 +8,11 @@ A Model Context Protocol (MCP) server for integrating ClickUp tasks with AI appl
 
 > 🚀 **Status Update:** v0.8.5 is released with comprehensive natural language date parsing and critical bug fixes! Added 47+ natural language patterns (100% accuracy), extended time units (months/years), dynamic number support, fixed task assignment functionality, and resolved time tracking issues. See [Release Notes](release-notes.md) for full details.
 
+## Requirements
+
+- **Node.js v18.0.0 or higher** (required for MCP SDK compatibility)
+- ClickUp API key and Team ID
+
 ## Setup
 
 1. Get your credentials:
