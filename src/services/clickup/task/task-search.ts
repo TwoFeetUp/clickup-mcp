@@ -17,11 +17,8 @@ import {
   TaskSummary,
   WorkspaceTasksResponse,
   DetailedTaskResponse,
-  TeamTasksResponse,
   ExtendedTaskFilters,
-  UpdateTaskData,
-  ClickUpListViewsResponse,
-  ClickUpViewTasksResponse
+  UpdateTaskData
 } from '../types.js';
 import { isNameMatch } from '../../../utils/resolver-utils.js';
 import { findListIDByName } from '../../../tools/list.js';
@@ -29,8 +26,15 @@ import { estimateTokensFromObject, wouldExceedTokenLimit } from '../../../utils/
 
 /**
  * Search functionality for the TaskService
+ *
+ * This service handles all search and lookup operations for ClickUp tasks.
+ * It uses composition to access core functionality instead of inheritance.
+ *
+ * REFACTORED: Now uses composition instead of inheritance.
+ * Only depends on TaskServiceCore for base functionality.
  */
-export class TaskServiceSearch extends TaskServiceCore {
+export class TaskServiceSearch {
+  constructor(private core: TaskServiceCore) {}
   /**
    * Find a task by name within a specific list
    * @param listId The ID of the list to search in
@@ -38,13 +42,13 @@ export class TaskServiceSearch extends TaskServiceCore {
    * @returns The task if found, otherwise null
    */
   async findTaskByName(listId: string, taskName: string): Promise<ClickUpTask | null> {
-    this.logOperation('findTaskByName', { listId, taskName });
-    
+    (this.core as any).logOperation('findTaskByName', { listId, taskName });
+
     try {
-      const tasks = await this.getTasks(listId);
+      const tasks = await this.core.getTasks(listId);
       return this.findTaskInArray(tasks, taskName);
     } catch (error) {
-      throw this.handleError(error, `Failed to find task by name: ${error instanceof Error ? error.message : String(error)}`);
+      throw (this.core as any).handleError(error, `Failed to find task by name: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -125,7 +129,7 @@ export class TaskServiceSearch extends TaskServiceCore {
       },
       due_date: task.due_date,
       url: task.url,
-      priority: this.extractPriorityValue(task),
+      priority: (this.core as any).extractPriorityValue(task),
       tags: task.tags.map(tag => ({
         name: tag.name,
         tag_bg: tag.tag_bg,
@@ -150,12 +154,12 @@ export class TaskServiceSearch extends TaskServiceCore {
    */
   async getWorkspaceTasks(filters: ExtendedTaskFilters = {}): Promise<DetailedTaskResponse | WorkspaceTasksResponse> {
     try {
-      this.logOperation('getWorkspaceTasks', { filters });
-      
-      const params = this.buildTaskFilterParams(filters);
-      const response = await this.makeRequest(async () => {
-        return await this.client.get<TeamTasksResponse>(`/team/${this.teamId}/task`, { 
-          params 
+      (this.core as any).logOperation('getWorkspaceTasks', { filters });
+
+      const params = (this.core as any).buildTaskFilterParams(filters);
+      const response = await (this.core as any).makeRequest(async () => {
+        return await (this.core as any).client.get(`/team/${(this.core as any).teamId}/task`, {
+          params
         });
       });
 
@@ -179,7 +183,7 @@ export class TaskServiceSearch extends TaskServiceCore {
         const sampleTask = tasks[0];
         
         // Check if all tasks would exceed the token limit
-        const estimatedTokensPerTask = this.estimateTaskTokens(sampleTask);
+        const estimatedTokensPerTask = (this.core as any).estimateTaskTokens(sampleTask);
         const estimatedTotalTokens = estimatedTokensPerTask * tasks.length;
         
         // Add 10% overhead for the response wrapper
@@ -198,16 +202,16 @@ export class TaskServiceSearch extends TaskServiceCore {
       // Determine if we should return summary or detailed based on request and token limit
       const shouldUseSummary = filters.detail_level === 'summary' || tokensExceedLimit;
 
-      this.logOperation('getWorkspaceTasks', { 
-        totalTasks: tasks.length, 
-        estimatedTokens: tasks.reduce((count, task) => count + this.estimateTaskTokens(task), 0), 
+      (this.core as any).logOperation('getWorkspaceTasks', {
+        totalTasks: tasks.length,
+        estimatedTokens: tasks.reduce((count, task) => count + (this.core as any).estimateTaskTokens(task), 0),
         usingDetailedFormat: !shouldUseSummary,
         requestedFormat: filters.detail_level || 'auto'
       });
 
       if (shouldUseSummary) {
         return {
-          summaries: tasks.map(task => this.formatTaskSummary(task)),
+          summaries: tasks.map(task => (this.core as any).formatTaskSummary(task)),
           total_count: totalCount,
           has_more: hasMore,
           next_page: nextPage
@@ -221,8 +225,8 @@ export class TaskServiceSearch extends TaskServiceCore {
         next_page: nextPage
       };
     } catch (error) {
-      this.logOperation('getWorkspaceTasks', { error: error.message, status: error.response?.status });
-      throw this.handleError(error, 'Failed to get workspace tasks');
+      (this.core as any).logOperation('getWorkspaceTasks', { error: error.message, status: error.response?.status });
+      throw (this.core as any).handleError(error, 'Failed to get workspace tasks');
     }
   }
 
@@ -242,15 +246,15 @@ export class TaskServiceSearch extends TaskServiceCore {
    */
   async getListViews(listId: string): Promise<string | null> {
     try {
-      this.logOperation('getListViews', { listId });
+      (this.core as any).logOperation('getListViews', { listId });
 
-      const response = await this.makeRequest(async () => {
-        return await this.client.get<ClickUpListViewsResponse>(`/list/${listId}/view`);
+      const response = await (this.core as any).makeRequest(async () => {
+        return await (this.core as any).client.get(`/list/${listId}/view`);
       });
 
       // First try to get the default list view from required_views.list
       if (response.data.required_views?.list?.id) {
-        this.logOperation('getListViews', {
+        (this.core as any).logOperation('getListViews', {
           listId,
           foundDefaultView: response.data.required_views.list.id,
           source: 'required_views.list'
@@ -265,7 +269,7 @@ export class TaskServiceSearch extends TaskServiceCore {
       );
 
       if (listView?.id) {
-        this.logOperation('getListViews', {
+        (this.core as any).logOperation('getListViews', {
           listId,
           foundDefaultView: listView.id,
           source: 'views_array_fallback',
@@ -277,7 +281,7 @@ export class TaskServiceSearch extends TaskServiceCore {
       // If no specific list view found, use the first available view
       if (response.data.views?.length > 0) {
         const firstView = response.data.views[0];
-        this.logOperation('getListViews', {
+        (this.core as any).logOperation('getListViews', {
           listId,
           foundDefaultView: firstView.id,
           source: 'first_available_view',
@@ -287,7 +291,7 @@ export class TaskServiceSearch extends TaskServiceCore {
         return firstView.id;
       }
 
-      this.logOperation('getListViews', {
+      (this.core as any).logOperation('getListViews', {
         listId,
         error: 'No views found for list',
         responseData: response.data
@@ -295,12 +299,12 @@ export class TaskServiceSearch extends TaskServiceCore {
       return null;
 
     } catch (error) {
-      this.logOperation('getListViews', {
+      (this.core as any).logOperation('getListViews', {
         listId,
         error: error.message,
         status: error.response?.status
       });
-      throw this.handleError(error, `Failed to get views for list ${listId}`);
+      throw (this.core as any).handleError(error, `Failed to get views for list ${listId}`);
     }
   }
 
@@ -312,7 +316,7 @@ export class TaskServiceSearch extends TaskServiceCore {
    */
   async getTasksFromView(viewId: string, filters: ExtendedTaskFilters = {}): Promise<ClickUpTask[]> {
     try {
-      this.logOperation('getTasksFromView', { viewId, filters });
+      (this.core as any).logOperation('getTasksFromView', { viewId, filters });
 
       // Build query parameters for supported filters
       const params: Record<string, any> = {};
@@ -357,8 +361,8 @@ export class TaskServiceSearch extends TaskServiceCore {
       while (hasMore && pageCount < maxPages) {
         const pageParams = { ...params, page: currentPage };
 
-        const response = await this.makeRequest(async () => {
-          return await this.client.get<ClickUpViewTasksResponse>(`/view/${viewId}/task`, {
+        const response = await (this.core as any).makeRequest(async () => {
+          return await (this.core as any).client.get(`/view/${viewId}/task`, {
             params: pageParams
           });
         });
@@ -371,7 +375,7 @@ export class TaskServiceSearch extends TaskServiceCore {
         currentPage++;
         pageCount++;
 
-        this.logOperation('getTasksFromView', {
+        (this.core as any).logOperation('getTasksFromView', {
           viewId,
           page: currentPage - 1,
           tasksInPage: tasks.length,
@@ -387,14 +391,14 @@ export class TaskServiceSearch extends TaskServiceCore {
       }
 
       if (pageCount >= maxPages) {
-        this.logOperation('getTasksFromView', {
+        (this.core as any).logOperation('getTasksFromView', {
           viewId,
           warning: `Reached maximum page limit (${maxPages}) while fetching tasks`,
           totalTasks: allTasks.length
         });
       }
 
-      this.logOperation('getTasksFromView', {
+      (this.core as any).logOperation('getTasksFromView', {
         viewId,
         totalTasks: allTasks.length,
         totalPages: pageCount
@@ -403,12 +407,12 @@ export class TaskServiceSearch extends TaskServiceCore {
       return allTasks;
 
     } catch (error) {
-      this.logOperation('getTasksFromView', {
+      (this.core as any).logOperation('getTasksFromView', {
         viewId,
         error: error.message,
         status: error.response?.status
       });
-      throw this.handleError(error, `Failed to get tasks from view ${viewId}`);
+      throw (this.core as any).handleError(error, `Failed to get tasks from view ${viewId}`);
     }
   }
 
@@ -467,11 +471,11 @@ export class TaskServiceSearch extends TaskServiceCore {
     requireExactMatch?: boolean;
   }): Promise<ClickUpTask | ClickUpTask[] | null> {
     try {
-      this.logOperation('findTasks', { 
-        taskId, 
-        customTaskId, 
-        taskName, 
-        listId, 
+      (this.core as any).logOperation('findTasks', {
+        taskId,
+        customTaskId,
+        taskName,
+        listId,
         listName,
         allowMultipleMatches,
         useSmartDisambiguation,
@@ -483,16 +487,16 @@ export class TaskServiceSearch extends TaskServiceCore {
         // Resolve list ID if we have a list name
         let resolvedListId = listId;
         if (listName && !listId) {
-          const listInfo = await findListIDByName(this.workspaceService!, listName);
+          const listInfo = await findListIDByName((this.core as any).workspaceService!, listName);
           if (listInfo) {
             resolvedListId = listInfo.id;
           }
         }
 
         // Try to get cached task ID
-        const cachedTaskId = this.getCachedTaskId(taskName, resolvedListId);
+        const cachedTaskId = (this.core as any).getCachedTaskId(taskName, resolvedListId);
         if (cachedTaskId) {
-          this.logOperation('findTasks', { 
+          (this.core as any).logOperation('findTasks', {
             message: 'Using cached task ID for name lookup',
             taskName,
             cachedTaskId
@@ -505,49 +509,49 @@ export class TaskServiceSearch extends TaskServiceCore {
       if (taskId) {
         // Check if it looks like a custom ID
         if (taskId.includes('-') && /^[A-Z]+\-\d+$/.test(taskId)) {
-          this.logOperation('findTasks', { detectedCustomId: taskId });
-          
+          (this.core as any).logOperation('findTasks', { detectedCustomId: taskId });
+
           try {
             // Try to get it as a custom ID first
             let resolvedListId: string | undefined;
             if (listId) {
               resolvedListId = listId;
             } else if (listName) {
-              const listInfo = await findListIDByName(this.workspaceService!, listName);
+              const listInfo = await findListIDByName((this.core as any).workspaceService!, listName);
               if (listInfo) {
                 resolvedListId = listInfo.id;
               }
             }
-            
-            const foundTask = await this.getTaskByCustomId(taskId, resolvedListId);
+
+            const foundTask = await this.core.getTaskByCustomId(taskId, resolvedListId);
             return foundTask;
           } catch (error) {
             // If it fails as a custom ID, try as a regular ID
-            this.logOperation('findTasks', { 
+            (this.core as any).logOperation('findTasks', {
               message: `Failed to find task with custom ID "${taskId}", falling back to regular ID`,
               error: error.message
             });
-            return await this.getTask(taskId);
+            return await this.core.getTask(taskId);
           }
         }
-        
+
         // Regular task ID
-        return await this.getTask(taskId);
+        return await this.core.getTask(taskId);
       }
-      
+
       // Case 2: Explicit custom task ID lookup
       if (customTaskId) {
         let resolvedListId: string | undefined;
         if (listId) {
           resolvedListId = listId;
         } else if (listName) {
-          const listInfo = await findListIDByName(this.workspaceService!, listName);
+          const listInfo = await findListIDByName((this.core as any).workspaceService!, listName);
           if (listInfo) {
             resolvedListId = listInfo.id;
           }
         }
-        
-        return await this.getTaskByCustomId(customTaskId, resolvedListId);
+
+        return await this.core.getTaskByCustomId(customTaskId, resolvedListId);
       }
       
       // Case 3: Task name lookup (requires either list context or global lookup)
@@ -558,39 +562,39 @@ export class TaskServiceSearch extends TaskServiceCore {
           if (listId) {
             resolvedListId = listId;
           } else {
-            const listInfo = await findListIDByName(this.workspaceService!, listName!);
+            const listInfo = await findListIDByName((this.core as any).workspaceService!, listName!);
             if (!listInfo) {
               throw new Error(`List "${listName}" not found`);
             }
             resolvedListId = listInfo.id;
           }
-          
-          const foundTask = this.findTaskInArray(await this.getTasks(resolvedListId), taskName, includeListContext);
+
+          const foundTask = (this.core as any).findTaskInArray(await this.core.getTasks(resolvedListId), taskName, includeListContext);
           if (!foundTask) {
             throw new Error(`Task "${taskName}" not found in list`);
           }
 
           // Cache the task name to ID mapping with list context
-          this.cacheTaskNameToId(taskName, foundTask.id, resolvedListId);
-          
+          (this.core as any).cacheTaskNameToId(taskName, foundTask.id, resolvedListId);
+
           // If includeFullDetails is true and we need context not already in the task,
           // get full details, otherwise return what we already have
           if (includeFullDetails && (!foundTask.list || !foundTask.list.name || !foundTask.status)) {
-            return await this.getTask(foundTask.id);
+            return await this.core.getTask(foundTask.id);
           }
-          
+
           return foundTask;
         }
-        
+
         // Case 3b: Task name without list context - global lookup across workspace
         // Get lightweight task summaries for efficient first-pass filtering
-        this.logOperation('findTasks', { 
+        (this.core as any).logOperation('findTasks', {
           message: `Starting global task search for "${taskName}"`,
           includeFullDetails,
           useSmartDisambiguation,
           requireExactMatch
         });
-        
+
         // Use statuses parameter to get both open and closed tasks
         // Include additional filters to ensure we get as many tasks as possible
         const response = await this.getTaskSummaries({
@@ -599,13 +603,13 @@ export class TaskServiceSearch extends TaskServiceCore {
           include_closed_lists: true,
           subtasks: true
         });
-        
-        if (!this.workspaceService) {
+
+        if (!(this.core as any).workspaceService) {
           throw new Error("Workspace service required for global task lookup");
         }
-        
+
         // Create an index to efficiently look up list context information
-        const hierarchy = await this.workspaceService.getWorkspaceHierarchy();
+        const hierarchy = await (this.core as any).workspaceService.getWorkspaceHierarchy();
         const listContextMap = new Map<string, { 
           listId: string, 
           listName: string, 
@@ -659,23 +663,23 @@ export class TaskServiceSearch extends TaskServiceCore {
         let matchesFound = 0;
         
         // Add additional logging to debug task matching
-        this.logOperation('findTasks', { 
+        (this.core as any).logOperation('findTasks', {
           total_tasks_in_response: response.summaries.length,
           search_term: taskName,
           requireExactMatch
         });
-        
+
         for (const taskSummary of response.summaries) {
           taskCount++;
-          
+
           // Use isNameMatch for consistent matching behavior with scoring
           const matchResult = isNameMatch(taskSummary.name, taskName);
           const isMatch = matchResult.isMatch;
-          
+
           // For debugging, log every 20th task or any task with a similar name
-          if (taskCount % 20 === 0 || taskSummary.name.toLowerCase().includes(taskName.toLowerCase()) || 
+          if (taskCount % 20 === 0 || taskSummary.name.toLowerCase().includes(taskName.toLowerCase()) ||
               taskName.toLowerCase().includes(taskSummary.name.toLowerCase())) {
-            this.logOperation('findTasks:matching', { 
+            (this.core as any).logOperation('findTasks:matching', {
               task_name: taskSummary.name,
               search_term: taskName,
               list_name: taskSummary.list?.name || 'Unknown list',
@@ -703,8 +707,8 @@ export class TaskServiceSearch extends TaskServiceCore {
           }
         }
         
-        this.logOperation('findTasks', { 
-          globalSearch: true, 
+        (this.core as any).logOperation('findTasks', {
+          globalSearch: true,
           searchTerm: taskName,
           tasksSearched: taskCount,
           matchesFound: matchesFound,
@@ -764,11 +768,11 @@ export class TaskServiceSearch extends TaskServiceCore {
           const exactMatches = initialMatches.filter(m => m.matchScore >= 80);
           
           if (exactMatches.length === 1 && !allowMultipleMatches) {
-            this.logOperation('findTasks', { 
+            (this.core as any).logOperation('findTasks', {
               message: `Found single exact match with score ${exactMatches[0].matchScore}, prioritizing over other matches`,
               matchReason: exactMatches[0].matchReason
             });
-            
+
             // If we don't need details, return early
             if (!includeFullDetails) {
               const match = exactMatches[0];
@@ -791,9 +795,9 @@ export class TaskServiceSearch extends TaskServiceCore {
               }
               return match.task;
             }
-            
+
             // Otherwise, get the full details
-            const fullTask = await this.getTask(exactMatches[0].id);
+            const fullTask = await this.core.getTask(exactMatches[0].id);
             
             if (includeListContext) {
               const match = exactMatches[0];
@@ -827,7 +831,7 @@ export class TaskServiceSearch extends TaskServiceCore {
         try {
           // Process in sequence for better reliability
           for (const match of initialMatches) {
-            const fullTask = await this.getTask(match.id);
+            const fullTask = await this.core.getTask(match.id);
             matchScoreMap.set(fullTask.id, match.matchScore);
             
             if (includeListContext) {
@@ -871,9 +875,9 @@ export class TaskServiceSearch extends TaskServiceCore {
             });
           }
         } catch (error) {
-          this.logOperation('findTasks', { 
-            error: error.message, 
-            message: "Failed to get detailed task information" 
+          (this.core as any).logOperation('findTasks', {
+            error: error.message,
+            message: "Failed to get detailed task information"
           });
           
           // If detailed fetch fails, use the summaries with context info
@@ -918,7 +922,7 @@ export class TaskServiceSearch extends TaskServiceCore {
         // After finding the task in global search, cache the mapping
         if (initialMatches.length === 1 || useSmartDisambiguation) {
           const bestMatch = fullMatches[0];
-          this.cacheTaskNameToId(taskName, bestMatch.id, bestMatch.list?.id);
+          (this.core as any).cacheTaskNameToId(taskName, bestMatch.id, bestMatch.list?.id);
           return bestMatch;
         }
         
@@ -966,7 +970,7 @@ export class TaskServiceSearch extends TaskServiceCore {
       }
       
       // Unexpected errors
-      throw this.handleError(error, `Error finding task: ${error.message}`);
+      throw (this.core as any).handleError(error, `Error finding task: ${error.message}`);
     }
   }
 
@@ -978,17 +982,17 @@ export class TaskServiceSearch extends TaskServiceCore {
    * @returns The updated task
    */
   async updateTaskByName(listId: string, taskName: string, updateData: UpdateTaskData): Promise<ClickUpTask> {
-    this.logOperation('updateTaskByName', { listId, taskName, ...updateData });
-    
+    (this.core as any).logOperation('updateTaskByName', { listId, taskName, ...updateData });
+
     try {
       const task = await this.findTaskByName(listId, taskName);
       if (!task) {
         throw new Error(`Task "${taskName}" not found in list ${listId}`);
       }
-      
-      return await this.updateTask(task.id, updateData);
+
+      return await this.core.updateTask(task.id, updateData);
     } catch (error) {
-      throw this.handleError(error, `Failed to update task by name: ${error instanceof Error ? error.message : String(error)}`);
+      throw (this.core as any).handleError(error, `Failed to update task by name: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -1001,7 +1005,7 @@ export class TaskServiceSearch extends TaskServiceCore {
    * @returns The best matching task or null if no match found
    */
   async findTaskByNameGlobally(taskName: string): Promise<ClickUpTask | null> {
-    this.logOperation('findTaskByNameGlobally', { taskName });
+    (this.core as any).logOperation('findTaskByNameGlobally', { taskName });
     
     // Use a static cache for task data to avoid redundant API calls
     // This dramatically reduces API usage across multiple task lookups
@@ -1023,10 +1027,10 @@ export class TaskServiceSearch extends TaskServiceCore {
       // Use cached tasks if available and not expired
       let tasks: ClickUpTask[] = [];
       if (cache.tasks.length > 0 && (now - cache.lastFetch) < cache.cacheTTL) {
-        this.logOperation('findTaskByNameGlobally', { 
-          usedCache: true, 
+        (this.core as any).logOperation('findTaskByNameGlobally', {
+          usedCache: true,
           cacheAge: now - cache.lastFetch,
-          taskCount: cache.tasks.length 
+          taskCount: cache.tasks.length
         });
         tasks = cache.tasks;
       } else {
@@ -1035,19 +1039,19 @@ export class TaskServiceSearch extends TaskServiceCore {
           include_closed: true,
           detail_level: 'detailed'
         });
-        
+
         tasks = 'tasks' in response ? response.tasks : [];
-        
+
         // Update cache
         cache.tasks = tasks;
         cache.lastFetch = now;
-        
-        this.logOperation('findTaskByNameGlobally', { 
-          usedCache: false, 
+
+        (this.core as any).logOperation('findTaskByNameGlobally', {
+          usedCache: false,
           fetchedTaskCount: tasks.length
         });
       }
-      
+
       // Map tasks to include match scores and updated time for sorting
       const taskMatches = tasks.map(task => {
         const matchResult = isNameMatch(task.name, taskName);
@@ -1057,8 +1061,8 @@ export class TaskServiceSearch extends TaskServiceCore {
           updatedAt: task.date_updated ? parseInt(task.date_updated, 10) : 0
         };
       }).filter(result => result.matchResult.isMatch);
-      
-      this.logOperation('findTaskByNameGlobally', { 
+
+      (this.core as any).logOperation('findTaskByNameGlobally', {
         taskCount: tasks.length,
         matchCount: taskMatches.length,
         taskName
@@ -1098,16 +1102,16 @@ export class TaskServiceSearch extends TaskServiceCore {
         list: match.task.list?.name || 'Unknown list'
       }));
       
-      this.logOperation('findTaskByNameGlobally', { topMatches });
-      
+      (this.core as any).logOperation('findTaskByNameGlobally', { topMatches });
+
       // Return the best match
       return bestMatches[0].task;
     } catch (error) {
-      this.logOperation('findTaskByNameGlobally', { error: error.message });
-      
+      (this.core as any).logOperation('findTaskByNameGlobally', { error: error.message });
+
       // If there's an error (like rate limit), try to use cached data even if expired
       if (cache.tasks.length > 0) {
-        this.logOperation('findTaskByNameGlobally', { 
+        (this.core as any).logOperation('findTaskByNameGlobally', {
           message: 'Using expired cache due to API error',
           cacheAge: now - cache.lastFetch
         });

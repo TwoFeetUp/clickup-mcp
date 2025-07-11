@@ -3,20 +3,27 @@
  * SPDX-License-Identifier: MIT
  *
  * ClickUp Task Service - Attachments Module
- * 
+ *
  * Handles file attachment operations for ClickUp tasks, supporting three methods:
  * - Uploading file attachments from base64/buffer data
  * - Uploading file attachments from a URL (web URLs like http/https)
  * - Uploading file attachments from local file paths (absolute paths)
+ *
+ * REFACTORED: Now uses composition instead of inheritance.
+ * Only depends on TaskServiceCore for base functionality.
  */
 
-import { TaskServiceSearch } from './task-search.js';
+import { TaskServiceCore } from './task-core.js';
 import { ClickUpTaskAttachment } from '../types.js';
 
 /**
  * Attachment functionality for the TaskService
+ *
+ * This service handles all file attachment operations for ClickUp tasks.
+ * It uses composition to access core functionality instead of inheritance.
  */
-export class TaskServiceAttachments extends TaskServiceSearch {
+export class TaskServiceAttachments {
+  constructor(private core: TaskServiceCore) {}
   /**
    * Upload a file attachment to a ClickUp task
    * @param taskId The ID of the task to attach the file to
@@ -25,36 +32,36 @@ export class TaskServiceAttachments extends TaskServiceSearch {
    * @returns Promise resolving to the attachment response from ClickUp
    */
   async uploadTaskAttachment(taskId: string, fileData: Buffer, fileName: string): Promise<ClickUpTaskAttachment> {
-    this.logOperation('uploadTaskAttachment', { taskId, fileName, fileSize: fileData.length });
-    
+    (this.core as any).logOperation('uploadTaskAttachment', { taskId, fileName, fileSize: fileData.length });
+
     try {
-      return await this.makeRequest(async () => {
+      return await (this.core as any).makeRequest(async () => {
         // Create FormData for multipart/form-data upload
         const FormData = (await import('form-data')).default;
         const formData = new FormData();
-        
+
         // Add the file to the form data
         formData.append('attachment', fileData, {
           filename: fileName,
           contentType: 'application/octet-stream' // Let ClickUp determine the content type
         });
-        
+
         // Use the raw axios client for this request since we need to handle FormData
-        const response = await this.client.post(
+        const response = await (this.core as any).client.post(
           `/task/${taskId}/attachment`,
           formData,
           {
             headers: {
               ...formData.getHeaders(),
-              'Authorization': this.apiKey
+              'Authorization': (this.core as any).apiKey
             }
           }
         );
-        
+
         return response.data;
       });
     } catch (error) {
-      throw this.handleError(error, `Failed to upload attachment to task ${taskId}`);
+      throw (this.core as any).handleError(error, `Failed to upload attachment to task ${taskId}`);
     }
   }
 
@@ -67,15 +74,15 @@ export class TaskServiceAttachments extends TaskServiceSearch {
    * @returns Promise resolving to the attachment response from ClickUp
    */
   async uploadTaskAttachmentFromUrl(
-    taskId: string, 
-    fileUrl: string, 
-    fileName?: string, 
+    taskId: string,
+    fileUrl: string,
+    fileName?: string,
     authHeader?: string
   ): Promise<ClickUpTaskAttachment> {
-    this.logOperation('uploadTaskAttachmentFromUrl', { taskId, fileUrl, fileName });
-    
+    (this.core as any).logOperation('uploadTaskAttachmentFromUrl', { taskId, fileUrl, fileName });
+
     try {
-      return await this.makeRequest(async () => {
+      return await (this.core as any).makeRequest(async () => {
         // Import required modules
         const axios = (await import('axios')).default;
         const FormData = (await import('form-data')).default;
@@ -104,21 +111,21 @@ export class TaskServiceAttachments extends TaskServiceSearch {
         });
         
         // Upload the file to ClickUp
-        const uploadResponse = await this.client.post(
+        const uploadResponse = await (this.core as any).client.post(
           `/task/${taskId}/attachment`,
           formData,
           {
             headers: {
               ...formData.getHeaders(),
-              'Authorization': this.apiKey
+              'Authorization': (this.core as any).apiKey
             }
           }
         );
-        
+
         return uploadResponse.data;
       });
     } catch (error) {
-      throw this.handleError(error, `Failed to upload attachment from URL to task ${taskId}`);
+      throw (this.core as any).handleError(error, `Failed to upload attachment from URL to task ${taskId}`);
     }
   }
 }

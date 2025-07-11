@@ -1,7 +1,7 @@
 # ClickUp MCP Server Test Plan
 
 ## 🎯 Objective
-This test plan evaluates all tools in the ClickUp MCP Server through diverse, natural language prompts simulating practical usage scenarios. Each test case includes verification methods.
+This test plan evaluates all 45 tools in the ClickUp MCP Server through diverse, natural language prompts simulating practical usage scenarios. Each test case includes verification methods and validates the TaskService composition architecture.
 
 ## 📋 Test Data Preparation
 Before executing the tests, you must generate the necessary test data in your ClickUp workspace:
@@ -376,6 +376,166 @@ Before executing the tests, you must generate the necessary test data in your Cl
 - **Expected Behavior:** Successfully removes the tag from the task and returns confirmation.
 - **Verification Method:** Use `get_task` to verify the tag no longer appears in the task's tags array.
 
+### Task (Time Tracking)
+
+#### Tool Name: `get_task_time_entries`
+- **Objective:** Retrieve all time entries for a specific task.
+- **Prompts:**
+  1. "Show all time entries for task 123456789"
+  2. "Get time tracking history for 'Website redesign' task"
+  3. "Retrieve time logs from task 123456789 for the last week"
+  4. "Show time entries for task 987654321 between yesterday and today"
+  5. "Get time tracking data for a task with no time entries"
+- **Expected Behavior:** Returns an array of time entries with user info, descriptions, and durations.
+- **Verification Method:** Verify the structure of returned time entries and confirm they belong to the specified task.
+
+#### Tool Name: `start_time_tracking`
+- **Objective:** Start tracking time on a specific task.
+- **Prompts:**
+  1. "Start time tracking on task 123456789"
+  2. "Begin timer for 'API development' task with description 'Working on authentication'"
+  3. "Start tracking time on task 123456789 as billable work"
+  4. "Begin timer for task 987654321 with tags 'development' and 'backend'"
+  5. "Start time tracking on a non-existent task"
+- **Expected Behavior:** Successfully starts time tracking and returns the active time entry.
+- **Verification Method:** Use `get_current_time_entry` to verify time tracking is active.
+
+#### Tool Name: `stop_time_tracking`
+- **Objective:** Stop the currently running time tracker.
+- **Prompts:**
+  1. "Stop time tracking"
+  2. "End current timer with description 'Completed authentication module'"
+  3. "Stop tracking time and add tags 'completed' and 'tested'"
+  4. "End timer and update description to 'Fixed login bug'"
+  5. "Stop time tracking when no timer is running"
+- **Expected Behavior:** Successfully stops time tracking and returns the completed time entry.
+- **Verification Method:** Use `get_current_time_entry` to verify no timer is running.
+
+#### Tool Name: `add_time_entry`
+- **Objective:** Add a manual time entry to a task.
+- **Prompts:**
+  1. "Add 2 hours of work to task 123456789 starting 2 hours ago"
+  2. "Log 30 minutes on 'Bug fixing' task from yesterday 9am"
+  3. "Add billable time entry of 1h 30m to task 123456789 with description 'Client meeting'"
+  4. "Log 45 minutes on task 987654321 with tags 'research' and 'planning'"
+  5. "Add time entry with invalid duration format"
+- **Expected Behavior:** Successfully creates the time entry and returns the entry data.
+- **Verification Method:** Use `get_task_time_entries` to verify the entry was added correctly.
+
+#### Tool Name: `delete_time_entry`
+- **Objective:** Remove a specific time entry.
+- **Prompts:**
+  1. "Delete time entry 123456789"
+  2. "Remove the incorrect time entry 987654321"
+  3. "Delete time entry that was logged by mistake"
+  4. "Remove time entry 456789123 permanently"
+  5. "Delete a non-existent time entry"
+- **Expected Behavior:** Successfully deletes the time entry if it exists and returns confirmation.
+- **Verification Method:** Use `get_task_time_entries` to confirm the entry no longer exists.
+
+#### Tool Name: `get_current_time_entry`
+- **Objective:** Retrieve the currently running time tracker, if any.
+- **Prompts:**
+  1. "Show current time tracking status"
+  2. "What task am I currently tracking time on?"
+  3. "Get active timer details"
+  4. "Check if any time tracker is running"
+  5. "Show current time entry when no timer is active"
+- **Expected Behavior:** Returns the active time entry if running, or null if no timer is active.
+- **Verification Method:** Verify the response structure matches expected time entry format or null.
+
+### Member Management
+
+#### Tool Name: `get_workspace_members`
+- **Objective:** Retrieve all members in the ClickUp workspace.
+- **Prompts:**
+  1. "Show all team members in the workspace"
+  2. "Get list of all users in ClickUp"
+  3. "Who are the members of this workspace?"
+  4. "List all available assignees"
+  5. "Show workspace member details"
+- **Expected Behavior:** Returns an array of all workspace members with their details.
+- **Verification Method:** Verify the returned data includes user IDs, names, and email addresses.
+
+#### Tool Name: `find_member_by_name`
+- **Objective:** Find a specific member by name or email.
+- **Prompts:**
+  1. "Find member 'John Smith'"
+  2. "Look up user by email 'john@company.com'"
+  3. "Search for team member 'Jane'"
+  4. "Find user with partial name 'Rob'"
+  5. "Search for a non-existent member"
+- **Expected Behavior:** Returns the member object if found, or null if not found.
+- **Verification Method:** Verify the returned member data matches the search criteria.
+
+#### Tool Name: `resolve_assignees`
+- **Objective:** Convert an array of names/emails to ClickUp user IDs.
+- **Prompts:**
+  1. "Resolve assignees ['John Smith', 'jane@company.com']"
+  2. "Convert names to user IDs: ['Alice', 'Bob', 'Charlie']"
+  3. "Get user IDs for ['john@company.com', 'Jane Doe']"
+  4. "Resolve assignees including some invalid names"
+  5. "Convert empty assignee list"
+- **Expected Behavior:** Returns an array of user IDs for valid names/emails, with errors for invalid ones.
+- **Verification Method:** Verify the returned IDs correspond to the correct users.
+
+### Document Management
+
+#### Tool Name: `create_document`
+- **Objective:** Create a new document in a ClickUp space, folder, or list.
+- **Prompts:**
+  1. "Create a document called 'Project Requirements' in space 123456789"
+  2. "Add a public document 'Meeting Notes' to the Development folder"
+  3. "Create private document 'API Documentation' in list 987654321"
+  4. "Set up document 'User Guide' in Marketing space with initial page"
+  5. "Create document in non-existent container"
+- **Expected Behavior:** Successfully creates the document and returns document data including ID.
+- **Verification Method:** Use `get_document` to verify the document was created with correct properties.
+
+#### Tool Name: `get_document`
+- **Objective:** Retrieve details about a specific document.
+- **Prompts:**
+  1. "Show details for document 123456789"
+  2. "Get information about 'Project Requirements' document"
+  3. "Retrieve document properties and pages"
+  4. "Show document content and metadata"
+  5. "Get details for non-existent document"
+- **Expected Behavior:** Returns comprehensive document data including pages and metadata.
+- **Verification Method:** Verify all expected document fields are present in the response.
+
+#### Tool Name: `list_documents`
+- **Objective:** List all documents in a container (space, folder, or list).
+- **Prompts:**
+  1. "List all documents in space 123456789"
+  2. "Show documents in the Development folder"
+  3. "Get all documents including archived ones"
+  4. "List documents created by user 987654321"
+  5. "Show documents in non-existent container"
+- **Expected Behavior:** Returns an array of documents matching the specified criteria.
+- **Verification Method:** Verify the returned documents belong to the specified container.
+
+#### Tool Name: `update_document`
+- **Objective:** Modify properties of an existing document.
+- **Prompts:**
+  1. "Rename document 123456789 to 'Updated Requirements'"
+  2. "Change document visibility to private"
+  3. "Update document description and settings"
+  4. "Modify document 'Meeting Notes' properties"
+  5. "Update non-existent document"
+- **Expected Behavior:** Updates the specified document fields and returns updated document data.
+- **Verification Method:** Use `get_document` to verify the changes were applied correctly.
+
+#### Tool Name: `create_document_page`
+- **Objective:** Add a new page to an existing document.
+- **Prompts:**
+  1. "Add page 'Introduction' to document 123456789"
+  2. "Create page with content 'This is the overview' in document 987654321"
+  3. "Add sub-page 'Technical Details' under page 456789123"
+  4. "Create page with title and subtitle in document"
+  5. "Add page to non-existent document"
+- **Expected Behavior:** Successfully creates the page and returns page data.
+- **Verification Method:** Use `get_document` to verify the page was added to the document.
+
 ## 📊 Test Execution
 
 For each test case:
@@ -389,4 +549,22 @@ For each test case:
 This test plan should be updated when:
 - New tools are added to the ClickUp MCP Server
 - Existing tools are modified or have parameter changes
-- New edge cases or usage patterns are identified 
+- New edge cases or usage patterns are identified
+- TaskService architecture changes that might affect tool behavior
+
+## 🏗️ Architecture Notes
+
+**TaskService Composition Architecture:**
+- All task-related tools now use the TaskService composition pattern
+- TaskService composes TaskServiceCore, TaskServiceSearch, TaskServiceComments, TaskServiceAttachments, TaskServiceTags, and TaskServiceCustomFields
+- This architecture eliminates artificial dependencies and improves maintainability
+- All 33+ public methods remain accessible through the main TaskService interface
+- Tools access TaskService through `clickUpServices.task` from shared services
+
+**Testing Focus Areas:**
+- Task CRUD operations (create, read, update, delete)
+- Search functionality across workspace and lists
+- Comments and attachments management
+- Tag operations and custom fields
+- Bulk operations and time tracking
+- Error handling and edge cases

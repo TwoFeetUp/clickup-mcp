@@ -3,19 +3,26 @@
  * SPDX-License-Identifier: MIT
  *
  * ClickUp Task Service - Comments Module
- * 
+ *
  * Handles comment operations for ClickUp tasks, including:
  * - Retrieving comments for a task
  * - Creating comments on a task
+ *
+ * REFACTORED: Now uses composition instead of inheritance.
+ * Only depends on TaskServiceCore for base functionality.
  */
 
-import { TaskServiceAttachments } from './task-attachments.js';
+import { TaskServiceCore } from './task-core.js';
 import { ClickUpComment } from '../types.js';
 
 /**
  * Comments functionality for the TaskService
+ *
+ * This service handles all comment-related operations for ClickUp tasks.
+ * It uses composition to access core functionality instead of inheritance.
  */
-export class TaskServiceComments extends TaskServiceAttachments {
+export class TaskServiceComments {
+  constructor(private core: TaskServiceCore) {}
   /**
    * Get all comments for a task
    * 
@@ -25,8 +32,8 @@ export class TaskServiceComments extends TaskServiceAttachments {
    * @returns Array of task comments
    */
   async getTaskComments(taskId: string, start?: number, startId?: string): Promise<ClickUpComment[]> {
-    this.logOperation('getTaskComments', { taskId, start, startId });
-    
+    (this.core as any).logOperation('getTaskComments', { taskId, start, startId });
+
     try {
       // Build query parameters for pagination
       const queryParams = new URLSearchParams();
@@ -36,15 +43,17 @@ export class TaskServiceComments extends TaskServiceAttachments {
       if (startId) {
         queryParams.append('start_id', startId);
       }
-      
+
       const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
-      const response = await this.client.get<{ comments: ClickUpComment[] }>(
-        `/task/${taskId}/comment${queryString}`
-      );
-      
-      return response.data.comments || [];
+
+      return await (this.core as any).makeRequest(async () => {
+        const response = await (this.core as any).client.get(
+          `/task/${taskId}/comment${queryString}`
+        );
+        return response.data.comments || [];
+      });
     } catch (error) {
-      throw this.handleError(error, 'Failed to get task comments');
+      throw (this.core as any).handleError(error, 'Failed to get task comments');
     }
   }
 
@@ -58,13 +67,13 @@ export class TaskServiceComments extends TaskServiceAttachments {
    * @returns The created comment
    */
   async createTaskComment(
-    taskId: string, 
-    commentText: string, 
+    taskId: string,
+    commentText: string,
     notifyAll: boolean = false,
     assignee?: number | null
   ): Promise<ClickUpComment> {
-    this.logOperation('createTaskComment', { taskId, commentText, notifyAll, assignee });
-    
+    (this.core as any).logOperation('createTaskComment', { taskId, commentText, notifyAll, assignee });
+
     try {
       const payload: {
         comment_text: string;
@@ -74,13 +83,13 @@ export class TaskServiceComments extends TaskServiceAttachments {
         comment_text: commentText,
         notify_all: notifyAll
       };
-      
+
       if (assignee) {
         payload.assignee = assignee;
       }
-      
+
       // Make the request directly without using makeRequest for better error handling
-      const response = await this.client.post(
+      const response = await (this.core as any).client.post(
         `/task/${taskId}/comment`,
         payload
       );
@@ -121,7 +130,7 @@ export class TaskServiceComments extends TaskServiceAttachments {
         } as ClickUpComment;
       }
       
-      throw this.handleError(error, 'Failed to create task comment');
+      throw (this.core as any).handleError(error, 'Failed to create task comment');
     }
   }
 }

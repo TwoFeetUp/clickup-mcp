@@ -9,12 +9,12 @@
  */
 
 // Export base service components
-export { 
-  BaseClickUpService, 
-  ClickUpServiceError, 
-  ErrorCode,
-  ServiceResponse 
+export {
+  BaseClickUpService,
+  ClickUpServiceError,
+  ErrorCode
 } from './base.js';
+export type { ServiceResponse } from './base.js';
 
 // Export type definitions
 export * from './types.js';
