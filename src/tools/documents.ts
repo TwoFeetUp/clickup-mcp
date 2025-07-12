@@ -23,7 +23,14 @@ const { document: documentService } = clickUpServices;
  */
 export const createDocumentTool = {
   name: "create_document",
-  description: `Creates a document in a ClickUp space, folder, or list. Requires name, parent info, visibility and create_page flag.`,
+  description: `Creates a document in a ClickUp space, folder, or list. Requires name, parent info, visibility and create_page flag.
+
+Example usage:
+- For list: parent: {"id": "901407953112", "type": 6}
+- For space: parent: {"id": "90141392755", "type": 4}
+- For folder: parent: {"id": "90144231850", "type": 5}
+
+Note: Document creation permissions may vary by ClickUp plan and parent container type.`,
   inputSchema: {
     type: "object",
     properties: {
@@ -36,16 +43,16 @@ export const createDocumentTool = {
         properties: {
           id: {
             type: "string",
-            description: "ID of the parent container (space, folder, or list)"
+            description: "ID of the parent container (space, folder, or list). Use actual ID from workspace hierarchy."
           },
           type: {
             type: "number",
             enum: [4, 5, 6, 7, 12],
-            description: "Type of the parent container (4=space, 5=folder, 6=list, 7=everything, 12=workspace)"
+            description: "Type of the parent container: 4=space, 5=folder, 6=list, 7=everything, 12=workspace. Most commonly use 6 for lists."
           }
         },
         required: ["id", "type"],
-        description: "Parent container information"
+        description: "Parent container object with id and type properties. Example: {\"id\": \"901407953112\", \"type\": 6}"
       },
       visibility: {
         type: "string",
