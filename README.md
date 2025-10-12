@@ -1,12 +1,12 @@
 <img src="assets/images/clickup_mcp_server_social_image.png" alt="ClickUp MCP Server" width="100%">
 
-![Total Supporters](https://img.shields.io/badge/🏆%20Total%20Supporters-4-gold)
+![Total Supporters](https://img.shields.io/badge/🏆%20Total%20Supporters-7-gold)
 [![GitHub Stars](https://img.shields.io/github/stars/TaazKareem/clickup-mcp-server?style=flat&logo=github)](https://github.com/TaazKareem/clickup-mcp-server/stargazers)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-no-grey.svg)](https://github.com/TaazKareem/clickup-mcp-server/graphs/commit-activity)
 
 A Model Context Protocol (MCP) server for integrating ClickUp tasks with AI applications. This server allows AI agents to interact with ClickUp tasks, spaces, lists, and folders through a standardized protocol.
 
-> 🚧 **Status Update:** Working with the ClickUp team... ✨
+> 🚧 **Status Update:** I will be maintaining this repo again. I am also abailable for hire or freelance work. Contact me!
 
 ## Requirements
 
