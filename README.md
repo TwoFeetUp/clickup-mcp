@@ -6,7 +6,7 @@
 
 A Model Context Protocol (MCP) server for integrating ClickUp tasks with AI applications. This server allows AI agents to interact with ClickUp tasks, spaces, lists, and folders through a standardized protocol.
 
-> 🚧 **Status Update:** I will be maintaining this repo again. I am also abailable for hire or freelance work. Contact me!
+> 🚧 **Status Update:** The Official ClickUp MCP Server, forked from this repo is released.  https://help.clickup.com/hc/en-us/articles/33335772678423-What-is-ClickUp-MCP 
 
 ## Requirements
 
