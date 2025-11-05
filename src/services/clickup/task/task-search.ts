@@ -181,9 +181,9 @@ export class TaskServiceSearch {
         
         // First check with a sample task - if one task exceeds the limit, we definitely need summary
         const sampleTask = tasks[0];
-        
+
         // Check if all tasks would exceed the token limit
-        const estimatedTokensPerTask = (this.core as any).estimateTaskTokens(sampleTask);
+        const estimatedTokensPerTask = estimateTokensFromObject(sampleTask);
         const estimatedTotalTokens = estimatedTokensPerTask * tasks.length;
         
         // Add 10% overhead for the response wrapper
@@ -204,14 +204,30 @@ export class TaskServiceSearch {
 
       (this.core as any).logOperation('getWorkspaceTasks', {
         totalTasks: tasks.length,
-        estimatedTokens: tasks.reduce((count, task) => count + (this.core as any).estimateTaskTokens(task), 0),
+        estimatedTokens: tasks.reduce((count, task) => count + estimateTokensFromObject(task), 0),
         usingDetailedFormat: !shouldUseSummary,
         requestedFormat: filters.detail_level || 'auto'
       });
 
       if (shouldUseSummary) {
         return {
-          summaries: tasks.map(task => (this.core as any).formatTaskSummary(task)),
+          summaries: tasks.map(task => ({
+            id: task.id,
+            name: task.name,
+            status: task.status.status,
+            list: {
+              id: task.list.id,
+              name: task.list.name
+            },
+            due_date: task.due_date,
+            url: task.url,
+            priority: task.priority?.priority || null,
+            tags: task.tags.map(tag => ({
+              name: tag.name,
+              tag_bg: tag.tag_bg,
+              tag_fg: tag.tag_fg
+            }))
+          })),
           total_count: totalCount,
           has_more: hasMore,
           next_page: nextPage
@@ -225,7 +241,12 @@ export class TaskServiceSearch {
         next_page: nextPage
       };
     } catch (error) {
-      (this.core as any).logOperation('getWorkspaceTasks', { error: error.message, status: error.response?.status });
+      (this.core as any).logOperation('getWorkspaceTasks', {
+        error: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      });
       throw (this.core as any).handleError(error, 'Failed to get workspace tasks');
     }
   }

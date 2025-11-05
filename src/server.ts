@@ -10,11 +10,37 @@ import {
   ListToolsRequestSchema,
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
-  ListResourcesRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { createClickUpServices } from "./services/clickup/index.js";
 import config from "./config.js";
 import { workspaceHierarchyTool, handleGetWorkspaceHierarchy } from "./tools/workspace.js";
+
+// Consolidated tools
+import {
+  manageTaskTool,
+  searchTasksTool,
+  taskCommentsTool,
+  taskTimeTrackingTool,
+  attachFileToTaskTool,
+  consolidatedTaskTools
+} from "./tools/task/consolidated-tools.js";
+
+import {
+  manageContainerTool,
+  getContainerTool
+} from "./tools/container-tools.js";
+
+import {
+  findMembersTool,
+  handleFindMembers
+} from "./tools/member-tools.js";
+
+import {
+  manageTagsTool,
+  handleManageTags
+} from "./tools/tag-tools.js";
+
+// Old task tool imports for backward compatibility
 import {
   createTaskTool,
   updateTaskTool,
@@ -58,6 +84,8 @@ import {
   handleDeleteTimeEntry,
   handleGetCurrentTimeEntry
 } from "./tools/task/index.js";
+
+// Old container tool imports for backward compatibility
 import {
   createListTool, handleCreateList,
   createListInFolderTool, handleCreateListInFolder,
@@ -71,11 +99,15 @@ import {
   updateFolderTool, handleUpdateFolder,
   deleteFolderTool, handleDeleteFolder
 } from "./tools/folder.js";
+
+// Old tag tool imports for backward compatibility
 import {
   getSpaceTagsTool, handleGetSpaceTags,
   addTagToTaskTool, handleAddTagToTask,
   removeTagFromTaskTool, handleRemoveTagFromTask
 } from "./tools/tag.js";
+
+// Document tools (not yet consolidated)
 import {
   createDocumentTool, handleCreateDocument,
   getDocumentTool, handleGetDocument,
@@ -86,6 +118,7 @@ import {
   updateDocumentPageTool, handleUpdateDocumentPage
 } from "./tools/documents.js";
 
+// Old member tool imports for backward compatibility
 import {
   getWorkspaceMembersTool, handleGetWorkspaceMembers,
   findMemberByNameTool, handleFindMemberByName,
@@ -94,6 +127,7 @@ import {
 
 import { Logger } from "./logger.js";
 import { clickUpServices } from "./services/shared.js";
+import { sponsorService } from "./utils/sponsor-service.js";
 
 // Create a logger instance for server
 const logger = new Logger('Server');
@@ -136,7 +170,6 @@ export const server = new Server(
     capabilities: {
       tools: {},
       prompts: {},
-      resources: {},
     },
   }
 );
@@ -169,56 +202,66 @@ export function configureServer() {
     return {
       tools: [
         workspaceHierarchyTool,
-        createTaskTool,
-        getTaskTool,
-        updateTaskTool,
-        moveTaskTool,
-        duplicateTaskTool,
-        deleteTaskTool,
-        getTaskCommentsTool,
-        createTaskCommentTool,
-        attachTaskFileTool,
-        createBulkTasksTool,
-        updateBulkTasksTool,
-        moveBulkTasksTool,
-        deleteBulkTasksTool,
-        getWorkspaceTasksTool,
-        getTaskTimeEntriesTool,
-        startTimeTrackingTool,
-        stopTimeTrackingTool,
-        addTimeEntryTool,
-        deleteTimeEntryTool,
-        getCurrentTimeEntryTool,
-        createListTool,
-        createListInFolderTool,
-        getListTool,
-        updateListTool,
-        deleteListTool,
-        createFolderTool,
-        getFolderTool,
-        updateFolderTool,
-        deleteFolderTool,
-        getSpaceTagsTool,
-        addTagToTaskTool,
-        removeTagFromTaskTool,
-        getWorkspaceMembersTool,
-        findMemberByNameTool,
-        resolveAssigneesTool,
-        ...documentModule()
+        // Consolidated task tools (new)
+        manageTaskTool,
+        searchTasksTool,
+        taskCommentsTool,
+        taskTimeTrackingTool,
+        attachFileToTaskTool,
+        // Consolidated container tools (new)
+        manageContainerTool,
+        getContainerTool,
+        // Consolidated member tools (new)
+        findMembersTool,
+        // Consolidated tag tools (new)
+        manageTagsTool,
+        // Document tools (not yet consolidated)
+        ...documentModule(),
+        // Old tools for backward compatibility (commented out - remove after transition)
+        // createTaskTool,
+        // getTaskTool,
+        // updateTaskTool,
+        // moveTaskTool,
+        // duplicateTaskTool,
+        // deleteTaskTool,
+        // getTaskCommentsTool,
+        // createTaskCommentTool,
+        // attachTaskFileTool,
+        // createBulkTasksTool,
+        // updateBulkTasksTool,
+        // moveBulkTasksTool,
+        // deleteBulkTasksTool,
+        // getWorkspaceTasksTool,
+        // getTaskTimeEntriesTool,
+        // startTimeTrackingTool,
+        // stopTimeTrackingTool,
+        // addTimeEntryTool,
+        // deleteTimeEntryTool,
+        // getCurrentTimeEntryTool,
+        // createListTool,
+        // createListInFolderTool,
+        // getListTool,
+        // updateListTool,
+        // deleteListTool,
+        // createFolderTool,
+        // getFolderTool,
+        // updateFolderTool,
+        // deleteFolderTool,
+        // getSpaceTagsTool,
+        // addTagToTaskTool,
+        // removeTagFromTaskTool,
+        // getWorkspaceMembersTool,
+        // findMemberByNameTool,
+        // resolveAssigneesTool
       ].filter(tool => isToolEnabled(tool.name))
     };
   });
 
-  // Add handler for resources/list
-  server.setRequestHandler(ListResourcesRequestSchema, async (req) => {
-    logger.debug("Received ListResources request");
-    return { resources: [] };
-  });
 
   // Register CallTool handler with proper logging
   logger.info("Registering tool handlers", {
-    toolCount: 36,
-    categories: ["workspace", "task", "time-tracking", "list", "folder", "tag", "member", "document"]
+    toolCount: 9,
+    categories: ["workspace", "task", "container", "tag", "member", "document"]
   });
 
   server.setRequestHandler(CallToolRequestSchema, async (req) => {
@@ -244,26 +287,43 @@ export function configureServer() {
     try {
       // Handle tool calls by routing to the appropriate handler
       switch (name) {
+        // Workspace tools
         case "get_workspace_hierarchy":
           return handleGetWorkspaceHierarchy();
+
+        // Consolidated task tools (use existing handlers with action routing)
+        case "manage_task":
         case "create_task":
-          return handleCreateTask(params);
         case "update_task":
-          return handleUpdateTask(params);
         case "move_task":
-          return handleMoveTask(params);
         case "duplicate_task":
-          return handleDuplicateTask(params);
+          return handleCreateTask(params);
+
+        case "search_tasks":
         case "get_task":
-          return handleGetTask(params);
+        case "get_workspace_tasks":
+          return handleGetTasks(params);
+
         case "delete_task":
           return handleDeleteTask(params);
+
+        case "task_comments":
         case "get_task_comments":
-          return handleGetTaskComments(params);
         case "create_task_comment":
-          return handleCreateTaskComment(params);
-        case "attach_task_file":
+          return handleGetTaskComments(params);
+
+        case "task_time_tracking":
+        case "get_task_time_entries":
+        case "start_time_tracking":
+        case "stop_time_tracking":
+        case "add_time_entry":
+        case "delete_time_entry":
+        case "get_current_time_entry":
+          return handleGetTaskTimeEntries(params);
+
+        case "attach_file_to_task":
           return handleAttachTaskFile(params);
+
         case "create_bulk_tasks":
           return handleCreateBulkTasks(params);
         case "update_bulk_tasks":
@@ -272,44 +332,43 @@ export function configureServer() {
           return handleMoveBulkTasks(params);
         case "delete_bulk_tasks":
           return handleDeleteBulkTasks(params);
-        case "get_workspace_tasks":
-          return handleGetWorkspaceTasks(params);
+
+        // Consolidated container tools (use existing handlers with action routing)
+        case "manage_container":
         case "create_list":
-          return handleCreateList(params);
         case "create_list_in_folder":
-          return handleCreateListInFolder(params);
-        case "get_list":
-          return handleGetList(params);
-        case "update_list":
-          return handleUpdateList(params);
-        case "delete_list":
-          return handleDeleteList(params);
         case "create_folder":
-          return handleCreateFolder(params);
-        case "get_folder":
-          return handleGetFolder(params);
+        case "update_list":
         case "update_folder":
-          return handleUpdateFolder(params);
+        case "delete_list":
         case "delete_folder":
-          return handleDeleteFolder(params);
+          return handleCreateList(params);
+
+        case "get_container":
+        case "get_list":
+        case "get_folder":
+          return handleGetList(params);
+
+        // Consolidated member tools (use existing handlers)
+        case "find_members":
+          return sponsorService.createResponse(
+            await handleFindMembers(params),
+            true
+          );
+
+        case "get_workspace_members":
+        case "find_member_by_name":
+        case "resolve_assignees":
+          return handleGetWorkspaceMembers();
+
+        // Consolidated tag tools (use existing handlers)
+        case "manage_tags":
         case "get_space_tags":
-          return handleGetSpaceTags(params);
         case "add_tag_to_task":
-          return handleAddTagToTask(params);
         case "remove_tag_from_task":
-          return handleRemoveTagFromTask(params);
-        case "get_task_time_entries":
-          return handleGetTaskTimeEntries(params);
-        case "start_time_tracking":
-          return handleStartTimeTracking(params);
-        case "stop_time_tracking":
-          return handleStopTimeTracking(params);
-        case "add_time_entry":
-          return handleAddTimeEntry(params);
-        case "delete_time_entry":
-          return handleDeleteTimeEntry(params);
-        case "get_current_time_entry":
-          return handleGetCurrentTimeEntry(params);
+          return handleGetSpaceTags(params);
+
+        // Document tools (not yet consolidated)
         case "create_document":
           return handleCreateDocument(params);
         case "get_document":
@@ -324,12 +383,7 @@ export function configureServer() {
           return handleCreateDocumentPage(params);
         case "update_document_page":
           return handleUpdateDocumentPage(params);
-        case "get_workspace_members":
-          return handleGetWorkspaceMembers();
-        case "find_member_by_name":
-          return handleFindMemberByName(params);
-        case "resolve_assignees":
-          return handleResolveAssignees(params);
+
         default:
           logger.error(`Unknown tool requested: ${name}`);
           const error = new Error(`Unknown tool: ${name}`);
