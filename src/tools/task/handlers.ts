@@ -1010,8 +1010,19 @@ export async function getWorkspaceTasksHandler(
 
     // Return the response without adding the redundant _note field
     return response;
-  } catch (error) {
-    throw new Error(`Failed to get workspace tasks: ${error.message}`);
+  } catch (error: any) {
+    // Log the full error for debugging
+    logger.error('getWorkspaceTasksHandler error', {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      params
+    });
+
+    // Provide more detailed error message
+    const errorDetails = error.response?.data?.err || error.response?.data?.error || error.message;
+    throw new Error(`Failed to get workspace tasks: ${errorDetails}`);
   }
 }
 
