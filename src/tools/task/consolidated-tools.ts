@@ -137,7 +137,7 @@ export const manageTaskTool = {
  */
 export const searchTasksTool = {
   name: "search_tasks",
-  description: "Search and retrieve tasks with rich filtering. Use taskId for single task, or list_ids/folder_ids/space_ids for workspace search. Supports filtering by tags, assignees, status, dates, and custom fields. Returns paginated results with configurable detail level and field selection.",
+  description: "Search and retrieve tasks with rich filtering. Works 3 ways: (1) Single task by taskId/taskName/customTaskId, (2) List search by listId/listName, (3) Workspace-wide search by providing ANY filter (assignees, tags, statuses, dates, etc.) - automatically searches across all accessible lists. Returns paginated results with configurable detail level and field selection.",
   inputSchema: {
     type: "object",
     properties: {
@@ -163,7 +163,7 @@ export const searchTasksTool = {
         type: "string",
         description: "Get all tasks in a specific list by ID"
       },
-      // Workspace-wide search filters (requires at least one)
+      // Workspace-wide search filters (provide ANY filter to search across all lists)
       list_ids: {
         type: "array",
         items: { type: "string" },
@@ -189,15 +189,10 @@ export const searchTasksTool = {
         items: { type: "string" },
         description: "Filter by task status (e.g., 'Open', 'In Progress')"
       },
-      assignees: {
+      assignee_ids: {
         type: "array",
-        items: {
-          oneOf: [
-            { type: "number", description: "User ID" },
-            { type: "string", description: "Email or username" }
-          ]
-        },
-        description: "Filter by assignees"
+        items: { type: "number" },
+        description: "Filter by assignee user IDs (numeric IDs only, not emails/usernames)"
       },
       // Date filtering
       date_created_gt: {

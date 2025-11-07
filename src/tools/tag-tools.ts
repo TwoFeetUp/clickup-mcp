@@ -190,7 +190,7 @@ export async function handleManageTags(params: any) {
       return sponsorService.createErrorResponse(error, params);
     }
 
-    return sponsorService.createResponse(result, true);
+    return sponsorService.createResponse(result);
   } catch (error: any) {
     logger.error('Error in handleManageTags', { error: error.message });
     return sponsorService.createErrorResponse(error, params);

@@ -263,7 +263,7 @@ async function handleListContainer(
             content,
             status
           });
-          return sponsorService.createResponse(result, true);
+          return sponsorService.createResponse(result);
         } else {
           // Create in space
           const result = await handleCreateList({
@@ -276,7 +276,7 @@ async function handleListContainer(
             assignee,
             status
           });
-          return sponsorService.createResponse(result, true);
+          return sponsorService.createResponse(result);
         }
       }
 
@@ -291,7 +291,7 @@ async function handleListContainer(
         if (status) updateParams.status = status;
 
         const result = await handleUpdateList(updateParams);
-        return sponsorService.createResponse(result, true);
+        return sponsorService.createResponse(result);
       }
 
       case 'delete': {
@@ -299,7 +299,7 @@ async function handleListContainer(
         const listId = await resolveContainerId('list', id, name, spaceId, spaceName, folderId, folderName);
 
         const result = await handleDeleteList({ listId });
-        return sponsorService.createResponse(result, true);
+        return sponsorService.createResponse(result);
       }
 
       default:
@@ -335,7 +335,7 @@ async function handleFolderContainer(
           spaceName,
           override_statuses
         });
-        return sponsorService.createResponse(result, true);
+        return sponsorService.createResponse(result);
       }
 
       case 'update': {
@@ -348,7 +348,7 @@ async function handleFolderContainer(
         if (override_statuses !== undefined) updateParams.override_statuses = override_statuses;
 
         const result = await handleUpdateFolder(updateParams);
-        return sponsorService.createResponse(result, true);
+        return sponsorService.createResponse(result);
       }
 
       case 'delete': {
@@ -356,7 +356,7 @@ async function handleFolderContainer(
         const folderId = await resolveContainerId('folder', id, name, spaceId, spaceName);
 
         const result = await handleDeleteFolder({ folderId });
-        return sponsorService.createResponse(result, true);
+        return sponsorService.createResponse(result);
       }
 
       default:
@@ -401,8 +401,7 @@ export async function handleGetContainer(parameters: any) {
       if (cached) {
         logger.debug('Cache hit for container', { type, id });
         return sponsorService.createResponse(
-          formatContainerResponse(cached, detail_level as DetailLevel, fields).data,
-          true
+          formatContainerResponse(cached, detail_level as DetailLevel, fields).data
         );
       }
     }

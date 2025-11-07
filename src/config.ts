@@ -71,7 +71,6 @@ const parseLogLevel = (levelStr: string | undefined): LogLevel => {
 interface Config {
   clickupApiKey: string;
   clickupTeamId: string;
-  enableSponsorMessage: boolean;
   documentSupport: string;
   logLevel: LogLevel;
   disabledTools: string[];
@@ -120,7 +119,6 @@ const parseOrigins = (value: string | undefined, defaultValue: string[]): string
 const configuration: Config = {
   clickupApiKey: envArgs.clickupApiKey || process.env.CLICKUP_API_KEY || '',
   clickupTeamId: envArgs.clickupTeamId || process.env.CLICKUP_TEAM_ID || '',
-  enableSponsorMessage: process.env.ENABLE_SPONSOR_MESSAGE !== 'false',
   documentSupport: envArgs.documentSupport || process.env.DOCUMENT_SUPPORT || process.env.DOCUMENT_MODULE || process.env.DOCUMENT_MODEL || 'false',
   logLevel: parseLogLevel(envArgs.logLevel || process.env.LOG_LEVEL),
   disabledTools: (

@@ -311,7 +311,7 @@ export async function handleCreateDocument(parameters: any) {
       parent: newDocument.parent,
       url: `https://app.clickup.com/${config.clickupTeamId}/v/d/${newDocument.id}`,
       message: `Document "${name}" created successfully`
-    }, true);
+    });
   } catch (error: any) {
     return sponsorService.createErrorResponse(`Failed to create document: ${error.message}`);
   }
@@ -351,7 +351,7 @@ export async function handleGetDocument(parameters: any) {
       public: document.public,
       type: document.type,
       url: `https://app.clickup.com/${config.clickupTeamId}/v/d/${document.id}`
-    }, true);
+    });
   } catch (error: any) {
     return sponsorService.createErrorResponse(`Failed to retrieve document: ${error.message}`);
   }
@@ -393,7 +393,7 @@ export async function handleListDocuments(parameters: any) {
       return sponsorService.createResponse({
         documents: [],
         message: "No documents found"
-      }, true);
+      });
     }
 
     // Map the documents to a simpler format
@@ -414,7 +414,7 @@ export async function handleListDocuments(parameters: any) {
       count: documents.length,
       next_cursor: response.next_cursor,
       message: `Found ${documents.length} document(s)`
-    }, true);
+    });
   } catch (error: any) {
     return sponsorService.createErrorResponse(`Failed to list documents: ${error.message}`);
   }
@@ -522,7 +522,7 @@ export async function handleUpdateDocumentPage(parameters: any) {
 
     return sponsorService.createResponse({
       message: `Page updated successfully`
-    }, true);
+    });
   } catch (error: any) {
     return sponsorService.createErrorResponse(
       `Failed to update document page: ${error.message}`

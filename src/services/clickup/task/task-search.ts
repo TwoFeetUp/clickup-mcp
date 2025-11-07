@@ -168,43 +168,13 @@ export class TaskServiceSearch {
       const hasMore = totalCount === 100; // ClickUp returns max 100 tasks per page
       const nextPage = (filters.page || 0) + 1;
 
-      // If the estimated token count exceeds 50,000 or detail_level is 'summary',
-      // return summary format for efficiency and to avoid hitting token limits
-      const TOKEN_LIMIT = 50000;
-      
-      // Estimate tokens for the full response
-      let tokensExceedLimit = false;
-      
-      if (filters.detail_level !== 'summary' && tasks.length > 0) {
-        // We only need to check token count if detailed was requested
-        // For summary requests, we always return summary format
-        
-        // First check with a sample task - if one task exceeds the limit, we definitely need summary
-        const sampleTask = tasks[0];
-
-        // Check if all tasks would exceed the token limit
-        const estimatedTokensPerTask = estimateTokensFromObject(sampleTask);
-        const estimatedTotalTokens = estimatedTokensPerTask * tasks.length;
-        
-        // Add 10% overhead for the response wrapper
-        tokensExceedLimit = estimatedTotalTokens * 1.1 > TOKEN_LIMIT;
-        
-        // Double-check with more precise estimation if we're close to the limit
-        if (!tokensExceedLimit && estimatedTotalTokens * 1.1 > TOKEN_LIMIT * 0.8) {
-          // More precise check - build a representative sample and extrapolate
-          tokensExceedLimit = wouldExceedTokenLimit(
-            { tasks, total_count: totalCount, has_more: hasMore, next_page: nextPage },
-            TOKEN_LIMIT
-          );
-        }
-      }
-
-      // Determine if we should return summary or detailed based on request and token limit
-      const shouldUseSummary = filters.detail_level === 'summary' || tokensExceedLimit;
+      // Return summary format only if explicitly requested
+      // Note: With optimized response formatting (minimal/standard levels),
+      // we no longer need token estimation overhead - the formatter handles this
+      const shouldUseSummary = filters.detail_level === 'summary';
 
       (this.core as any).logOperation('getWorkspaceTasks', {
         totalTasks: tasks.length,
-        estimatedTokens: tasks.reduce((count, task) => count + estimateTokensFromObject(task), 0),
         usingDetailedFormat: !shouldUseSummary,
         requestedFormat: filters.detail_level || 'auto'
       });

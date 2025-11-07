@@ -255,7 +255,7 @@ export async function handleGetTaskTimeEntries(params: any) {
           status: entry.task.status?.status || "Unknown"
         } : null
       }))
-    }, true);
+    });
   } catch (error) {
     logger.error("Error getting task time entries", error);
     return sponsorService.createErrorResponse((error as Error).message || "An unknown error occurred");
@@ -327,7 +327,7 @@ export async function handleStartTimeTracking(params: any) {
         billable: timeEntry.billable,
         tags: timeEntry.tags
       }
-    }, true);
+    });
   } catch (error) {
     logger.error("Error starting time tracking", error);
     return sponsorService.createErrorResponse((error as Error).message || "An unknown error occurred");
@@ -383,7 +383,7 @@ export async function handleStopTimeTracking(params: any) {
         billable: timeEntry.billable,
         tags: timeEntry.tags
       }
-    }, true);
+    });
   } catch (error) {
     logger.error("Error stopping time tracking", error);
     return sponsorService.createErrorResponse((error as Error).message || "An unknown error occurred");
@@ -455,7 +455,7 @@ export async function handleAddTimeEntry(params: any) {
         billable: timeEntry.billable,
         tags: timeEntry.tags
       }
-    }, true);
+    });
   } catch (error) {
     logger.error("Error adding time entry", error);
     return sponsorService.createErrorResponse((error as Error).message || "An unknown error occurred");
@@ -486,7 +486,7 @@ export async function handleDeleteTimeEntry(params: any) {
     return sponsorService.createResponse({
       success: true,
       message: "Time entry deleted successfully."
-    }, true);
+    });
   } catch (error) {
     logger.error("Error deleting time entry", error);
     return sponsorService.createErrorResponse((error as Error).message || "An unknown error occurred");
@@ -515,7 +515,7 @@ export async function handleGetCurrentTimeEntry(params?: any) {
         success: true,
         timer_running: false,
         message: "No timer is currently running."
-      }, true);
+      });
     }
 
     // Format the response
@@ -537,7 +537,7 @@ export async function handleGetCurrentTimeEntry(params?: any) {
         billable: timeEntry.billable,
         tags: timeEntry.tags
       }
-    }, true);
+    });
   } catch (error) {
     logger.error("Error getting current time entry", error);
     return sponsorService.createErrorResponse((error as Error).message || "An unknown error occurred");

@@ -59,6 +59,7 @@ export interface FormattedResponse<T = any> {
     fieldsIncluded?: string[];
     pagination?: PaginationInfo;
     truncated?: boolean;
+    note?: string; // Additional context about the response
   };
 }
 
@@ -92,6 +93,106 @@ const FIELD_DEFINITIONS = {
     detailed: ['*']
   }
 };
+
+/**
+ * Remove null, undefined, empty arrays, and empty objects from data
+ * Only applies at minimal and standard detail levels to save tokens
+ */
+export function removeEmptyFields<T extends Record<string, any>>(
+  obj: T,
+  recursive: boolean = true
+): Partial<T> {
+  const cleaned: any = {};
+
+  for (const [key, value] of Object.entries(obj)) {
+    // Skip null and undefined
+    if (value === null || value === undefined) continue;
+
+    // Skip empty arrays
+    if (Array.isArray(value) && value.length === 0) continue;
+
+    // Skip empty objects (but not Date objects, etc.)
+    if (
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      value.constructor === Object &&
+      Object.keys(value).length === 0
+    ) continue;
+
+    // Recursively clean nested objects if requested
+    if (recursive && typeof value === 'object' && !Array.isArray(value) && value.constructor === Object) {
+      const cleanedNested = removeEmptyFields(value, true);
+      if (Object.keys(cleanedNested).length > 0) {
+        cleaned[key] = cleanedNested;
+      }
+    } else if (recursive && Array.isArray(value)) {
+      // Clean array elements
+      const cleanedArray = value
+        .map(item => typeof item === 'object' && item.constructor === Object ? removeEmptyFields(item, true) : item)
+        .filter(item => item !== null && item !== undefined);
+      if (cleanedArray.length > 0) {
+        cleaned[key] = cleanedArray;
+      }
+    } else {
+      cleaned[key] = value;
+    }
+  }
+
+  return cleaned;
+}
+
+/**
+ * Simplify nested objects to reduce token usage
+ * - status: object → string
+ * - assignees: full objects → usernames array
+ * - list/folder/space: full objects → name string
+ */
+export function simplifyNestedObjects(obj: any, detailLevel: DetailLevel): any {
+  if (!obj || typeof obj !== 'object') return obj;
+
+  const simplified: any = { ...obj };
+
+  // Only simplify at minimal/standard levels
+  if (detailLevel === 'minimal' || detailLevel === 'standard') {
+    // Simplify status: {status: "open", ...} → "open"
+    if (simplified.status && typeof simplified.status === 'object') {
+      simplified.status = simplified.status.status || simplified.status;
+    }
+
+    // Simplify assignees: [{id, username, email, ...}] → ["username"]
+    if (Array.isArray(simplified.assignees)) {
+      simplified.assignees = simplified.assignees.map((a: any) => {
+        if (typeof a === 'object' && a.username) {
+          return a.username;
+        }
+        return a;
+      });
+    }
+
+    // Simplify list/folder/space: {id, name, ...} → "name"
+    if (simplified.list && typeof simplified.list === 'object') {
+      simplified.list = simplified.list.name || simplified.list;
+    }
+    if (simplified.folder && typeof simplified.folder === 'object') {
+      simplified.folder = simplified.folder.name || simplified.folder;
+    }
+    if (simplified.space && typeof simplified.space === 'object') {
+      simplified.space = simplified.space.name || simplified.space;
+    }
+
+    // Simplify creator/watchers - keep only username
+    if (simplified.creator && typeof simplified.creator === 'object') {
+      simplified.creator = simplified.creator.username || simplified.creator;
+    }
+    if (Array.isArray(simplified.watchers)) {
+      simplified.watchers = simplified.watchers.map((w: any) =>
+        typeof w === 'object' && w.username ? w.username : w
+      );
+    }
+  }
+
+  return simplified;
+}
 
 /**
  * Get fields to include based on detail level and entity type
@@ -226,15 +327,42 @@ export function formatResponse<T>(
     const fieldsToInclude = fields ||
       (entityType ? getFieldsForDetailLevel(entityType, detailLevel) : null);
 
-    // Filter each item
-    if (fieldsToInclude) {
-      processedData = data.map(item => filterFields(item, fieldsToInclude)) as T;
-    }
+    // Process each item: filter fields, simplify objects, remove empty fields
+    processedData = data.map(item => {
+      let processed = item;
+
+      // Apply field filtering
+      if (fieldsToInclude) {
+        processed = filterFields(processed, fieldsToInclude);
+      }
+
+      // Simplify nested objects (at minimal/standard levels)
+      processed = simplifyNestedObjects(processed, detailLevel);
+
+      // Remove null/empty fields (at minimal/standard levels only)
+      if (detailLevel === 'minimal' || detailLevel === 'standard') {
+        processed = removeEmptyFields(processed);
+      }
+
+      return processed;
+    }) as T;
   } else if (data && typeof data === 'object' && !Array.isArray(data)) {
-    // Apply field filtering for single object
+    // Apply processing for single object
+    let processed: any = data;
+
     if (fields) {
-      processedData = filterFields(data as any, fields) as T;
+      processed = filterFields(processed, fields);
     }
+
+    // Simplify nested objects
+    processed = simplifyNestedObjects(processed, detailLevel);
+
+    // Remove null/empty fields (at minimal/standard levels only)
+    if (detailLevel === 'minimal' || detailLevel === 'standard') {
+      processed = removeEmptyFields(processed);
+    }
+
+    processedData = processed as T;
   }
 
   const response: FormattedResponse<T> = {

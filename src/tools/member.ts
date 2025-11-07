@@ -59,7 +59,7 @@ export const resolveAssigneesTool = {
 export async function handleGetWorkspaceMembers() {
     try {
         const members = await workspaceService.getWorkspaceMembers();
-        return sponsorService.createResponse({ members }, true);
+        return sponsorService.createResponse({ members });
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         return sponsorService.createErrorResponse(`Failed to get workspace members: ${errorMessage}`);
@@ -81,7 +81,7 @@ export async function handleFindMemberByName(parameters: any) {
             m.username?.toLowerCase() === nameOrEmail.toLowerCase() ||
             m.name?.toLowerCase() === nameOrEmail.toLowerCase()
         );
-        return sponsorService.createResponse({ member: found || null }, true);
+        return sponsorService.createResponse({ member: found || null });
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         return sponsorService.createErrorResponse(`Failed to find member: ${errorMessage}`);
@@ -106,7 +106,7 @@ export async function handleResolveAssignees(parameters: any) {
             );
             return found ? found.id : null;
         });
-        return sponsorService.createResponse({ userIds: resolved }, true);
+        return sponsorService.createResponse({ userIds: resolved });
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         return sponsorService.createErrorResponse(`Failed to resolve assignees: ${errorMessage}`);

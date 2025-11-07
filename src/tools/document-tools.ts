@@ -333,7 +333,7 @@ export async function handleManageDocument(params: any): Promise<any> {
         return sponsorService.createErrorResponse(new Error(`Invalid action: ${action}. Must be create or update.`));
     }
 
-    return sponsorService.createResponse(result, true);
+    return sponsorService.createResponse(result);
   } catch (error: any) {
     logger.error('Error in handleManageDocument', { error: error.message });
     return sponsorService.createErrorResponse(error, params);
@@ -375,7 +375,7 @@ export async function handleManageDocumentPage(params: any): Promise<any> {
         return sponsorService.createErrorResponse(new Error(`Invalid action: ${action}. Must be create, update, get, or list.`));
     }
 
-    return sponsorService.createResponse(result, true);
+    return sponsorService.createResponse(result);
   } catch (error: any) {
     logger.error('Error in handleManageDocumentPage', { error: error.message });
     return sponsorService.createErrorResponse(error, params);
@@ -420,7 +420,7 @@ export async function handleListDocuments(params: any): Promise<any> {
         documents: [],
         count: 0,
         message: 'No documents found'
-      }, true);
+      });
     }
 
     // Format documents based on detail level
@@ -431,7 +431,7 @@ export async function handleListDocuments(params: any): Promise<any> {
       count: documents.length,
       next_cursor: response.next_cursor,
       message: `Found ${documents.length} document(s)`
-    }, true);
+    });
   } catch (error: any) {
     logger.error('Error listing documents', { error: error.message });
     return sponsorService.createErrorResponse(error, params);
