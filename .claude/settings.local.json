@@ -15,7 +15,8 @@
       "mcp__Ref__ref_read_url",
       "Bash(npm install:*)",
       "Bash(node:*)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

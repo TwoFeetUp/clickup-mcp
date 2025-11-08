@@ -278,6 +278,10 @@ export const searchTasksTool = {
       include_subtasks: {
         type: "boolean",
         description: "For single task: include subtasks in response"
+      },
+      include_empty_custom_fields: {
+        type: "boolean",
+        description: "Include custom fields even if they have no value. Useful for discovering available fields to set. Default: false (only show fields with values)"
       }
     }
   }
