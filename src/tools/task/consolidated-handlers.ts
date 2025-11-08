@@ -162,7 +162,8 @@ export async function handleSearchTasks(params: any) {
     fields,
     offset = 0,
     limit = 50,
-    include_subtasks
+    include_subtasks,
+    include_empty_custom_fields = false
   } = params;
 
   logger.info('Handling search_tasks', { taskId, taskName, listId, listName });
@@ -181,7 +182,8 @@ export async function handleSearchTasks(params: any) {
       const formattedTask = formatResponse(task, {
         detailLevel: detail_level,
         fields,
-        includeMetadata: true
+        includeMetadata: true,
+        includeEmptyCustomFields: include_empty_custom_fields
       });
       return sponsorService.createResponse(formattedTask);
     }
@@ -213,7 +215,8 @@ export async function handleSearchTasks(params: any) {
       const response = formatResponse(items, {
         detailLevel: effectiveDetailLevel,
         fields,
-        includeMetadata: true
+        includeMetadata: true,
+        includeEmptyCustomFields: include_empty_custom_fields
       });
 
       if (response.metadata) {
@@ -268,7 +271,8 @@ export async function handleSearchTasks(params: any) {
       const response = formatResponse(items, {
         detailLevel: effectiveDetailLevel,
         fields,
-        includeMetadata: true
+        includeMetadata: true,
+        includeEmptyCustomFields: include_empty_custom_fields
       });
 
       if (response.metadata) {
@@ -308,7 +312,8 @@ export async function handleSearchTasks(params: any) {
     const response = formatResponse(items, {
       detailLevel: effectiveDetailLevel,
       fields,
-      includeMetadata: true
+      includeMetadata: true,
+      includeEmptyCustomFields: include_empty_custom_fields
     });
 
     if (response.metadata) {

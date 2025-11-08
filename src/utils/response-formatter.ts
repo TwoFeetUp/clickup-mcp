@@ -36,6 +36,9 @@ export interface FormatOptions {
 
   /** Include token usage metadata */
   includeMetadata?: boolean;
+
+  /** Include custom fields even if they have no value (default: false) */
+  includeEmptyCustomFields?: boolean;
 }
 
 /**
@@ -146,42 +149,57 @@ export function removeEmptyFields<T extends Record<string, any>>(
  * - status: object → string
  * - assignees: full objects → usernames array
  * - list/folder/space: full objects → name string
- * - custom_fields: removed entirely (huge token saver - 57% of response!)
+ * - custom_fields: smart filtering based on includeEmptyFields flag
  */
-export function simplifyNestedObjects(obj: any, detailLevel: DetailLevel): any {
+export function simplifyNestedObjects(
+  obj: any,
+  detailLevel: DetailLevel,
+  includeEmptyFields: boolean = false
+): any {
   if (!obj || typeof obj !== 'object') return obj;
 
   const simplified: any = { ...obj };
 
   // Smart custom_fields handling:
-  // - Keep only fields that have actual values
-  // - At minimal/standard: simplify to just {id, name, value}
-  // - At detailed: keep full structure
+  // - includeEmptyFields=false (default): only show fields with values
+  // - includeEmptyFields=true: show all fields, indicate which have values
   if (Array.isArray(simplified.custom_fields)) {
-    // Filter to only custom fields with actual values
-    const fieldsWithValues = simplified.custom_fields.filter((field: any) =>
-      field.value !== undefined && field.value !== null
-    );
-
-    if (fieldsWithValues.length === 0) {
-      // No values - remove entirely to save tokens
-      delete simplified.custom_fields;
-    } else if (detailLevel === 'minimal' || detailLevel === 'standard') {
-      // Simplify to just essential data: {id, name, value}
-      simplified.custom_fields = fieldsWithValues.map((field: any) => ({
-        id: field.id,
-        name: field.name,
-        value: field.value
-      }));
+    if (includeEmptyFields) {
+      // Show ALL fields (empty + populated)
+      simplified.custom_fields = simplified.custom_fields.map((field: any) => {
+        const hasValue = field.value !== undefined && field.value !== null && field.value !== '';
+        const base = {
+          id: field.id,
+          name: field.name,
+          type: field.type
+        };
+        return hasValue ? { ...base, value: field.value } : base;
+      });
     } else {
-      // Detailed level: simplify but keep type info, remove type_config bloat
-      simplified.custom_fields = fieldsWithValues.map((field: any) => ({
-        id: field.id,
-        name: field.name,
-        type: field.type,
-        value: field.value,
-        required: field.required
-      }));
+      // Default: only show fields with values (token-efficient)
+      const fieldsWithValues = simplified.custom_fields.filter((field: any) =>
+        field.value !== undefined && field.value !== null && field.value !== ''
+      );
+
+      if (fieldsWithValues.length === 0) {
+        // No values - remove entirely to save tokens
+        delete simplified.custom_fields;
+      } else if (detailLevel === 'minimal' || detailLevel === 'standard') {
+        // Simplify to just essential data: {id, name, value}
+        simplified.custom_fields = fieldsWithValues.map((field: any) => ({
+          id: field.id,
+          name: field.name,
+          value: field.value
+        }));
+      } else {
+        // Detailed level: simplify but keep type info, remove type_config bloat
+        simplified.custom_fields = fieldsWithValues.map((field: any) => ({
+          id: field.id,
+          name: field.name,
+          type: field.type,
+          value: field.value
+        }));
+      }
     }
   }
 
@@ -336,7 +354,8 @@ export function formatResponse<T>(
     detailLevel = 'standard',
     fields,
     maxTokens,
-    includeMetadata = false
+    includeMetadata = false,
+    includeEmptyCustomFields = false
   } = options;
 
   let processedData = data;
@@ -375,7 +394,7 @@ export function formatResponse<T>(
       }
 
       // Simplify nested objects (at minimal/standard levels)
-      processed = simplifyNestedObjects(processed, detailLevel);
+      processed = simplifyNestedObjects(processed, detailLevel, includeEmptyCustomFields);
 
       // Remove null/empty fields (at minimal/standard levels only)
       if (detailLevel === 'minimal' || detailLevel === 'standard') {
@@ -393,7 +412,7 @@ export function formatResponse<T>(
     }
 
     // Simplify nested objects
-    processed = simplifyNestedObjects(processed, detailLevel);
+    processed = simplifyNestedObjects(processed, detailLevel, includeEmptyCustomFields);
 
     // Remove null/empty fields (at minimal/standard levels only)
     if (detailLevel === 'minimal' || detailLevel === 'standard') {
