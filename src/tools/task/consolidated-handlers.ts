@@ -202,15 +202,25 @@ export async function handleSearchTasks(params: any) {
         limit
       );
 
+      // Auto-downgrade detail_level if too many results
+      let effectiveDetailLevel = detail_level;
+      if (detail_level === 'detailed' && items.length > 10) {
+        effectiveDetailLevel = 'standard';
+        logger.info(`Auto-downgraded detail_level from 'detailed' to 'standard' (${items.length} tasks found, limit is 10)`);
+      }
+
       // Format response with pagination
       const response = formatResponse(items, {
-        detailLevel: detail_level,
+        detailLevel: effectiveDetailLevel,
         fields,
         includeMetadata: true
       });
 
       if (response.metadata) {
         response.metadata.pagination = pagination;
+        if (effectiveDetailLevel !== detail_level) {
+          response.metadata.note = `Detail level auto-downgraded from 'detailed' to 'standard' due to ${items.length} tasks (limit: 10). Use standard or minimal for large result sets.`;
+        }
       }
 
       return sponsorService.createResponse(response);
@@ -247,15 +257,25 @@ export async function handleSearchTasks(params: any) {
       // Apply pagination
       const { items, pagination } = paginate(tasks, offset, limit);
 
+      // Auto-downgrade detail_level if too many results
+      let effectiveDetailLevel = detail_level;
+      if (detail_level === 'detailed' && items.length > 10) {
+        effectiveDetailLevel = 'standard';
+        logger.info(`Auto-downgraded detail_level from 'detailed' to 'standard' (${items.length} tasks found, limit is 10)`);
+      }
+
       // Format response
       const response = formatResponse(items, {
-        detailLevel: detail_level,
+        detailLevel: effectiveDetailLevel,
         fields,
         includeMetadata: true
       });
 
       if (response.metadata) {
         response.metadata.pagination = pagination;
+        if (effectiveDetailLevel !== detail_level) {
+          response.metadata.note = `Detail level auto-downgraded from 'detailed' to 'standard' due to ${items.length} tasks (limit: 10). Use standard or minimal for large result sets.`;
+        }
       }
 
       return sponsorService.createResponse(response);
@@ -277,16 +297,27 @@ export async function handleSearchTasks(params: any) {
     // Apply pagination
     const { items, pagination } = paginate(tasks, offset, limit);
 
+    // Auto-downgrade detail_level if too many results
+    let effectiveDetailLevel = detail_level;
+    if (detail_level === 'detailed' && items.length > 10) {
+      effectiveDetailLevel = 'standard';
+      logger.info(`Auto-downgraded detail_level from 'detailed' to 'standard' (${items.length} tasks found, limit is 10)`);
+    }
+
     // Format response
     const response = formatResponse(items, {
-      detailLevel: detail_level,
+      detailLevel: effectiveDetailLevel,
       fields,
       includeMetadata: true
     });
 
     if (response.metadata) {
       response.metadata.pagination = pagination;
-      response.metadata.note = 'Showing recent tasks from workspace. Add filters (assignees, tags, statuses, etc.) to narrow results.';
+      let note = 'Showing recent tasks from workspace. Add filters (assignees, tags, statuses, etc.) to narrow results.';
+      if (effectiveDetailLevel !== detail_level) {
+        note += ` Detail level auto-downgraded from 'detailed' to 'standard' due to ${items.length} tasks (limit: 10).`;
+      }
+      response.metadata.note = note;
     }
 
     return sponsorService.createResponse(response);
