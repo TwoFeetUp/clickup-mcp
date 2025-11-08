@@ -268,7 +268,7 @@ export const searchTasksTool = {
       detail_level: {
         type: "string",
         enum: ["minimal", "standard", "detailed"],
-        description: "Response detail: minimal (IDs/names), standard (default), detailed (all fields)"
+        description: "Response detail: minimal (IDs/names), standard (default), detailed (all fields). Note: 'detailed' automatically downgrades to 'standard' if >10 tasks found to prevent performance issues."
       },
       fields: {
         type: "array",
