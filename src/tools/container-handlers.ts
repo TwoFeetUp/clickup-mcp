@@ -88,10 +88,12 @@ async function resolveContainerId(
           targetSpaceId = spaceResult.id;
         }
 
-        const hierarchy = await workspaceService.getWorkspaceHierarchy();
-        const listInfo = workspaceService.findIDByNameInHierarchy(hierarchy, name, 'list');
-        if (listInfo) {
-          return listInfo.id;
+        // Optimization: Use direct API call when we have spaceId instead of fetching full hierarchy
+        const listsInSpace = await workspaceService.getListsInSpace(targetSpaceId);
+        const matchingList = listsInSpace.find((list: any) => list.name === name);
+        if (matchingList) {
+          logger.debug(`Found list "${name}" in space ${targetSpaceId} via direct API call`);
+          return matchingList.id;
         }
       }
 

@@ -25,8 +25,10 @@ const logger = new Logger('WorkspaceService');
  */
 export class WorkspaceService extends BaseClickUpService {
 
-  // Store the workspace hierarchy in memory
+  // Store the workspace hierarchy in memory with TTL
   private workspaceHierarchy: WorkspaceTree | null = null;
+  private workspaceHierarchyCachedAt: number = 0;
+  private readonly HIERARCHY_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
   /**
    * Creates an instance of WorkspaceService
@@ -133,10 +135,14 @@ export class WorkspaceService extends BaseClickUpService {
    */
   async getWorkspaceHierarchy(forceRefresh = false): Promise<WorkspaceTree> {
     try {
-      // If we have the hierarchy in memory and not forcing refresh, return it
+      // If we have the hierarchy in memory and not forcing refresh, check TTL
       if (this.workspaceHierarchy && !forceRefresh) {
-        logger.debug('Returning cached workspace hierarchy');
-        return this.workspaceHierarchy;
+        const cacheAge = Date.now() - this.workspaceHierarchyCachedAt;
+        if (cacheAge < this.HIERARCHY_CACHE_TTL) {
+          logger.debug(`Returning cached workspace hierarchy (age: ${Math.round(cacheAge / 1000)}s, TTL: ${this.HIERARCHY_CACHE_TTL / 1000}s)`);
+          return this.workspaceHierarchy;
+        }
+        logger.debug(`Cache expired (age: ${Math.round(cacheAge / 1000)}s), refreshing workspace hierarchy`);
       }
 
       const startTime = Date.now();
@@ -259,8 +265,10 @@ export class WorkspaceService extends BaseClickUpService {
         averageTimePerNode: totalTime / (spaces.length + totalFolders + totalLists)
       });
 
-      // Store the hierarchy for later use
+      // Store the hierarchy for later use with timestamp
       this.workspaceHierarchy = workspaceTree;
+      this.workspaceHierarchyCachedAt = Date.now();
+      logger.debug(`Cached workspace hierarchy at ${new Date(this.workspaceHierarchyCachedAt).toISOString()}`);
       return workspaceTree;
     } catch (error) {
       throw this.handleError(error, 'Failed to get workspace hierarchy');
@@ -272,6 +280,8 @@ export class WorkspaceService extends BaseClickUpService {
    */
   clearWorkspaceHierarchy(): void {
     this.workspaceHierarchy = null;
+    this.workspaceHierarchyCachedAt = 0;
+    logger.debug('Cleared workspace hierarchy cache');
   }
 
   /**

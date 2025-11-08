@@ -276,8 +276,32 @@ async function findDocumentByTitle(parentId: string, title: string): Promise<str
 
 /**
  * Helper function to find parent container ID by name and type
+ * @param name - Name of the container to find
+ * @param type - Type of container (space, folder, or list)
+ * @param parentSpaceId - Optional space ID for optimized direct API lookup
  */
-async function findParentIdByName(name: string, type: 'space' | 'folder' | 'list'): Promise<string | null> {
+async function findParentIdByName(
+  name: string,
+  type: 'space' | 'folder' | 'list',
+  parentSpaceId?: string
+): Promise<string | null> {
+  // Optimization: Try direct API call first when we have spaceId
+  if (parentSpaceId && (type === 'list' || type === 'folder')) {
+    try {
+      const items = type === 'list'
+        ? await workspaceService.getListsInSpace(parentSpaceId)
+        : await workspaceService.getFoldersInSpace(parentSpaceId);
+      const matchingItem = items.find((item: any) => item.name === name);
+      if (matchingItem) {
+        logger.debug(`Found ${type} "${name}" in space ${parentSpaceId} via direct API call`);
+        return matchingItem.id;
+      }
+    } catch (error) {
+      logger.warn(`Failed to search space ${parentSpaceId} directly, falling back to hierarchy: ${error.message}`);
+    }
+  }
+
+  // Fallback: Use workspace hierarchy for global search
   const hierarchy = await workspaceService.getWorkspaceHierarchy();
   const container = workspaceService.findIDByNameInHierarchy(hierarchy, name, type);
   return container ? container.id : null;
