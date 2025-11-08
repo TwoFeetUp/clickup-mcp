@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: © 2025 Sjoerd van Beuningen
+ * SPDX-FileCopyrightText: © 2025 Sjoerd Tiemensma
  * SPDX-License-Identifier: MIT
  *
  * Concurrency Utilities
