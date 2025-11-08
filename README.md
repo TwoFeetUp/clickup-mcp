@@ -27,6 +27,30 @@ This repository builds on the original ClickUp MCP server with significant perfo
 
 ## Installation
 
+### NPM Installation (Recommended)
+
+Install globally via npm:
+
+```bash
+npm install -g @twofeetup/clickup-mcp
+```
+
+Then configure in your MCP client (e.g., Claude Desktop):
+
+```json
+{
+  "mcpServers": {
+    "ClickUp": {
+      "command": "clickup-mcp",
+      "env": {
+        "CLICKUP_API_KEY": "your-api-key",
+        "CLICKUP_TEAM_ID": "your-team-id"
+      }
+    }
+  }
+}
+```
+
 ### Local Setup
 
 1. Clone this repository:
