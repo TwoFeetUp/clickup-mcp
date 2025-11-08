@@ -70,6 +70,78 @@ function convertToTimestamp(dateInput: string | number): string {
 //=============================================================================
 
 /**
+ * Build minimal success response for manage_task operations
+ * Reduces token usage by returning only essential fields for successful operations
+ * Full error details are preserved (handled by error catch)
+ */
+function buildMinimalSuccessResponse(action: string, result: any, params?: any): any {
+  switch (action) {
+    case 'create':
+      // AI needs: ID for chaining, name for confirmation, URL for sharing, status for context
+      return {
+        success: true,
+        id: result.id,
+        name: result.name,
+        url: result.url,
+        status: result.status?.status || result.status,
+        custom_id: result.custom_id || undefined
+      };
+
+    case 'update':
+      // AI needs: ID, name, and what fields were changed
+      const updatedFields: any = {};
+      if (params.name !== undefined) updatedFields.name = result.name;
+      if (params.description !== undefined || params.markdown_description !== undefined) updatedFields.description = true;
+      if (params.status !== undefined) updatedFields.status = result.status?.status || result.status;
+      if (params.priority !== undefined) updatedFields.priority = result.priority;
+      if (params.dueDate !== undefined) updatedFields.due_date = result.due_date;
+      if (params.startDate !== undefined) updatedFields.start_date = result.start_date;
+      if (params.assignees !== undefined) updatedFields.assignees = result.assignees?.length || 0;
+      if (params.tags !== undefined) updatedFields.tags = result.tags?.length || 0;
+
+      return {
+        success: true,
+        id: result.id,
+        name: result.name,
+        updated_fields: updatedFields
+      };
+
+    case 'delete':
+      // AI needs: confirmation message
+      return {
+        success: true,
+        message: `Task deleted successfully`
+      };
+
+    case 'move':
+      // AI needs: ID, name, source and destination list info
+      return {
+        success: true,
+        id: result.id,
+        name: result.name,
+        to_list: {
+          id: result.list?.id || result.list,
+          name: result.list?.name
+        }
+      };
+
+    case 'duplicate':
+      // AI needs: both IDs (original and duplicate), name, URL for the new task
+      return {
+        success: true,
+        duplicate_id: result.id,
+        duplicate_name: result.name,
+        duplicate_url: result.url,
+        custom_id: result.custom_id || undefined
+      };
+
+    default:
+      // Fallback: return result as-is
+      return result;
+  }
+}
+
+/**
  * Handler for manage_task tool
  * Routes to specific handlers based on action parameter
  */
@@ -82,7 +154,8 @@ export async function handleManageTask(params: any) {
     switch (action) {
       case 'create':
         const createResult = await createTaskHandler(params);
-        return sponsorService.createResponse(createResult);
+        const minimalCreate = buildMinimalSuccessResponse('create', createResult, params);
+        return sponsorService.createResponse(minimalCreate);
 
       case 'update':
         // Update requires task identification
@@ -90,7 +163,8 @@ export async function handleManageTask(params: any) {
           throw new Error('Task identification required: provide taskId, taskName, or customTaskId');
         }
         const updateResult = await updateTaskHandler(taskService, params);
-        return sponsorService.createResponse(updateResult);
+        const minimalUpdate = buildMinimalSuccessResponse('update', updateResult, params);
+        return sponsorService.createResponse(minimalUpdate);
 
       case 'delete':
         // Delete requires task identification
@@ -98,7 +172,8 @@ export async function handleManageTask(params: any) {
           throw new Error('Task identification required: provide taskId, taskName, or customTaskId');
         }
         const deleteResult = await deleteTaskHandler(params);
-        return sponsorService.createResponse(deleteResult);
+        const minimalDelete = buildMinimalSuccessResponse('delete', deleteResult, params);
+        return sponsorService.createResponse(minimalDelete);
 
       case 'move':
         // Move requires task identification and target list
@@ -115,7 +190,8 @@ export async function handleManageTask(params: any) {
           listName: params.targetListName || params.listName
         };
         const moveResult = await moveTaskHandler(moveParams);
-        return sponsorService.createResponse(moveResult);
+        const minimalMove = buildMinimalSuccessResponse('move', moveResult, params);
+        return sponsorService.createResponse(minimalMove);
 
       case 'duplicate':
         // Duplicate requires task identification
@@ -129,7 +205,8 @@ export async function handleManageTask(params: any) {
           listName: params.targetListName || params.listName
         };
         const dupResult = await duplicateTaskHandler(dupParams);
-        return sponsorService.createResponse(dupResult);
+        const minimalDuplicate = buildMinimalSuccessResponse('duplicate', dupResult, params);
+        return sponsorService.createResponse(minimalDuplicate);
 
       default:
         throw new Error(`Invalid action: ${action}. Must be one of: create, update, delete, move, duplicate`);
