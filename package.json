@@ -49,6 +49,7 @@
   },
   "homepage": "https://github.com/TwoFeetUp/clickup-mcp#readme",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
     "@modelcontextprotocol/sdk": "^1.11.3",
     "axios": "^1.6.7",
     "cors": "^2.8.5",

@@ -1,0 +1,2322 @@
+{
+  "data": [
+    {
+      "id": "86c6dv0ht",
+      "custom_id": null,
+      "custom_item_id": 0,
+      "name": "clickup-mcp",
+      "text_content": "",
+      "description": "",
+      "status": {
+        "status": "in development",
+        "id": "sc901516923457_gMnOjDMd",
+        "color": "#5f55ee",
+        "type": "custom",
+        "orderindex": 1
+      },
+      "orderindex": "120485956.00000000000000000000000000000000",
+      "date_created": "1762589444053",
+      "date_updated": "1762589444127",
+      "date_closed": null,
+      "date_done": null,
+      "archived": false,
+      "creator": {
+        "id": 94774460,
+        "username": "Fahim Rohmon",
+        "color": "#ffa727",
+        "email": "fahim@twofeetup.com",
+        "profilePicture": null
+      },
+      "assignees": [
+        {
+          "id": 94722743,
+          "username": "Sjoerd Tiemensma",
+          "color": "#ff897f",
+          "initials": "ST",
+          "email": "sjoerd@productievetijd.nl",
+          "profilePicture": null
+        },
+        {
+          "id": 248437841,
+          "username": "Lex Zwakenberg",
+          "color": "#e040fb",
+          "initials": "LZ",
+          "email": "lex@twofeetup.com",
+          "profilePicture": null
+        }
+      ],
+      "group_assignees": [],
+      "watchers": [
+        {
+          "id": 94774460,
+          "username": "Fahim Rohmon",
+          "color": "#ffa727",
+          "initials": "FR",
+          "email": "fahim@twofeetup.com",
+          "profilePicture": null
+        },
+        {
+          "id": 94722743,
+          "username": "Sjoerd Tiemensma",
+          "color": "#ff897f",
+          "initials": "ST",
+          "email": "sjoerd@productievetijd.nl",
+          "profilePicture": null
+        },
+        {
+          "id": 248437841,
+          "username": "Lex Zwakenberg",
+          "color": "#e040fb",
+          "initials": "LZ",
+          "email": "lex@twofeetup.com",
+          "profilePicture": null
+        }
+      ],
+      "checklists": [],
+      "tags": [],
+      "parent": null,
+      "top_level_parent": null,
+      "priority": null,
+      "due_date": "1762657200000",
+      "start_date": null,
+      "points": null,
+      "time_estimate": null,
+      "custom_fields": [
+        {
+          "id": "1a70e24b-4cf1-492c-a480-348dd99d768c",
+          "name": "Description",
+          "type": "text",
+          "type_config": {},
+          "date_created": "1761766760449",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "f76b2b5c-1e19-4909-ad8b-6396e22d066b",
+          "name": "Notes",
+          "type": "short_text",
+          "type_config": {},
+          "date_created": "1761741372718",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "33b3d4f8-3a2c-4910-93d9-95f95a2b1499",
+          "name": "Repository URL",
+          "type": "url",
+          "type_config": {},
+          "date_created": "1761637916113",
+          "hide_from_guests": false,
+          "value": "https://github.com/TwoFeetUp/clickup-mcp",
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "3a6a06be-0e14-41a9-83d5-13b5f4f5e553",
+          "name": "Source URL",
+          "type": "short_text",
+          "type_config": {},
+          "date_created": "1761635821851",
+          "hide_from_guests": false,
+          "value": "TwoFeetUp/clickup-mcp",
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "359beb8b-a467-4110-8ae5-9191c5d35404",
+          "name": "Type",
+          "type": "drop_down",
+          "type_config": {
+            "sorting": "name_asc",
+            "new_drop_down": true,
+            "options": [
+              {
+                "id": "9f43e9ea-804a-4ba2-8d2f-19da52f26d08",
+                "name": "Client",
+                "color": "#2ecd6f",
+                "orderindex": 0
+              },
+              {
+                "id": "5d319e16-9de9-4b44-8593-321ab7afc78e",
+                "name": "Experiment",
+                "color": "#EA80FC",
+                "orderindex": 1
+              },
+              {
+                "id": "c9d099b5-eea1-4ed1-8d10-0fc2a5a6374b",
+                "name": "Hackathon",
+                "color": "#02BCD4",
+                "orderindex": 2
+              },
+              {
+                "id": "c7ca0ed3-9371-4a27-997c-63537b37bad7",
+                "name": "Internal",
+                "color": "#7C4DFF",
+                "orderindex": 3
+              },
+              {
+                "id": "09f519b5-4b91-4aa5-9611-2fa08eef8ac4",
+                "name": "Other",
+                "color": "#f900ea",
+                "orderindex": 4
+              },
+              {
+                "id": "e216cdf5-3830-4476-927e-2478f901c083",
+                "name": "SaaS",
+                "color": "#5B5E0A",
+                "orderindex": 5
+              },
+              {
+                "id": "282e30de-4ec6-4458-bfef-2337a20d014e",
+                "name": "Template",
+                "color": "#f9d900",
+                "orderindex": 6
+              }
+            ]
+          },
+          "date_created": "1761642046834",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "b2e0bbe7-9695-40fd-95b5-3001219b4726",
+          "name": "Related list ID",
+          "type": "short_text",
+          "type_config": {},
+          "date_created": "1761642988004",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "0632c957-ccfb-48d2-b3dc-5cf99b221990",
+          "name": "⚡ Effort Level",
+          "type": "drop_down",
+          "type_config": {
+            "sorting": "manual",
+            "new_drop_down": true,
+            "options": [
+              {
+                "id": "2c58c695-428e-4918-9c1b-2c99e79f4b5a",
+                "name": "1 - Quick win",
+                "color": "#81B1FF",
+                "orderindex": 0
+              },
+              {
+                "id": "36b9f130-4d3a-4333-aa88-d49a8ba5a083",
+                "name": "2 - Small task",
+                "color": "#EA80FC",
+                "orderindex": 1
+              },
+              {
+                "id": "44e72ddb-c7af-4629-a7b3-68234a57cb14",
+                "name": "3 - Medium project",
+                "color": "#FF4081",
+                "orderindex": 2
+              },
+              {
+                "id": "64083b8e-bdde-48dc-b597-7c2957e06f3b",
+                "name": "4 - large project",
+                "color": "#E65100",
+                "orderindex": 3
+              },
+              {
+                "id": "92c13061-7bc5-415f-8ed8-1486f746cfb5",
+                "name": "5 - epic/platform",
+                "color": "#81B1FF",
+                "orderindex": 4
+              }
+            ]
+          },
+          "date_created": "1760967561344",
+          "hide_from_guests": false,
+          "value": 0,
+          "value_richtext": null,
+          "required": true
+        }
+      ],
+      "dependencies": [],
+      "linked_tasks": [],
+      "locations": [],
+      "team_id": "90151257705",
+      "url": "https://app.clickup.com/t/86c6dv0ht",
+      "sharing": {
+        "public": false,
+        "public_share_expires_on": null,
+        "public_fields": [
+          "assignees",
+          "priority",
+          "due_date",
+          "content",
+          "comments",
+          "attachments",
+          "customFields",
+          "subtasks",
+          "tags",
+          "checklists",
+          "coverimage"
+        ],
+        "token": null,
+        "seo_optimized": false
+      },
+      "permission_level": "create",
+      "list": {
+        "id": "901516923457",
+        "name": "Repo's",
+        "access": true
+      },
+      "project": {
+        "id": "901511029161",
+        "name": "hidden",
+        "hidden": true,
+        "access": true
+      },
+      "folder": {
+        "id": "901511029161",
+        "name": "hidden",
+        "hidden": true,
+        "access": true
+      },
+      "space": {
+        "id": "90155023275"
+      }
+    },
+    {
+      "id": "86c6dn1p9",
+      "custom_id": null,
+      "custom_item_id": 0,
+      "name": "📬 MVP PRD sturen naar Indiase developers",
+      "text_content": "Stuur MVP PRD naar de Indiase developers",
+      "description": "Stuur MVP PRD naar de Indiase developers",
+      "status": {
+        "status": "to do",
+        "id": "sc901516319899_iGEUdS7o",
+        "color": "#87909e",
+        "type": "open",
+        "orderindex": 0
+      },
+      "orderindex": "120485955.00000000000000000000000000000000",
+      "date_created": "1762530837557",
+      "date_updated": "1762530843765",
+      "date_closed": null,
+      "date_done": null,
+      "archived": false,
+      "creator": {
+        "id": 200590639,
+        "username": "Wouter van den Bijgaart",
+        "color": "",
+        "email": "wouter@twofeetup.com",
+        "profilePicture": "https://attachments.clickup.com/profilePictures/200590639_xyX.jpg"
+      },
+      "assignees": [
+        {
+          "id": 200590639,
+          "username": "Wouter van den Bijgaart",
+          "color": "",
+          "initials": "WB",
+          "email": "wouter@twofeetup.com",
+          "profilePicture": "https://attachments.clickup.com/profilePictures/200590639_xyX.jpg"
+        }
+      ],
+      "group_assignees": [],
+      "watchers": [
+        {
+          "id": 200590639,
+          "username": "Wouter van den Bijgaart",
+          "color": "",
+          "initials": "WB",
+          "email": "wouter@twofeetup.com",
+          "profilePicture": "https://attachments.clickup.com/profilePictures/200590639_xyX.jpg"
+        }
+      ],
+      "checklists": [],
+      "tags": [],
+      "parent": null,
+      "top_level_parent": null,
+      "priority": {
+        "color": "#f8ae00",
+        "id": "2",
+        "orderindex": "2",
+        "priority": "high"
+      },
+      "due_date": null,
+      "start_date": null,
+      "points": null,
+      "time_estimate": null,
+      "custom_fields": [
+        {
+          "id": "3720e74b-bee4-4c40-a2b9-5d18ce964b1e",
+          "name": "Related to",
+          "type": "text",
+          "type_config": {},
+          "date_created": "1761668818416",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "977fc1d6-9e54-4e02-aaa9-2f4113fa7770",
+          "name": "⏰ Duration",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Estimate how long this task will take: Quick for tasks under 15 minutes, Short for 15-30 minute tasks, Medium for 30-60 minute tasks, Long for 1-2 hour tasks, or Project for tasks requiring more than 2 hours or multiple sessions.",
+              "source": "custom_dropdown"
+            },
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "7cc5f9c4-f435-4fa0-83ba-ce72cf9c7ca8",
+                "name": "⚡ < 15m",
+                "color": "#2ecd6f",
+                "orderindex": 0
+              },
+              {
+                "id": "67e17fa4-f093-4e50-b0c5-fb18bd3db62d",
+                "name": "⏱️ 15-30m",
+                "color": "#02BCD4",
+                "orderindex": 1
+              },
+              {
+                "id": "5388bfec-2003-47fe-bb88-87b3c8a76927",
+                "name": "🕐  30-60m",
+                "color": "#f9d900",
+                "orderindex": 2
+              },
+              {
+                "id": "8cdea285-82f4-48d9-91f7-69db98d30699",
+                "name": "⏳ 1-2h",
+                "color": "#ff7800",
+                "orderindex": 3
+              },
+              {
+                "id": "25ee0dd9-1749-4daf-8195-d5c8572aaee5",
+                "name": "📅 >2h",
+                "color": "#e50000",
+                "orderindex": 4
+              }
+            ]
+          },
+          "date_created": "1761951496324",
+          "hide_from_guests": false,
+          "value": 0,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "1611801a-3591-4c90-9bb0-893ab36efa75",
+          "name": "⭐ ",
+          "type": "checkbox",
+          "type_config": {},
+          "date_created": "1761952592460",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "fabc0c58-3b7e-49de-b880-cb3f6c22a932",
+          "name": "🌎 Workspace",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Identify which business or life workspace this task belongs to: TwoFeetUp for TwoFeetUp Group related work, VR Nederland for VR Nederland/VR op Locatie work, or Personal for private life matters.",
+              "source": "custom_dropdown"
+            },
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "8ca5bc3d-415c-42a8-99c3-67c74af22252",
+                "name": "👣 TwoFeetUp",
+                "color": "#8ed8f8",
+                "orderindex": 0
+              },
+              {
+                "id": "19ba8d2d-51f4-40fc-bc60-29317def32fc",
+                "name": "🥽 VR Nederland",
+                "color": "#ff8156",
+                "orderindex": 1
+              },
+              {
+                "id": "9d202fef-6ed0-475f-9fea-d8205ce2da2c",
+                "name": "🏠 Personal",
+                "color": "#2ecd6f",
+                "orderindex": 2
+              }
+            ]
+          },
+          "date_created": "1761952429726",
+          "hide_from_guests": false,
+          "value": 0,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "8f776a51-f3c7-496c-8b2a-76fe0b7a93c9",
+          "name": "🏃 Action Type",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Categorize the task by the type of action required: Call for phone calls, Email for sending emails, Purchase for buying items, Meeting for scheduled discussions, Create for making/building something, Research for investigating or finding information, Technical for tech/system work, Administrative for admin tasks, Decision for choices to make, or Idea/Inspiration for creative thoughts and concepts.",
+              "source": "categorize"
+            },
+            "sorting": "manual",
+            "new_drop_down": true,
+            "options": [
+              {
+                "id": "e887f2ad-61d9-4436-a427-67c5adf9d4b7",
+                "name": "📞 Call",
+                "color": "#EA80FC",
+                "orderindex": 0
+              },
+              {
+                "id": "af4ddecd-d8de-40a2-b557-3e6b3d3d9e32",
+                "name": "📧 Email",
+                "color": "#0231E8",
+                "orderindex": 1
+              },
+              {
+                "id": "b4976b7b-2458-4c0f-9c39-02c9c6c33a4d",
+                "name": "🛒 Purchase",
+                "color": "#800000",
+                "orderindex": 2
+              },
+              {
+                "id": "a2803223-4dda-4fac-bfd5-df554da27e7b",
+                "name": "🤝 Meeting",
+                "color": "#AF7E2E",
+                "orderindex": 3
+              },
+              {
+                "id": "6c52fbbc-ba55-47a1-9c59-e48a410f6288",
+                "name": "📝 Create",
+                "color": "#E65100",
+                "orderindex": 4
+              },
+              {
+                "id": "f23aabb6-8bb4-4553-9612-6533dc2523f9",
+                "name": "🔍 Research",
+                "color": "#04A9F4",
+                "orderindex": 5
+              },
+              {
+                "id": "d949b9b6-2531-4168-af1c-530d9313d71b",
+                "name": "⚙️ Technical",
+                "color": "#81B1FF",
+                "orderindex": 6
+              },
+              {
+                "id": "09cd4535-d77f-40ff-8041-b101e305737b",
+                "name": "📋 Administrative",
+                "color": "#e50000",
+                "orderindex": 7
+              },
+              {
+                "id": "d687e4c2-d956-4c91-90ba-a0e92e8772a9",
+                "name": "💭 Decision",
+                "color": "#800000",
+                "orderindex": 8
+              },
+              {
+                "id": "4c14f286-558c-4df8-92a0-04b128588576",
+                "name": "💡 Inspiration",
+                "color": "#bf55ec",
+                "orderindex": 9
+              }
+            ]
+          },
+          "date_created": "1761950303719",
+          "hide_from_guests": false,
+          "value": 1,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "c31d3c36-ca98-4b51-8ad7-c08b349b8b16",
+          "name": "📁 Area",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Categorize the task by its area of responsibility: LinkedIn for LinkedIn-specific content, Content/Marketing for general marketing, Product/Development for building features, Sales/Commercial for client work, Finance/Admin for financial tasks, Team/HR for people management, Tech/Tools for system work, Strategy/Business for planning, Personal for individual tasks, Family for family-related items, Health/Wellness for health matters, or Learning/Development for education and growth.",
+              "source": "custom_dropdown"
+            },
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "923414b5-52c6-4e34-94c6-1aa16896213a",
+                "name": "📱 LinkedIn",
+                "color": "#04A9F4",
+                "orderindex": 0
+              },
+              {
+                "id": "fbc2806c-5cee-4500-95df-3cf18af8655a",
+                "name": "📚 Learning/Development",
+                "color": "#667684",
+                "orderindex": 1
+              },
+              {
+                "id": "db5a40c7-399b-4de0-bf4f-51c6dde667ab",
+                "name": "🧘 Health/Wellness",
+                "color": "#AF7E2E",
+                "orderindex": 2
+              },
+              {
+                "id": "f37aabcc-b889-4e39-9e9b-0c00d360cef9",
+                "name": "👨‍👩‍👧‍👦 Family",
+                "color": "#0231E8",
+                "orderindex": 3
+              },
+              {
+                "id": "c53955ca-8c59-4abc-aec4-3034e641e270",
+                "name": "👤 Personal",
+                "color": "#FF7FAB",
+                "orderindex": 4
+              },
+              {
+                "id": "db7a71bf-d98b-4d2d-84b0-9959db0d0aa2",
+                "name": "🎯 Strategy/Business",
+                "color": "#0231E8",
+                "orderindex": 5
+              },
+              {
+                "id": "abb2318e-ec0e-4bef-a457-fe4b3b7c488b",
+                "name": "⚙️ Tech/Tools",
+                "color": "#EA80FC",
+                "orderindex": 6
+              },
+              {
+                "id": "1a6f5c47-ad3b-4113-9dc5-4bbe20cf3bae",
+                "name": "👥 Team/HR",
+                "color": "#b5bcc2",
+                "orderindex": 7
+              },
+              {
+                "id": "da2dc7f2-bece-4775-a49b-3d8feb327399",
+                "name": "💰 Finance/Admin",
+                "color": "#2ecd6f",
+                "orderindex": 8
+              },
+              {
+                "id": "c0e69c60-cee2-4330-a281-727a12c1aaaa",
+                "name": "💼 Sales/Commercial",
+                "color": "#EA80FC",
+                "orderindex": 9
+              },
+              {
+                "id": "607a840c-eba3-45c6-bf7b-031bc8ae85e9",
+                "name": "🛠️ Product/Development",
+                "color": "#EA80FC",
+                "orderindex": 10
+              },
+              {
+                "id": "e8fc9d13-c336-46cc-908d-27ea6f05f504",
+                "name": "✍️ Content/Marketing",
+                "color": "#ff7800",
+                "orderindex": 11
+              }
+            ]
+          },
+          "date_created": "1761950732717",
+          "hide_from_guests": false,
+          "value": 10,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "9819a0e8-0dd8-465c-9a66-c259892c0d6f",
+          "name": "Request Type",
+          "type": "drop_down",
+          "type_config": {
+            "sorting": "manual",
+            "new_drop_down": true,
+            "options": [
+              {
+                "id": "51e443db-a0ac-414c-b06a-77984b672596",
+                "name": "Feature Request",
+                "color": "#02BCD4",
+                "orderindex": 0
+              },
+              {
+                "id": "da781a0b-1d3c-499c-a1c5-033db464623b",
+                "name": "Bug/Issue",
+                "color": "#f9d900",
+                "orderindex": 1
+              },
+              {
+                "id": "985d9468-139d-44f0-ad11-6343f8b880b1",
+                "name": "New Tool/Product",
+                "color": "#7C4DFF",
+                "orderindex": 2
+              },
+              {
+                "id": "f11b20d6-cf5f-44ee-84d2-89deec53bc2a",
+                "name": "Process Improvement",
+                "color": "#E65100",
+                "orderindex": 3
+              },
+              {
+                "id": "95178cee-4f5a-4aa5-85a8-6b80f7fb9cb6",
+                "name": "Content Idea",
+                "color": "#AF7E2E",
+                "orderindex": 4
+              },
+              {
+                "id": "4365173d-0217-499d-a0dc-7cd5311934b1",
+                "name": "General Idea",
+                "color": "#667684",
+                "orderindex": 5
+              },
+              {
+                "id": "828017cf-9897-46d1-a67b-bbf71ccceb4d",
+                "name": "Question/Research",
+                "color": "#f900ea",
+                "orderindex": 6
+              },
+              {
+                "id": "66211cfb-8779-4eec-9cb0-a6eb57bd28df",
+                "name": "Other",
+                "color": null,
+                "orderindex": 7
+              }
+            ]
+          },
+          "date_created": "1761668757841",
+          "hide_from_guests": false,
+          "required": true
+        },
+        {
+          "id": "aa7c311f-d5fd-40f3-98ce-87cebbd0490c",
+          "name": "✅ ✔️",
+          "type": "checkbox",
+          "type_config": {},
+          "date_created": "1762078037237",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "d6637a85-1a0d-4b31-8297-91b5b173692e",
+          "name": "🏷️ Labels",
+          "type": "labels",
+          "type_config": {
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "85127ff8-3714-4716-b4c8-db08d4aa5359",
+                "label": "🤝 Delegate",
+                "color": "#2ecd6f",
+                "orderindex": 0
+              },
+              {
+                "id": "3d64ae73-0958-4944-b7f1-020897f4519d",
+                "label": "💬 Discuss",
+                "color": "#b5bcc2",
+                "orderindex": 1
+              },
+              {
+                "id": "bdb7d9b7-aea4-4e6b-9862-d96f71b337c4",
+                "label": "🆘 Assistance",
+                "color": "#FF4081",
+                "orderindex": 2
+              },
+              {
+                "id": "19bc90d7-ea61-4108-babd-6d276d290317",
+                "label": "⏳ Waiting",
+                "color": "#AF7E2E",
+                "orderindex": 3
+              },
+              {
+                "id": "28ac2a14-9298-48a2-8e09-191f18883a46",
+                "label": "🚫 Blocked",
+                "color": "#e50000",
+                "orderindex": 4
+              },
+              {
+                "id": "af34a87f-fa53-459d-a4d2-04a800f11c70",
+                "label": "📌 Follow-up",
+                "color": "#04A9F4",
+                "orderindex": 5
+              }
+            ]
+          },
+          "date_created": "1761952533936",
+          "hide_from_guests": false,
+          "required": false
+        }
+      ],
+      "dependencies": [],
+      "linked_tasks": [],
+      "locations": [],
+      "team_id": "90151257705",
+      "url": "https://app.clickup.com/t/86c6dn1p9",
+      "sharing": {
+        "public": false,
+        "public_share_expires_on": null,
+        "public_fields": [
+          "assignees",
+          "priority",
+          "due_date",
+          "content",
+          "comments",
+          "attachments",
+          "customFields",
+          "subtasks",
+          "tags",
+          "checklists",
+          "coverimage"
+        ],
+        "token": null,
+        "seo_optimized": false
+      },
+      "permission_level": "create",
+      "list": {
+        "id": "901516319899",
+        "name": "🧠 Wouter - Brein Inbox",
+        "access": true
+      },
+      "project": {
+        "id": "901510548964",
+        "name": "hidden",
+        "hidden": true,
+        "access": true
+      },
+      "folder": {
+        "id": "901510548964",
+        "name": "hidden",
+        "hidden": true,
+        "access": true
+      },
+      "space": {
+        "id": "90157324928"
+      }
+    },
+    {
+      "id": "86c6dn1mv",
+      "custom_id": null,
+      "custom_item_id": 0,
+      "name": "📬 roadmap sturen naar Thomas obv Fireflies van Mirik/Kristel",
+      "text_content": "Maak roadmap op basis van Fireflies meeting met Mirik en Kristel en stuur naar Thomas",
+      "description": "Maak roadmap op basis van Fireflies meeting met Mirik en Kristel en stuur naar Thomas",
+      "status": {
+        "status": "to do",
+        "id": "sc901516319899_iGEUdS7o",
+        "color": "#87909e",
+        "type": "open",
+        "orderindex": 0
+      },
+      "orderindex": "120485954.00000000000000000000000000000000",
+      "date_created": "1762530833185",
+      "date_updated": "1762530928959",
+      "date_closed": null,
+      "date_done": null,
+      "archived": false,
+      "creator": {
+        "id": 200590639,
+        "username": "Wouter van den Bijgaart",
+        "color": "",
+        "email": "wouter@twofeetup.com",
+        "profilePicture": "https://attachments.clickup.com/profilePictures/200590639_xyX.jpg"
+      },
+      "assignees": [
+        {
+          "id": 200590639,
+          "username": "Wouter van den Bijgaart",
+          "color": "",
+          "initials": "WB",
+          "email": "wouter@twofeetup.com",
+          "profilePicture": "https://attachments.clickup.com/profilePictures/200590639_xyX.jpg"
+        }
+      ],
+      "group_assignees": [],
+      "watchers": [
+        {
+          "id": 94722741,
+          "username": "Leonie Forsman",
+          "color": "#d60800",
+          "initials": "LF",
+          "email": "leonie@twofeetup.com",
+          "profilePicture": "https://attachments.clickup.com/profilePictures/94722741_155.jpg"
+        },
+        {
+          "id": 200590639,
+          "username": "Wouter van den Bijgaart",
+          "color": "",
+          "initials": "WB",
+          "email": "wouter@twofeetup.com",
+          "profilePicture": "https://attachments.clickup.com/profilePictures/200590639_xyX.jpg"
+        }
+      ],
+      "checklists": [],
+      "tags": [],
+      "parent": null,
+      "top_level_parent": null,
+      "priority": {
+        "color": "#f8ae00",
+        "id": "2",
+        "orderindex": "2",
+        "priority": "high"
+      },
+      "due_date": null,
+      "start_date": null,
+      "points": null,
+      "time_estimate": null,
+      "custom_fields": [
+        {
+          "id": "3720e74b-bee4-4c40-a2b9-5d18ce964b1e",
+          "name": "Related to",
+          "type": "text",
+          "type_config": {},
+          "date_created": "1761668818416",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "977fc1d6-9e54-4e02-aaa9-2f4113fa7770",
+          "name": "⏰ Duration",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Estimate how long this task will take: Quick for tasks under 15 minutes, Short for 15-30 minute tasks, Medium for 30-60 minute tasks, Long for 1-2 hour tasks, or Project for tasks requiring more than 2 hours or multiple sessions.",
+              "source": "custom_dropdown"
+            },
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "7cc5f9c4-f435-4fa0-83ba-ce72cf9c7ca8",
+                "name": "⚡ < 15m",
+                "color": "#2ecd6f",
+                "orderindex": 0
+              },
+              {
+                "id": "67e17fa4-f093-4e50-b0c5-fb18bd3db62d",
+                "name": "⏱️ 15-30m",
+                "color": "#02BCD4",
+                "orderindex": 1
+              },
+              {
+                "id": "5388bfec-2003-47fe-bb88-87b3c8a76927",
+                "name": "🕐  30-60m",
+                "color": "#f9d900",
+                "orderindex": 2
+              },
+              {
+                "id": "8cdea285-82f4-48d9-91f7-69db98d30699",
+                "name": "⏳ 1-2h",
+                "color": "#ff7800",
+                "orderindex": 3
+              },
+              {
+                "id": "25ee0dd9-1749-4daf-8195-d5c8572aaee5",
+                "name": "📅 >2h",
+                "color": "#e50000",
+                "orderindex": 4
+              }
+            ]
+          },
+          "date_created": "1761951496324",
+          "hide_from_guests": false,
+          "value": 2,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "1611801a-3591-4c90-9bb0-893ab36efa75",
+          "name": "⭐ ",
+          "type": "checkbox",
+          "type_config": {},
+          "date_created": "1761952592460",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "fabc0c58-3b7e-49de-b880-cb3f6c22a932",
+          "name": "🌎 Workspace",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Identify which business or life workspace this task belongs to: TwoFeetUp for TwoFeetUp Group related work, VR Nederland for VR Nederland/VR op Locatie work, or Personal for private life matters.",
+              "source": "custom_dropdown"
+            },
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "8ca5bc3d-415c-42a8-99c3-67c74af22252",
+                "name": "👣 TwoFeetUp",
+                "color": "#8ed8f8",
+                "orderindex": 0
+              },
+              {
+                "id": "19ba8d2d-51f4-40fc-bc60-29317def32fc",
+                "name": "🥽 VR Nederland",
+                "color": "#ff8156",
+                "orderindex": 1
+              },
+              {
+                "id": "9d202fef-6ed0-475f-9fea-d8205ce2da2c",
+                "name": "🏠 Personal",
+                "color": "#2ecd6f",
+                "orderindex": 2
+              }
+            ]
+          },
+          "date_created": "1761952429726",
+          "hide_from_guests": false,
+          "value": 0,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "8f776a51-f3c7-496c-8b2a-76fe0b7a93c9",
+          "name": "🏃 Action Type",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Categorize the task by the type of action required: Call for phone calls, Email for sending emails, Purchase for buying items, Meeting for scheduled discussions, Create for making/building something, Research for investigating or finding information, Technical for tech/system work, Administrative for admin tasks, Decision for choices to make, or Idea/Inspiration for creative thoughts and concepts.",
+              "source": "categorize"
+            },
+            "sorting": "manual",
+            "new_drop_down": true,
+            "options": [
+              {
+                "id": "e887f2ad-61d9-4436-a427-67c5adf9d4b7",
+                "name": "📞 Call",
+                "color": "#EA80FC",
+                "orderindex": 0
+              },
+              {
+                "id": "af4ddecd-d8de-40a2-b557-3e6b3d3d9e32",
+                "name": "📧 Email",
+                "color": "#0231E8",
+                "orderindex": 1
+              },
+              {
+                "id": "b4976b7b-2458-4c0f-9c39-02c9c6c33a4d",
+                "name": "🛒 Purchase",
+                "color": "#800000",
+                "orderindex": 2
+              },
+              {
+                "id": "a2803223-4dda-4fac-bfd5-df554da27e7b",
+                "name": "🤝 Meeting",
+                "color": "#AF7E2E",
+                "orderindex": 3
+              },
+              {
+                "id": "6c52fbbc-ba55-47a1-9c59-e48a410f6288",
+                "name": "📝 Create",
+                "color": "#E65100",
+                "orderindex": 4
+              },
+              {
+                "id": "f23aabb6-8bb4-4553-9612-6533dc2523f9",
+                "name": "🔍 Research",
+                "color": "#04A9F4",
+                "orderindex": 5
+              },
+              {
+                "id": "d949b9b6-2531-4168-af1c-530d9313d71b",
+                "name": "⚙️ Technical",
+                "color": "#81B1FF",
+                "orderindex": 6
+              },
+              {
+                "id": "09cd4535-d77f-40ff-8041-b101e305737b",
+                "name": "📋 Administrative",
+                "color": "#e50000",
+                "orderindex": 7
+              },
+              {
+                "id": "d687e4c2-d956-4c91-90ba-a0e92e8772a9",
+                "name": "💭 Decision",
+                "color": "#800000",
+                "orderindex": 8
+              },
+              {
+                "id": "4c14f286-558c-4df8-92a0-04b128588576",
+                "name": "💡 Inspiration",
+                "color": "#bf55ec",
+                "orderindex": 9
+              }
+            ]
+          },
+          "date_created": "1761950303719",
+          "hide_from_guests": false,
+          "value": 4,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "c31d3c36-ca98-4b51-8ad7-c08b349b8b16",
+          "name": "📁 Area",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Categorize the task by its area of responsibility: LinkedIn for LinkedIn-specific content, Content/Marketing for general marketing, Product/Development for building features, Sales/Commercial for client work, Finance/Admin for financial tasks, Team/HR for people management, Tech/Tools for system work, Strategy/Business for planning, Personal for individual tasks, Family for family-related items, Health/Wellness for health matters, or Learning/Development for education and growth.",
+              "source": "custom_dropdown"
+            },
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "923414b5-52c6-4e34-94c6-1aa16896213a",
+                "name": "📱 LinkedIn",
+                "color": "#04A9F4",
+                "orderindex": 0
+              },
+              {
+                "id": "fbc2806c-5cee-4500-95df-3cf18af8655a",
+                "name": "📚 Learning/Development",
+                "color": "#667684",
+                "orderindex": 1
+              },
+              {
+                "id": "db5a40c7-399b-4de0-bf4f-51c6dde667ab",
+                "name": "🧘 Health/Wellness",
+                "color": "#AF7E2E",
+                "orderindex": 2
+              },
+              {
+                "id": "f37aabcc-b889-4e39-9e9b-0c00d360cef9",
+                "name": "👨‍👩‍👧‍👦 Family",
+                "color": "#0231E8",
+                "orderindex": 3
+              },
+              {
+                "id": "c53955ca-8c59-4abc-aec4-3034e641e270",
+                "name": "👤 Personal",
+                "color": "#FF7FAB",
+                "orderindex": 4
+              },
+              {
+                "id": "db7a71bf-d98b-4d2d-84b0-9959db0d0aa2",
+                "name": "🎯 Strategy/Business",
+                "color": "#0231E8",
+                "orderindex": 5
+              },
+              {
+                "id": "abb2318e-ec0e-4bef-a457-fe4b3b7c488b",
+                "name": "⚙️ Tech/Tools",
+                "color": "#EA80FC",
+                "orderindex": 6
+              },
+              {
+                "id": "1a6f5c47-ad3b-4113-9dc5-4bbe20cf3bae",
+                "name": "👥 Team/HR",
+                "color": "#b5bcc2",
+                "orderindex": 7
+              },
+              {
+                "id": "da2dc7f2-bece-4775-a49b-3d8feb327399",
+                "name": "💰 Finance/Admin",
+                "color": "#2ecd6f",
+                "orderindex": 8
+              },
+              {
+                "id": "c0e69c60-cee2-4330-a281-727a12c1aaaa",
+                "name": "💼 Sales/Commercial",
+                "color": "#EA80FC",
+                "orderindex": 9
+              },
+              {
+                "id": "607a840c-eba3-45c6-bf7b-031bc8ae85e9",
+                "name": "🛠️ Product/Development",
+                "color": "#EA80FC",
+                "orderindex": 10
+              },
+              {
+                "id": "e8fc9d13-c336-46cc-908d-27ea6f05f504",
+                "name": "✍️ Content/Marketing",
+                "color": "#ff7800",
+                "orderindex": 11
+              }
+            ]
+          },
+          "date_created": "1761950732717",
+          "hide_from_guests": false,
+          "value": 5,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "9819a0e8-0dd8-465c-9a66-c259892c0d6f",
+          "name": "Request Type",
+          "type": "drop_down",
+          "type_config": {
+            "sorting": "manual",
+            "new_drop_down": true,
+            "options": [
+              {
+                "id": "51e443db-a0ac-414c-b06a-77984b672596",
+                "name": "Feature Request",
+                "color": "#02BCD4",
+                "orderindex": 0
+              },
+              {
+                "id": "da781a0b-1d3c-499c-a1c5-033db464623b",
+                "name": "Bug/Issue",
+                "color": "#f9d900",
+                "orderindex": 1
+              },
+              {
+                "id": "985d9468-139d-44f0-ad11-6343f8b880b1",
+                "name": "New Tool/Product",
+                "color": "#7C4DFF",
+                "orderindex": 2
+              },
+              {
+                "id": "f11b20d6-cf5f-44ee-84d2-89deec53bc2a",
+                "name": "Process Improvement",
+                "color": "#E65100",
+                "orderindex": 3
+              },
+              {
+                "id": "95178cee-4f5a-4aa5-85a8-6b80f7fb9cb6",
+                "name": "Content Idea",
+                "color": "#AF7E2E",
+                "orderindex": 4
+              },
+              {
+                "id": "4365173d-0217-499d-a0dc-7cd5311934b1",
+                "name": "General Idea",
+                "color": "#667684",
+                "orderindex": 5
+              },
+              {
+                "id": "828017cf-9897-46d1-a67b-bbf71ccceb4d",
+                "name": "Question/Research",
+                "color": "#f900ea",
+                "orderindex": 6
+              },
+              {
+                "id": "66211cfb-8779-4eec-9cb0-a6eb57bd28df",
+                "name": "Other",
+                "color": null,
+                "orderindex": 7
+              }
+            ]
+          },
+          "date_created": "1761668757841",
+          "hide_from_guests": false,
+          "required": true
+        },
+        {
+          "id": "aa7c311f-d5fd-40f3-98ce-87cebbd0490c",
+          "name": "✅ ✔️",
+          "type": "checkbox",
+          "type_config": {},
+          "date_created": "1762078037237",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "d6637a85-1a0d-4b31-8297-91b5b173692e",
+          "name": "🏷️ Labels",
+          "type": "labels",
+          "type_config": {
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "85127ff8-3714-4716-b4c8-db08d4aa5359",
+                "label": "🤝 Delegate",
+                "color": "#2ecd6f",
+                "orderindex": 0
+              },
+              {
+                "id": "3d64ae73-0958-4944-b7f1-020897f4519d",
+                "label": "💬 Discuss",
+                "color": "#b5bcc2",
+                "orderindex": 1
+              },
+              {
+                "id": "bdb7d9b7-aea4-4e6b-9862-d96f71b337c4",
+                "label": "🆘 Assistance",
+                "color": "#FF4081",
+                "orderindex": 2
+              },
+              {
+                "id": "19bc90d7-ea61-4108-babd-6d276d290317",
+                "label": "⏳ Waiting",
+                "color": "#AF7E2E",
+                "orderindex": 3
+              },
+              {
+                "id": "28ac2a14-9298-48a2-8e09-191f18883a46",
+                "label": "🚫 Blocked",
+                "color": "#e50000",
+                "orderindex": 4
+              },
+              {
+                "id": "af34a87f-fa53-459d-a4d2-04a800f11c70",
+                "label": "📌 Follow-up",
+                "color": "#04A9F4",
+                "orderindex": 5
+              }
+            ]
+          },
+          "date_created": "1761952533936",
+          "hide_from_guests": false,
+          "required": false
+        }
+      ],
+      "dependencies": [],
+      "linked_tasks": [],
+      "locations": [],
+      "team_id": "90151257705",
+      "url": "https://app.clickup.com/t/86c6dn1mv",
+      "sharing": {
+        "public": false,
+        "public_share_expires_on": null,
+        "public_fields": [
+          "assignees",
+          "priority",
+          "due_date",
+          "content",
+          "comments",
+          "attachments",
+          "customFields",
+          "subtasks",
+          "tags",
+          "checklists",
+          "coverimage"
+        ],
+        "token": null,
+        "seo_optimized": false
+      },
+      "permission_level": "create",
+      "list": {
+        "id": "901516319899",
+        "name": "🧠 Wouter - Brein Inbox",
+        "access": true
+      },
+      "project": {
+        "id": "901510548964",
+        "name": "hidden",
+        "hidden": true,
+        "access": true
+      },
+      "folder": {
+        "id": "901510548964",
+        "name": "hidden",
+        "hidden": true,
+        "access": true
+      },
+      "space": {
+        "id": "90157324928"
+      }
+    },
+    {
+      "id": "86c6dcwpt",
+      "custom_id": null,
+      "custom_item_id": 0,
+      "name": "🎥 LinkedIn video Terry Proto bekijken (14 min)",
+      "text_content": "LinkedIn video van Terry Proto - 14 minuten - rustig bekijken wanneer er tijd is\n\n🔗 LinkedIn post: https://www.linkedin.com/posts/terryproto_rin-realityinnovatorsnetwork-vrm-ugcPost-7390034398814875648-qt0E\n\nMogelijk relevant voor VR Nederland innovaties",
+      "description": "LinkedIn video van Terry Proto - 14 minuten - rustig bekijken wanneer er tijd is\n\n🔗 LinkedIn post: https://www.linkedin.com/posts/terryproto_rin-realityinnovatorsnetwork-vrm-ugcPost-7390034398814875648-qt0E\n\nMogelijk relevant voor VR Nederland innovaties",
+      "status": {
+        "status": "to do",
+        "id": "sc901516319899_iGEUdS7o",
+        "color": "#87909e",
+        "type": "open",
+        "orderindex": 0
+      },
+      "orderindex": "120485945.00000000000000000000000000000000",
+      "date_created": "1762510378815",
+      "date_updated": "1762510383926",
+      "date_closed": null,
+      "date_done": null,
+      "archived": false,
+      "creator": {
+        "id": 200590639,
+        "username": "Wouter van den Bijgaart",
+        "color": "",
+        "email": "wouter@twofeetup.com",
+        "profilePicture": "https://attachments.clickup.com/profilePictures/200590639_xyX.jpg"
+      },
+      "assignees": [
+        {
+          "id": 200590639,
+          "username": "Wouter van den Bijgaart",
+          "color": "",
+          "initials": "WB",
+          "email": "wouter@twofeetup.com",
+          "profilePicture": "https://attachments.clickup.com/profilePictures/200590639_xyX.jpg"
+        }
+      ],
+      "group_assignees": [],
+      "watchers": [
+        {
+          "id": 200590639,
+          "username": "Wouter van den Bijgaart",
+          "color": "",
+          "initials": "WB",
+          "email": "wouter@twofeetup.com",
+          "profilePicture": "https://attachments.clickup.com/profilePictures/200590639_xyX.jpg"
+        }
+      ],
+      "checklists": [],
+      "tags": [],
+      "parent": null,
+      "top_level_parent": null,
+      "priority": {
+        "color": "#d8d8d8",
+        "id": "4",
+        "orderindex": "4",
+        "priority": "low"
+      },
+      "due_date": null,
+      "start_date": null,
+      "points": null,
+      "time_estimate": null,
+      "custom_fields": [
+        {
+          "id": "3720e74b-bee4-4c40-a2b9-5d18ce964b1e",
+          "name": "Related to",
+          "type": "text",
+          "type_config": {},
+          "date_created": "1761668818416",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "977fc1d6-9e54-4e02-aaa9-2f4113fa7770",
+          "name": "⏰ Duration",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Estimate how long this task will take: Quick for tasks under 15 minutes, Short for 15-30 minute tasks, Medium for 30-60 minute tasks, Long for 1-2 hour tasks, or Project for tasks requiring more than 2 hours or multiple sessions.",
+              "source": "custom_dropdown"
+            },
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "7cc5f9c4-f435-4fa0-83ba-ce72cf9c7ca8",
+                "name": "⚡ < 15m",
+                "color": "#2ecd6f",
+                "orderindex": 0
+              },
+              {
+                "id": "67e17fa4-f093-4e50-b0c5-fb18bd3db62d",
+                "name": "⏱️ 15-30m",
+                "color": "#02BCD4",
+                "orderindex": 1
+              },
+              {
+                "id": "5388bfec-2003-47fe-bb88-87b3c8a76927",
+                "name": "🕐  30-60m",
+                "color": "#f9d900",
+                "orderindex": 2
+              },
+              {
+                "id": "8cdea285-82f4-48d9-91f7-69db98d30699",
+                "name": "⏳ 1-2h",
+                "color": "#ff7800",
+                "orderindex": 3
+              },
+              {
+                "id": "25ee0dd9-1749-4daf-8195-d5c8572aaee5",
+                "name": "📅 >2h",
+                "color": "#e50000",
+                "orderindex": 4
+              }
+            ]
+          },
+          "date_created": "1761951496324",
+          "hide_from_guests": false,
+          "value": 0,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "1611801a-3591-4c90-9bb0-893ab36efa75",
+          "name": "⭐ ",
+          "type": "checkbox",
+          "type_config": {},
+          "date_created": "1761952592460",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "fabc0c58-3b7e-49de-b880-cb3f6c22a932",
+          "name": "🌎 Workspace",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Identify which business or life workspace this task belongs to: TwoFeetUp for TwoFeetUp Group related work, VR Nederland for VR Nederland/VR op Locatie work, or Personal for private life matters.",
+              "source": "custom_dropdown"
+            },
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "8ca5bc3d-415c-42a8-99c3-67c74af22252",
+                "name": "👣 TwoFeetUp",
+                "color": "#8ed8f8",
+                "orderindex": 0
+              },
+              {
+                "id": "19ba8d2d-51f4-40fc-bc60-29317def32fc",
+                "name": "🥽 VR Nederland",
+                "color": "#ff8156",
+                "orderindex": 1
+              },
+              {
+                "id": "9d202fef-6ed0-475f-9fea-d8205ce2da2c",
+                "name": "🏠 Personal",
+                "color": "#2ecd6f",
+                "orderindex": 2
+              }
+            ]
+          },
+          "date_created": "1761952429726",
+          "hide_from_guests": false,
+          "value": 1,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "8f776a51-f3c7-496c-8b2a-76fe0b7a93c9",
+          "name": "🏃 Action Type",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Categorize the task by the type of action required: Call for phone calls, Email for sending emails, Purchase for buying items, Meeting for scheduled discussions, Create for making/building something, Research for investigating or finding information, Technical for tech/system work, Administrative for admin tasks, Decision for choices to make, or Idea/Inspiration for creative thoughts and concepts.",
+              "source": "categorize"
+            },
+            "sorting": "manual",
+            "new_drop_down": true,
+            "options": [
+              {
+                "id": "e887f2ad-61d9-4436-a427-67c5adf9d4b7",
+                "name": "📞 Call",
+                "color": "#EA80FC",
+                "orderindex": 0
+              },
+              {
+                "id": "af4ddecd-d8de-40a2-b557-3e6b3d3d9e32",
+                "name": "📧 Email",
+                "color": "#0231E8",
+                "orderindex": 1
+              },
+              {
+                "id": "b4976b7b-2458-4c0f-9c39-02c9c6c33a4d",
+                "name": "🛒 Purchase",
+                "color": "#800000",
+                "orderindex": 2
+              },
+              {
+                "id": "a2803223-4dda-4fac-bfd5-df554da27e7b",
+                "name": "🤝 Meeting",
+                "color": "#AF7E2E",
+                "orderindex": 3
+              },
+              {
+                "id": "6c52fbbc-ba55-47a1-9c59-e48a410f6288",
+                "name": "📝 Create",
+                "color": "#E65100",
+                "orderindex": 4
+              },
+              {
+                "id": "f23aabb6-8bb4-4553-9612-6533dc2523f9",
+                "name": "🔍 Research",
+                "color": "#04A9F4",
+                "orderindex": 5
+              },
+              {
+                "id": "d949b9b6-2531-4168-af1c-530d9313d71b",
+                "name": "⚙️ Technical",
+                "color": "#81B1FF",
+                "orderindex": 6
+              },
+              {
+                "id": "09cd4535-d77f-40ff-8041-b101e305737b",
+                "name": "📋 Administrative",
+                "color": "#e50000",
+                "orderindex": 7
+              },
+              {
+                "id": "d687e4c2-d956-4c91-90ba-a0e92e8772a9",
+                "name": "💭 Decision",
+                "color": "#800000",
+                "orderindex": 8
+              },
+              {
+                "id": "4c14f286-558c-4df8-92a0-04b128588576",
+                "name": "💡 Inspiration",
+                "color": "#bf55ec",
+                "orderindex": 9
+              }
+            ]
+          },
+          "date_created": "1761950303719",
+          "hide_from_guests": false,
+          "value": 5,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "c31d3c36-ca98-4b51-8ad7-c08b349b8b16",
+          "name": "📁 Area",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Categorize the task by its area of responsibility: LinkedIn for LinkedIn-specific content, Content/Marketing for general marketing, Product/Development for building features, Sales/Commercial for client work, Finance/Admin for financial tasks, Team/HR for people management, Tech/Tools for system work, Strategy/Business for planning, Personal for individual tasks, Family for family-related items, Health/Wellness for health matters, or Learning/Development for education and growth.",
+              "source": "custom_dropdown"
+            },
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "923414b5-52c6-4e34-94c6-1aa16896213a",
+                "name": "📱 LinkedIn",
+                "color": "#04A9F4",
+                "orderindex": 0
+              },
+              {
+                "id": "fbc2806c-5cee-4500-95df-3cf18af8655a",
+                "name": "📚 Learning/Development",
+                "color": "#667684",
+                "orderindex": 1
+              },
+              {
+                "id": "db5a40c7-399b-4de0-bf4f-51c6dde667ab",
+                "name": "🧘 Health/Wellness",
+                "color": "#AF7E2E",
+                "orderindex": 2
+              },
+              {
+                "id": "f37aabcc-b889-4e39-9e9b-0c00d360cef9",
+                "name": "👨‍👩‍👧‍👦 Family",
+                "color": "#0231E8",
+                "orderindex": 3
+              },
+              {
+                "id": "c53955ca-8c59-4abc-aec4-3034e641e270",
+                "name": "👤 Personal",
+                "color": "#FF7FAB",
+                "orderindex": 4
+              },
+              {
+                "id": "db7a71bf-d98b-4d2d-84b0-9959db0d0aa2",
+                "name": "🎯 Strategy/Business",
+                "color": "#0231E8",
+                "orderindex": 5
+              },
+              {
+                "id": "abb2318e-ec0e-4bef-a457-fe4b3b7c488b",
+                "name": "⚙️ Tech/Tools",
+                "color": "#EA80FC",
+                "orderindex": 6
+              },
+              {
+                "id": "1a6f5c47-ad3b-4113-9dc5-4bbe20cf3bae",
+                "name": "👥 Team/HR",
+                "color": "#b5bcc2",
+                "orderindex": 7
+              },
+              {
+                "id": "da2dc7f2-bece-4775-a49b-3d8feb327399",
+                "name": "💰 Finance/Admin",
+                "color": "#2ecd6f",
+                "orderindex": 8
+              },
+              {
+                "id": "c0e69c60-cee2-4330-a281-727a12c1aaaa",
+                "name": "💼 Sales/Commercial",
+                "color": "#EA80FC",
+                "orderindex": 9
+              },
+              {
+                "id": "607a840c-eba3-45c6-bf7b-031bc8ae85e9",
+                "name": "🛠️ Product/Development",
+                "color": "#EA80FC",
+                "orderindex": 10
+              },
+              {
+                "id": "e8fc9d13-c336-46cc-908d-27ea6f05f504",
+                "name": "✍️ Content/Marketing",
+                "color": "#ff7800",
+                "orderindex": 11
+              }
+            ]
+          },
+          "date_created": "1761950732717",
+          "hide_from_guests": false,
+          "value": 0,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "9819a0e8-0dd8-465c-9a66-c259892c0d6f",
+          "name": "Request Type",
+          "type": "drop_down",
+          "type_config": {
+            "sorting": "manual",
+            "new_drop_down": true,
+            "options": [
+              {
+                "id": "51e443db-a0ac-414c-b06a-77984b672596",
+                "name": "Feature Request",
+                "color": "#02BCD4",
+                "orderindex": 0
+              },
+              {
+                "id": "da781a0b-1d3c-499c-a1c5-033db464623b",
+                "name": "Bug/Issue",
+                "color": "#f9d900",
+                "orderindex": 1
+              },
+              {
+                "id": "985d9468-139d-44f0-ad11-6343f8b880b1",
+                "name": "New Tool/Product",
+                "color": "#7C4DFF",
+                "orderindex": 2
+              },
+              {
+                "id": "f11b20d6-cf5f-44ee-84d2-89deec53bc2a",
+                "name": "Process Improvement",
+                "color": "#E65100",
+                "orderindex": 3
+              },
+              {
+                "id": "95178cee-4f5a-4aa5-85a8-6b80f7fb9cb6",
+                "name": "Content Idea",
+                "color": "#AF7E2E",
+                "orderindex": 4
+              },
+              {
+                "id": "4365173d-0217-499d-a0dc-7cd5311934b1",
+                "name": "General Idea",
+                "color": "#667684",
+                "orderindex": 5
+              },
+              {
+                "id": "828017cf-9897-46d1-a67b-bbf71ccceb4d",
+                "name": "Question/Research",
+                "color": "#f900ea",
+                "orderindex": 6
+              },
+              {
+                "id": "66211cfb-8779-4eec-9cb0-a6eb57bd28df",
+                "name": "Other",
+                "color": null,
+                "orderindex": 7
+              }
+            ]
+          },
+          "date_created": "1761668757841",
+          "hide_from_guests": false,
+          "required": true
+        },
+        {
+          "id": "aa7c311f-d5fd-40f3-98ce-87cebbd0490c",
+          "name": "✅ ✔️",
+          "type": "checkbox",
+          "type_config": {},
+          "date_created": "1762078037237",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "d6637a85-1a0d-4b31-8297-91b5b173692e",
+          "name": "🏷️ Labels",
+          "type": "labels",
+          "type_config": {
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "85127ff8-3714-4716-b4c8-db08d4aa5359",
+                "label": "🤝 Delegate",
+                "color": "#2ecd6f",
+                "orderindex": 0
+              },
+              {
+                "id": "3d64ae73-0958-4944-b7f1-020897f4519d",
+                "label": "💬 Discuss",
+                "color": "#b5bcc2",
+                "orderindex": 1
+              },
+              {
+                "id": "bdb7d9b7-aea4-4e6b-9862-d96f71b337c4",
+                "label": "🆘 Assistance",
+                "color": "#FF4081",
+                "orderindex": 2
+              },
+              {
+                "id": "19bc90d7-ea61-4108-babd-6d276d290317",
+                "label": "⏳ Waiting",
+                "color": "#AF7E2E",
+                "orderindex": 3
+              },
+              {
+                "id": "28ac2a14-9298-48a2-8e09-191f18883a46",
+                "label": "🚫 Blocked",
+                "color": "#e50000",
+                "orderindex": 4
+              },
+              {
+                "id": "af34a87f-fa53-459d-a4d2-04a800f11c70",
+                "label": "📌 Follow-up",
+                "color": "#04A9F4",
+                "orderindex": 5
+              }
+            ]
+          },
+          "date_created": "1761952533936",
+          "hide_from_guests": false,
+          "required": false
+        }
+      ],
+      "dependencies": [],
+      "linked_tasks": [],
+      "locations": [],
+      "team_id": "90151257705",
+      "url": "https://app.clickup.com/t/86c6dcwpt",
+      "sharing": {
+        "public": false,
+        "public_share_expires_on": null,
+        "public_fields": [
+          "assignees",
+          "priority",
+          "due_date",
+          "content",
+          "comments",
+          "attachments",
+          "customFields",
+          "subtasks",
+          "tags",
+          "checklists",
+          "coverimage"
+        ],
+        "token": null,
+        "seo_optimized": false
+      },
+      "permission_level": "create",
+      "list": {
+        "id": "901516319899",
+        "name": "🧠 Wouter - Brein Inbox",
+        "access": true
+      },
+      "project": {
+        "id": "901510548964",
+        "name": "hidden",
+        "hidden": true,
+        "access": true
+      },
+      "folder": {
+        "id": "901510548964",
+        "name": "hidden",
+        "hidden": true,
+        "access": true
+      },
+      "space": {
+        "id": "90157324928"
+      }
+    },
+    {
+      "id": "86c6dcwjb",
+      "custom_id": null,
+      "custom_item_id": 0,
+      "name": "📖 Ruben Hassid learnings & AI Guides",
+      "text_content": "Ruben Hassid heeft interessante learnings over AI, business en growth\n\n📚 Bronnen:\n\nMaster artikel: https://ruben.substack.com/p/master\nAI Guides collectie: Ruben Hassids AI Guides\n\nDoorlezen en eventueel toepassen in TwoFeetUp context",
+      "description": "Ruben Hassid heeft interessante learnings over AI, business en growth\n\n📚 Bronnen:\n\nMaster artikel: https://ruben.substack.com/p/master\nAI Guides collectie: Ruben Hassids AI Guides\n\nDoorlezen en eventueel toepassen in TwoFeetUp context",
+      "status": {
+        "status": "to do",
+        "id": "sc901516319899_iGEUdS7o",
+        "color": "#87909e",
+        "type": "open",
+        "orderindex": 0
+      },
+      "orderindex": "120485944.00000000000000000000000000000000",
+      "date_created": "1762510367974",
+      "date_updated": "1762510373776",
+      "date_closed": null,
+      "date_done": null,
+      "archived": false,
+      "creator": {
+        "id": 200590639,
+        "username": "Wouter van den Bijgaart",
+        "color": "",
+        "email": "wouter@twofeetup.com",
+        "profilePicture": "https://attachments.clickup.com/profilePictures/200590639_xyX.jpg"
+      },
+      "assignees": [
+        {
+          "id": 200590639,
+          "username": "Wouter van den Bijgaart",
+          "color": "",
+          "initials": "WB",
+          "email": "wouter@twofeetup.com",
+          "profilePicture": "https://attachments.clickup.com/profilePictures/200590639_xyX.jpg"
+        }
+      ],
+      "group_assignees": [],
+      "watchers": [
+        {
+          "id": 200590639,
+          "username": "Wouter van den Bijgaart",
+          "color": "",
+          "initials": "WB",
+          "email": "wouter@twofeetup.com",
+          "profilePicture": "https://attachments.clickup.com/profilePictures/200590639_xyX.jpg"
+        }
+      ],
+      "checklists": [],
+      "tags": [],
+      "parent": null,
+      "top_level_parent": null,
+      "priority": {
+        "color": "#6fddff",
+        "id": "3",
+        "orderindex": "3",
+        "priority": "normal"
+      },
+      "due_date": null,
+      "start_date": null,
+      "points": null,
+      "time_estimate": null,
+      "custom_fields": [
+        {
+          "id": "3720e74b-bee4-4c40-a2b9-5d18ce964b1e",
+          "name": "Related to",
+          "type": "text",
+          "type_config": {},
+          "date_created": "1761668818416",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "977fc1d6-9e54-4e02-aaa9-2f4113fa7770",
+          "name": "⏰ Duration",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Estimate how long this task will take: Quick for tasks under 15 minutes, Short for 15-30 minute tasks, Medium for 30-60 minute tasks, Long for 1-2 hour tasks, or Project for tasks requiring more than 2 hours or multiple sessions.",
+              "source": "custom_dropdown"
+            },
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "7cc5f9c4-f435-4fa0-83ba-ce72cf9c7ca8",
+                "name": "⚡ < 15m",
+                "color": "#2ecd6f",
+                "orderindex": 0
+              },
+              {
+                "id": "67e17fa4-f093-4e50-b0c5-fb18bd3db62d",
+                "name": "⏱️ 15-30m",
+                "color": "#02BCD4",
+                "orderindex": 1
+              },
+              {
+                "id": "5388bfec-2003-47fe-bb88-87b3c8a76927",
+                "name": "🕐  30-60m",
+                "color": "#f9d900",
+                "orderindex": 2
+              },
+              {
+                "id": "8cdea285-82f4-48d9-91f7-69db98d30699",
+                "name": "⏳ 1-2h",
+                "color": "#ff7800",
+                "orderindex": 3
+              },
+              {
+                "id": "25ee0dd9-1749-4daf-8195-d5c8572aaee5",
+                "name": "📅 >2h",
+                "color": "#e50000",
+                "orderindex": 4
+              }
+            ]
+          },
+          "date_created": "1761951496324",
+          "hide_from_guests": false,
+          "value": 2,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "1611801a-3591-4c90-9bb0-893ab36efa75",
+          "name": "⭐ ",
+          "type": "checkbox",
+          "type_config": {},
+          "date_created": "1761952592460",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "fabc0c58-3b7e-49de-b880-cb3f6c22a932",
+          "name": "🌎 Workspace",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Identify which business or life workspace this task belongs to: TwoFeetUp for TwoFeetUp Group related work, VR Nederland for VR Nederland/VR op Locatie work, or Personal for private life matters.",
+              "source": "custom_dropdown"
+            },
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "8ca5bc3d-415c-42a8-99c3-67c74af22252",
+                "name": "👣 TwoFeetUp",
+                "color": "#8ed8f8",
+                "orderindex": 0
+              },
+              {
+                "id": "19ba8d2d-51f4-40fc-bc60-29317def32fc",
+                "name": "🥽 VR Nederland",
+                "color": "#ff8156",
+                "orderindex": 1
+              },
+              {
+                "id": "9d202fef-6ed0-475f-9fea-d8205ce2da2c",
+                "name": "🏠 Personal",
+                "color": "#2ecd6f",
+                "orderindex": 2
+              }
+            ]
+          },
+          "date_created": "1761952429726",
+          "hide_from_guests": false,
+          "value": 0,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "8f776a51-f3c7-496c-8b2a-76fe0b7a93c9",
+          "name": "🏃 Action Type",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Categorize the task by the type of action required: Call for phone calls, Email for sending emails, Purchase for buying items, Meeting for scheduled discussions, Create for making/building something, Research for investigating or finding information, Technical for tech/system work, Administrative for admin tasks, Decision for choices to make, or Idea/Inspiration for creative thoughts and concepts.",
+              "source": "categorize"
+            },
+            "sorting": "manual",
+            "new_drop_down": true,
+            "options": [
+              {
+                "id": "e887f2ad-61d9-4436-a427-67c5adf9d4b7",
+                "name": "📞 Call",
+                "color": "#EA80FC",
+                "orderindex": 0
+              },
+              {
+                "id": "af4ddecd-d8de-40a2-b557-3e6b3d3d9e32",
+                "name": "📧 Email",
+                "color": "#0231E8",
+                "orderindex": 1
+              },
+              {
+                "id": "b4976b7b-2458-4c0f-9c39-02c9c6c33a4d",
+                "name": "🛒 Purchase",
+                "color": "#800000",
+                "orderindex": 2
+              },
+              {
+                "id": "a2803223-4dda-4fac-bfd5-df554da27e7b",
+                "name": "🤝 Meeting",
+                "color": "#AF7E2E",
+                "orderindex": 3
+              },
+              {
+                "id": "6c52fbbc-ba55-47a1-9c59-e48a410f6288",
+                "name": "📝 Create",
+                "color": "#E65100",
+                "orderindex": 4
+              },
+              {
+                "id": "f23aabb6-8bb4-4553-9612-6533dc2523f9",
+                "name": "🔍 Research",
+                "color": "#04A9F4",
+                "orderindex": 5
+              },
+              {
+                "id": "d949b9b6-2531-4168-af1c-530d9313d71b",
+                "name": "⚙️ Technical",
+                "color": "#81B1FF",
+                "orderindex": 6
+              },
+              {
+                "id": "09cd4535-d77f-40ff-8041-b101e305737b",
+                "name": "📋 Administrative",
+                "color": "#e50000",
+                "orderindex": 7
+              },
+              {
+                "id": "d687e4c2-d956-4c91-90ba-a0e92e8772a9",
+                "name": "💭 Decision",
+                "color": "#800000",
+                "orderindex": 8
+              },
+              {
+                "id": "4c14f286-558c-4df8-92a0-04b128588576",
+                "name": "💡 Inspiration",
+                "color": "#bf55ec",
+                "orderindex": 9
+              }
+            ]
+          },
+          "date_created": "1761950303719",
+          "hide_from_guests": false,
+          "value": 5,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "c31d3c36-ca98-4b51-8ad7-c08b349b8b16",
+          "name": "📁 Area",
+          "type": "drop_down",
+          "type_config": {
+            "ai": {
+              "prompt": "Categorize the task by its area of responsibility: LinkedIn for LinkedIn-specific content, Content/Marketing for general marketing, Product/Development for building features, Sales/Commercial for client work, Finance/Admin for financial tasks, Team/HR for people management, Tech/Tools for system work, Strategy/Business for planning, Personal for individual tasks, Family for family-related items, Health/Wellness for health matters, or Learning/Development for education and growth.",
+              "source": "custom_dropdown"
+            },
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "923414b5-52c6-4e34-94c6-1aa16896213a",
+                "name": "📱 LinkedIn",
+                "color": "#04A9F4",
+                "orderindex": 0
+              },
+              {
+                "id": "fbc2806c-5cee-4500-95df-3cf18af8655a",
+                "name": "📚 Learning/Development",
+                "color": "#667684",
+                "orderindex": 1
+              },
+              {
+                "id": "db5a40c7-399b-4de0-bf4f-51c6dde667ab",
+                "name": "🧘 Health/Wellness",
+                "color": "#AF7E2E",
+                "orderindex": 2
+              },
+              {
+                "id": "f37aabcc-b889-4e39-9e9b-0c00d360cef9",
+                "name": "👨‍👩‍👧‍👦 Family",
+                "color": "#0231E8",
+                "orderindex": 3
+              },
+              {
+                "id": "c53955ca-8c59-4abc-aec4-3034e641e270",
+                "name": "👤 Personal",
+                "color": "#FF7FAB",
+                "orderindex": 4
+              },
+              {
+                "id": "db7a71bf-d98b-4d2d-84b0-9959db0d0aa2",
+                "name": "🎯 Strategy/Business",
+                "color": "#0231E8",
+                "orderindex": 5
+              },
+              {
+                "id": "abb2318e-ec0e-4bef-a457-fe4b3b7c488b",
+                "name": "⚙️ Tech/Tools",
+                "color": "#EA80FC",
+                "orderindex": 6
+              },
+              {
+                "id": "1a6f5c47-ad3b-4113-9dc5-4bbe20cf3bae",
+                "name": "👥 Team/HR",
+                "color": "#b5bcc2",
+                "orderindex": 7
+              },
+              {
+                "id": "da2dc7f2-bece-4775-a49b-3d8feb327399",
+                "name": "💰 Finance/Admin",
+                "color": "#2ecd6f",
+                "orderindex": 8
+              },
+              {
+                "id": "c0e69c60-cee2-4330-a281-727a12c1aaaa",
+                "name": "💼 Sales/Commercial",
+                "color": "#EA80FC",
+                "orderindex": 9
+              },
+              {
+                "id": "607a840c-eba3-45c6-bf7b-031bc8ae85e9",
+                "name": "🛠️ Product/Development",
+                "color": "#EA80FC",
+                "orderindex": 10
+              },
+              {
+                "id": "e8fc9d13-c336-46cc-908d-27ea6f05f504",
+                "name": "✍️ Content/Marketing",
+                "color": "#ff7800",
+                "orderindex": 11
+              }
+            ]
+          },
+          "date_created": "1761950732717",
+          "hide_from_guests": false,
+          "value": 1,
+          "value_richtext": null,
+          "required": false
+        },
+        {
+          "id": "9819a0e8-0dd8-465c-9a66-c259892c0d6f",
+          "name": "Request Type",
+          "type": "drop_down",
+          "type_config": {
+            "sorting": "manual",
+            "new_drop_down": true,
+            "options": [
+              {
+                "id": "51e443db-a0ac-414c-b06a-77984b672596",
+                "name": "Feature Request",
+                "color": "#02BCD4",
+                "orderindex": 0
+              },
+              {
+                "id": "da781a0b-1d3c-499c-a1c5-033db464623b",
+                "name": "Bug/Issue",
+                "color": "#f9d900",
+                "orderindex": 1
+              },
+              {
+                "id": "985d9468-139d-44f0-ad11-6343f8b880b1",
+                "name": "New Tool/Product",
+                "color": "#7C4DFF",
+                "orderindex": 2
+              },
+              {
+                "id": "f11b20d6-cf5f-44ee-84d2-89deec53bc2a",
+                "name": "Process Improvement",
+                "color": "#E65100",
+                "orderindex": 3
+              },
+              {
+                "id": "95178cee-4f5a-4aa5-85a8-6b80f7fb9cb6",
+                "name": "Content Idea",
+                "color": "#AF7E2E",
+                "orderindex": 4
+              },
+              {
+                "id": "4365173d-0217-499d-a0dc-7cd5311934b1",
+                "name": "General Idea",
+                "color": "#667684",
+                "orderindex": 5
+              },
+              {
+                "id": "828017cf-9897-46d1-a67b-bbf71ccceb4d",
+                "name": "Question/Research",
+                "color": "#f900ea",
+                "orderindex": 6
+              },
+              {
+                "id": "66211cfb-8779-4eec-9cb0-a6eb57bd28df",
+                "name": "Other",
+                "color": null,
+                "orderindex": 7
+              }
+            ]
+          },
+          "date_created": "1761668757841",
+          "hide_from_guests": false,
+          "required": true
+        },
+        {
+          "id": "aa7c311f-d5fd-40f3-98ce-87cebbd0490c",
+          "name": "✅ ✔️",
+          "type": "checkbox",
+          "type_config": {},
+          "date_created": "1762078037237",
+          "hide_from_guests": false,
+          "required": false
+        },
+        {
+          "id": "d6637a85-1a0d-4b31-8297-91b5b173692e",
+          "name": "🏷️ Labels",
+          "type": "labels",
+          "type_config": {
+            "sorting": "manual",
+            "options": [
+              {
+                "id": "85127ff8-3714-4716-b4c8-db08d4aa5359",
+                "label": "🤝 Delegate",
+                "color": "#2ecd6f",
+                "orderindex": 0
+              },
+              {
+                "id": "3d64ae73-0958-4944-b7f1-020897f4519d",
+                "label": "💬 Discuss",
+                "color": "#b5bcc2",
+                "orderindex": 1
+              },
+              {
+                "id": "bdb7d9b7-aea4-4e6b-9862-d96f71b337c4",
+                "label": "🆘 Assistance",
+                "color": "#FF4081",
+                "orderindex": 2
+              },
+              {
+                "id": "19bc90d7-ea61-4108-babd-6d276d290317",
+                "label": "⏳ Waiting",
+                "color": "#AF7E2E",
+                "orderindex": 3
+              },
+              {
+                "id": "28ac2a14-9298-48a2-8e09-191f18883a46",
+                "label": "🚫 Blocked",
+                "color": "#e50000",
+                "orderindex": 4
+              },
+              {
+                "id": "af34a87f-fa53-459d-a4d2-04a800f11c70",
+                "label": "📌 Follow-up",
+                "color": "#04A9F4",
+                "orderindex": 5
+              }
+            ]
+          },
+          "date_created": "1761952533936",
+          "hide_from_guests": false,
+          "required": false
+        }
+      ],
+      "dependencies": [],
+      "linked_tasks": [],
+      "locations": [],
+      "team_id": "90151257705",
+      "url": "https://app.clickup.com/t/86c6dcwjb",
+      "sharing": {
+        "public": false,
+        "public_share_expires_on": null,
+        "public_fields": [
+          "assignees",
+          "priority",
+          "due_date",
+          "content",
+          "comments",
+          "attachments",
+          "customFields",
+          "subtasks",
+          "tags",
+          "checklists",
+          "coverimage"
+        ],
+        "token": null,
+        "seo_optimized": false
+      },
+      "permission_level": "create",
+      "list": {
+        "id": "901516319899",
+        "name": "🧠 Wouter - Brein Inbox",
+        "access": true
+      },
+      "project": {
+        "id": "901510548964",
+        "name": "hidden",
+        "hidden": true,
+        "access": true
+      },
+      "folder": {
+        "id": "901510548964",
+        "name": "hidden",
+        "hidden": true,
+        "access": true
+      },
+      "space": {
+        "id": "90157324928"
+      }
+    }
+  ],
+  "metadata": {
+    "estimatedTokens": 14964,
+    "detailLevel": "detailed",
+    "pagination": {
+      "offset": 0,
+      "limit": 5,
+      "total": 100,
+      "hasMore": true
+    }
+  }
+}

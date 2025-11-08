@@ -1,0 +1,146 @@
+======================================================================
+TOKEN USAGE MEASUREMENT
+Using Anthropic Messages Count Tokens API with MCP Tool Calls
+======================================================================
+
+🔧 Starting MCP server...
+✅ MCP server connected
+
+📊 Measuring 1 tasks at 'minimal' detail level...
+  📝 Got response with 1 tasks
+  ✅ 1 tasks: 141 tokens (141.0 per task)
+
+📊 Measuring 1 tasks at 'standard' detail level...
+  📝 Got response with 1 tasks
+  ✅ 1 tasks: 189 tokens (189.0 per task)
+
+📊 Measuring 1 tasks at 'detailed' detail level...
+  📝 Got response with 1 tasks
+  ✅ 1 tasks: 2805 tokens (2805.0 per task)
+
+📊 Measuring 5 tasks at 'minimal' detail level...
+  📝 Got response with 5 tasks
+  ✅ 5 tasks: 431 tokens (86.2 per task)
+
+📊 Measuring 5 tasks at 'standard' detail level...
+  📝 Got response with 5 tasks
+  ✅ 5 tasks: 757 tokens (151.4 per task)
+
+📊 Measuring 5 tasks at 'detailed' detail level...
+  📝 Got response with 5 tasks
+  ✅ 5 tasks: 25326 tokens (5065.2 per task)
+
+📊 Measuring 10 tasks at 'minimal' detail level...
+  📝 Got response with 10 tasks
+  ✅ 10 tasks: 773 tokens (77.3 per task)
+
+📊 Measuring 10 tasks at 'standard' detail level...
+  📝 Got response with 10 tasks
+  ✅ 10 tasks: 1482 tokens (148.2 per task)
+
+📊 Measuring 10 tasks at 'detailed' detail level...
+  📝 Got response with 10 tasks
+  ✅ 10 tasks: 53018 tokens (5301.8 per task)
+
+📊 Measuring 25 tasks at 'minimal' detail level...
+  📝 Got response with 25 tasks
+  ✅ 25 tasks: 1632 tokens (65.3 per task)
+
+📊 Measuring 25 tasks at 'standard' detail level...
+  📝 Got response with 25 tasks
+  ✅ 25 tasks: 2908 tokens (116.3 per task)
+
+📊 Measuring 25 tasks at 'detailed' detail level...
+  📝 Got response with 25 tasks
+  ✅ 25 tasks: 2952 tokens (118.1 per task)
+
+📊 Measuring 50 tasks at 'minimal' detail level...
+  📝 Got response with 50 tasks
+  ✅ 50 tasks: 3252 tokens (65.0 per task)
+
+📊 Measuring 50 tasks at 'standard' detail level...
+  📝 Got response with 50 tasks
+  ✅ 50 tasks: 5843 tokens (116.9 per task)
+
+📊 Measuring 50 tasks at 'detailed' detail level...
+  📝 Got response with 50 tasks
+  ✅ 50 tasks: 5887 tokens (117.7 per task)
+
+📊 Measuring 100 tasks at 'minimal' detail level...
+  📝 Got response with 100 tasks
+  ✅ 100 tasks: 6233 tokens (62.3 per task)
+
+📊 Measuring 100 tasks at 'standard' detail level...
+  📝 Got response with 100 tasks
+  ✅ 100 tasks: 9447 tokens (94.5 per task)
+
+✅ MCP server disconnected
+
+======================================================================
+ANALYSIS: Token Thresholds for 10,000 Token Limit
+======================================================================
+
+📈 MINIMAL Detail Level:
+  Average tokens per task: 82.9
+  Estimated max tasks for 10000 tokens: ~120 tasks
+  Measurements:
+    ✅ 1 tasks = 141 tokens (141/task)
+    ✅ 5 tasks = 431 tokens (86.2/task)
+    ✅ 10 tasks = 773 tokens (77.3/task)
+    ✅ 25 tasks = 1632 tokens (65.3/task)
+    ✅ 50 tasks = 3252 tokens (65/task)
+    ✅ 100 tasks = 6233 tokens (62.3/task)
+
+📈 STANDARD Detail Level:
+  Average tokens per task: 136.0
+  Estimated max tasks for 10000 tokens: ~73 tasks
+  Measurements:
+    ✅ 1 tasks = 189 tokens (189/task)
+    ✅ 5 tasks = 757 tokens (151.4/task)
+    ✅ 10 tasks = 1482 tokens (148.2/task)
+    ✅ 25 tasks = 2908 tokens (116.3/task)
+    ✅ 50 tasks = 5843 tokens (116.9/task)
+    ✅ 100 tasks = 9447 tokens (94.5/task)
+
+📈 DETAILED Detail Level:
+  Average tokens per task: 2681.6
+  Estimated max tasks for 10000 tokens: ~3 tasks
+  Measurements:
+    ✅ 1 tasks = 2805 tokens (2805/task)
+    ❌ 5 tasks = 25326 tokens (5065.2/task)
+    ❌ 10 tasks = 53018 tokens (5301.8/task)
+    ✅ 25 tasks = 2952 tokens (118.1/task)
+    ✅ 50 tasks = 5887 tokens (117.7/task)
+
+======================================================================
+RECOMMENDED THRESHOLDS
+======================================================================
+
+For 10,000 token limit (based on REAL MCP responses):
+
+1. DETAILED level:
+   - Use when: ≤ 3 tasks
+   - Avg 2681.6 tokens/task
+
+2. STANDARD level:
+   - Use when: 4 - 73 tasks
+   - Avg 136.0 tokens/task
+
+3. MINIMAL level:
+   - Use when: > 73 tasks
+   - Avg 82.9 tokens/task
+   - Safe up to ~120 tasks
+
+Implementation for consolidated-handlers.ts:
+
+const DETAILED_THRESHOLD = 3;    // tasks
+const STANDARD_THRESHOLD = 73;   // tasks
+const TOKEN_LIMIT = 10000;       // tokens
+
+Auto-downgrade logic:
+- If task_count > STANDARD_THRESHOLD → minimal
+- Else if task_count > DETAILED_THRESHOLD && detail_level == 'detailed' → standard
+
+
+📁 Full results saved to: playground/token-measurement-results.json
+

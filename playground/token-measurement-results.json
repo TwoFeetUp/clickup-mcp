@@ -1,0 +1,135 @@
+{
+  "timestamp": "2025-11-08T09:27:35.537Z",
+  "tokenLimit": 10000,
+  "results": [
+    {
+      "taskCount": 1,
+      "detailLevel": "minimal",
+      "totalTokens": 141,
+      "tokensPerTask": 141,
+      "responseSize": 325
+    },
+    {
+      "taskCount": 1,
+      "detailLevel": "standard",
+      "totalTokens": 189,
+      "tokensPerTask": 189,
+      "responseSize": 444
+    },
+    {
+      "taskCount": 1,
+      "detailLevel": "detailed",
+      "totalTokens": 1057,
+      "tokensPerTask": 1057,
+      "responseSize": 3006
+    },
+    {
+      "taskCount": 5,
+      "detailLevel": "minimal",
+      "totalTokens": 431,
+      "tokensPerTask": 86.2,
+      "responseSize": 996
+    },
+    {
+      "taskCount": 5,
+      "detailLevel": "standard",
+      "totalTokens": 757,
+      "tokensPerTask": 151.4,
+      "responseSize": 1892
+    },
+    {
+      "taskCount": 5,
+      "detailLevel": "detailed",
+      "totalTokens": 5063,
+      "tokensPerTask": 1012.6,
+      "responseSize": 14425
+    },
+    {
+      "taskCount": 10,
+      "detailLevel": "minimal",
+      "totalTokens": 773,
+      "tokensPerTask": 77.3,
+      "responseSize": 1787
+    },
+    {
+      "taskCount": 10,
+      "detailLevel": "standard",
+      "totalTokens": 1482,
+      "tokensPerTask": 148.2,
+      "responseSize": 3735
+    },
+    {
+      "taskCount": 10,
+      "detailLevel": "detailed",
+      "totalTokens": 11405,
+      "tokensPerTask": 1140.5,
+      "responseSize": 32006
+    },
+    {
+      "taskCount": 25,
+      "detailLevel": "minimal",
+      "totalTokens": 1632,
+      "tokensPerTask": 65.3,
+      "responseSize": 3962
+    },
+    {
+      "taskCount": 25,
+      "detailLevel": "standard",
+      "totalTokens": 2908,
+      "tokensPerTask": 116.3,
+      "responseSize": 7420
+    },
+    {
+      "taskCount": 25,
+      "detailLevel": "detailed",
+      "totalTokens": 2952,
+      "tokensPerTask": 118.1,
+      "responseSize": 7570
+    },
+    {
+      "taskCount": 50,
+      "detailLevel": "minimal",
+      "totalTokens": 3252,
+      "tokensPerTask": 65,
+      "responseSize": 7876
+    },
+    {
+      "taskCount": 50,
+      "detailLevel": "standard",
+      "totalTokens": 5843,
+      "tokensPerTask": 116.9,
+      "responseSize": 14984
+    },
+    {
+      "taskCount": 50,
+      "detailLevel": "detailed",
+      "totalTokens": 5887,
+      "tokensPerTask": 117.7,
+      "responseSize": 15134
+    },
+    {
+      "taskCount": 100,
+      "detailLevel": "minimal",
+      "totalTokens": 6233,
+      "tokensPerTask": 62.3,
+      "responseSize": 15283
+    },
+    {
+      "taskCount": 100,
+      "detailLevel": "standard",
+      "totalTokens": 9447,
+      "tokensPerTask": 94.5,
+      "responseSize": 24181
+    }
+  ],
+  "averages": {
+    "detailed": 689.18,
+    "standard": 136.04999999999998,
+    "minimal": 82.85000000000001
+  },
+  "thresholds": {
+    "detailed": 14,
+    "standard": 73,
+    "minimal": 120
+  }
+}

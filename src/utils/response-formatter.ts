@@ -146,13 +146,25 @@ export function removeEmptyFields<T extends Record<string, any>>(
  * - status: object → string
  * - assignees: full objects → usernames array
  * - list/folder/space: full objects → name string
+ * - custom_fields: removed entirely (huge token saver - 57% of response!)
  */
 export function simplifyNestedObjects(obj: any, detailLevel: DetailLevel): any {
   if (!obj || typeof obj !== 'object') return obj;
 
   const simplified: any = { ...obj };
 
-  // Only simplify at minimal/standard levels
+  // Remove custom_fields at ALL detail levels - they're schema definitions with no values
+  // This alone saves 57% of tokens! Schema should be fetched separately if needed.
+  if (simplified.custom_fields) {
+    delete simplified.custom_fields;
+  }
+
+  // Remove sharing object - it's workspace-level config, identical across all tasks
+  if (simplified.sharing) {
+    delete simplified.sharing;
+  }
+
+  // Only simplify user objects at minimal/standard levels
   if (detailLevel === 'minimal' || detailLevel === 'standard') {
     // Simplify status: {status: "open", ...} → "open"
     if (simplified.status && typeof simplified.status === 'object') {
