@@ -169,4 +169,4 @@ MIT
 
 This optimized version builds upon the original [ClickUp MCP Server](https://github.com/TaazKareem/clickup-mcp-server) by Talib Kareem, with significant architectural improvements and performance optimizations.
 
-Optimizations by Sjoerd van Beuningen.
+Optimizations by Sjoerd Tiemensma.
