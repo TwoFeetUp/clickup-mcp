@@ -40,6 +40,32 @@ const logger = new Logger('ConsolidatedHandlers');
 const { task: taskService } = clickUpServices;
 
 //=============================================================================
+// DATE CONVERSION HELPER
+//=============================================================================
+
+/**
+ * Convert date string to Unix timestamp in milliseconds
+ * Accepts: ISO dates, human-readable dates, or timestamps
+ */
+function convertToTimestamp(dateInput: string | number): string {
+  // Already a timestamp
+  if (typeof dateInput === 'number' || /^\d+$/.test(dateInput)) {
+    const timestamp = typeof dateInput === 'string' ? parseInt(dateInput) : dateInput;
+    // If it's in seconds, convert to milliseconds
+    return timestamp < 10000000000 ? (timestamp * 1000).toString() : timestamp.toString();
+  }
+
+  // Parse date string
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) {
+    logger.warn(`Invalid date format: ${dateInput}, returning as-is`);
+    return dateInput.toString();
+  }
+
+  return date.getTime().toString();
+}
+
+//=============================================================================
 // MANAGE TASK HANDLER - consolidates create/update/delete/move/duplicate
 //=============================================================================
 
@@ -203,6 +229,14 @@ export async function handleSearchTasks(params: any) {
       if (assigneeIds) {
         searchParams.assignees = assigneeIds;
       }
+
+      // Auto-convert date strings to timestamps
+      if (searchParams.date_created_gt) searchParams.date_created_gt = convertToTimestamp(searchParams.date_created_gt);
+      if (searchParams.date_created_lt) searchParams.date_created_lt = convertToTimestamp(searchParams.date_created_lt);
+      if (searchParams.date_updated_gt) searchParams.date_updated_gt = convertToTimestamp(searchParams.date_updated_gt);
+      if (searchParams.date_updated_lt) searchParams.date_updated_lt = convertToTimestamp(searchParams.date_updated_lt);
+      if (searchParams.due_date_gt) searchParams.due_date_gt = convertToTimestamp(searchParams.due_date_gt);
+      if (searchParams.due_date_lt) searchParams.due_date_lt = convertToTimestamp(searchParams.due_date_lt);
 
       const workspaceTasks = await getWorkspaceTasksHandler(taskService, searchParams);
 
