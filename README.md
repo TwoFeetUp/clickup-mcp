@@ -31,7 +31,7 @@ This repository builds on the original ClickUp MCP server with significant perfo
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/clickup-mcp.git
+git clone https://github.com/TwoFeetUp/clickup-mcp.git
 cd clickup-mcp
 ```
 

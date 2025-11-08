@@ -1,5 +1,5 @@
 {
-  "name": "clickup-mcp",
+  "name": "@twofeetup/clickup-mcp",
   "version": "1.0.0",
   "description": "Optimized ClickUp MCP Server - High-performance AI integration with consolidated tools and response optimization",
   "type": "module",
@@ -42,12 +42,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/clickup-mcp.git"
+    "url": "git+https://github.com/TwoFeetUp/clickup-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/clickup-mcp/issues"
+    "url": "https://github.com/TwoFeetUp/clickup-mcp/issues"
   },
-  "homepage": "https://github.com/yourusername/clickup-mcp#readme",
+  "homepage": "https://github.com/TwoFeetUp/clickup-mcp#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.11.3",
     "axios": "^1.6.7",
