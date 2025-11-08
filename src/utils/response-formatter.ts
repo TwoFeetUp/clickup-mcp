@@ -69,7 +69,7 @@ export interface FormattedResponse<T = any> {
 const FIELD_DEFINITIONS = {
   task: {
     minimal: ['id', 'name', 'status', 'list'],
-    standard: ['id', 'name', 'status', 'list', 'assignees', 'due_date', 'priority', 'tags'],
+    standard: ['id', 'name', 'status', 'list', 'assignees', 'due_date', 'priority', 'tags', 'custom_fields'],
     detailed: ['*'] // All fields
   },
   list: {
@@ -153,10 +153,36 @@ export function simplifyNestedObjects(obj: any, detailLevel: DetailLevel): any {
 
   const simplified: any = { ...obj };
 
-  // Remove custom_fields at ALL detail levels - they're schema definitions with no values
-  // This alone saves 57% of tokens! Schema should be fetched separately if needed.
-  if (simplified.custom_fields) {
-    delete simplified.custom_fields;
+  // Smart custom_fields handling:
+  // - Keep only fields that have actual values
+  // - At minimal/standard: simplify to just {id, name, value}
+  // - At detailed: keep full structure
+  if (Array.isArray(simplified.custom_fields)) {
+    // Filter to only custom fields with actual values
+    const fieldsWithValues = simplified.custom_fields.filter((field: any) =>
+      field.value !== undefined && field.value !== null
+    );
+
+    if (fieldsWithValues.length === 0) {
+      // No values - remove entirely to save tokens
+      delete simplified.custom_fields;
+    } else if (detailLevel === 'minimal' || detailLevel === 'standard') {
+      // Simplify to just essential data: {id, name, value}
+      simplified.custom_fields = fieldsWithValues.map((field: any) => ({
+        id: field.id,
+        name: field.name,
+        value: field.value
+      }));
+    } else {
+      // Detailed level: simplify but keep type info, remove type_config bloat
+      simplified.custom_fields = fieldsWithValues.map((field: any) => ({
+        id: field.id,
+        name: field.name,
+        type: field.type,
+        value: field.value,
+        required: field.required
+      }));
+    }
   }
 
   // Remove sharing object - it's workspace-level config, identical across all tasks
