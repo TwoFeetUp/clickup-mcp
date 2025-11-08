@@ -9,13 +9,16 @@
  * and in folders.
  */
 
-import { 
-  CreateListData, 
+import {
+  CreateListData,
   ClickUpList
 } from '../services/clickup/types.js';
 import { listService, workspaceService } from '../services/shared.js';
 import config from '../config.js';
 import { sponsorService } from '../utils/sponsor-service.js';
+import { Logger } from '../logger.js';
+
+const logger = new Logger('ListTools');
 
 /**
  * Tool definition for creating a list directly in a space
@@ -186,9 +189,30 @@ export const deleteListTool = {
 /**
  * Helper function to find a list ID by name
  * Uses the ClickUp service's global list search functionality
+ * @param workspaceService - Workspace service instance
+ * @param listName - Name of the list to find
+ * @param spaceId - Optional space ID for optimized direct API lookup
  */
-export async function findListIDByName(workspaceService: any, listName: string): Promise<{ id: string; name: string } | null> {
-  // Use workspace service to find the list in the hierarchy
+export async function findListIDByName(
+  workspaceService: any,
+  listName: string,
+  spaceId?: string
+): Promise<{ id: string; name: string } | null> {
+  // Optimization: Try direct lookup first if spaceId provided
+  if (spaceId) {
+    try {
+      const lists = await workspaceService.getListsInSpace(spaceId);
+      const matchingList = lists.find((list: any) => list.name === listName);
+      if (matchingList) {
+        logger.debug(`Found list "${listName}" in space ${spaceId} via direct API call`);
+        return { id: matchingList.id, name: listName };
+      }
+    } catch (error) {
+      logger.warn(`Failed to search space ${spaceId} directly, falling back to hierarchy: ${error.message}`);
+    }
+  }
+
+  // Fallback: Use workspace hierarchy to find the list globally
   const hierarchy = await workspaceService.getWorkspaceHierarchy();
   const listInfo = workspaceService.findIDByNameInHierarchy(hierarchy, listName, 'list');
   if (!listInfo) return null;
