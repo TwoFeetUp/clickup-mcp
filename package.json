@@ -1,6 +1,6 @@
 {
   "name": "@twofeetup/clickup-mcp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Optimized ClickUp MCP Server - High-performance AI integration with consolidated tools and response optimization",
   "type": "module",
   "main": "build/index.js",
