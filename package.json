@@ -1,18 +1,17 @@
 {
-  "name": "@taazkareem/clickup-mcp-server",
-  "version": "0.8.5",
-  "description": "ClickUp MCP Server - Integrate ClickUp tasks with AI through Model Context Protocol",
+  "name": "clickup-mcp",
+  "version": "1.0.0",
+  "description": "Optimized ClickUp MCP Server - High-performance AI integration with consolidated tools and response optimization",
   "type": "module",
   "main": "build/index.js",
   "bin": {
-    "clickup-mcp-server": "build/index.js"
+    "clickup-mcp": "build/index.js"
   },
   "files": [
     "build",
     "README.md",
     "LICENSE",
-    "Dockerfile",
-    "smithery.yaml"
+    "Dockerfile"
   ],
   "scripts": {
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
@@ -27,33 +26,28 @@
     "tasks",
     "project-management",
     "model-context-protocol",
-    "clickup-server",
-    "clickup-mcp-server",
     "task-management",
     "productivity",
     "automation",
     "workflow",
     "team-collaboration",
     "artificial-intelligence",
-    "project-tracking",
-    "task-tracking",
-    "project-planning",
     "clickup-integration",
     "clickup-api",
-    "clickup-automation",
-    "task-organization",
-    "project-organization"
+    "performance-optimized",
+    "consolidated-tools",
+    "ai-first-design"
   ],
-  "author": "Talib Kareem",
+  "author": "Sjoerd van Beuningen",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/taazkareem/clickup-mcp-server.git"
+    "url": "git+https://github.com/yourusername/clickup-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/taazkareem/clickup-mcp-server/issues"
+    "url": "https://github.com/yourusername/clickup-mcp/issues"
   },
-  "homepage": "https://github.com/taazkareem/clickup-mcp-server#readme",
+  "homepage": "https://github.com/yourusername/clickup-mcp#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.11.3",
     "axios": "^1.6.7",

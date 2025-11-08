@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: © 2025 Talib Kareem <taazkareem@icloud.com>
+ * SPDX-FileCopyrightText: © 2025 Sjoerd van Beuningen
  * SPDX-License-Identifier: MIT
  *
  * Configuration handling for ClickUp API credentials and application settings
