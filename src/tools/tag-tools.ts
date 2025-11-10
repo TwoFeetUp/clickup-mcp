@@ -32,7 +32,7 @@ const { task: taskService } = clickUpServices;
 //=============================================================================
 
 /**
- * Consolidated manage_tags tool definition
+ * Consolidated operate_tags tool definition
  *
  * Unified interface for all tag operations with two primary scopes:
  *
@@ -52,8 +52,8 @@ const { task: taskService } = clickUpServices;
  * - Add tag to task: scope="task", action="add", taskId="abc123", tagName="bug"
  * - Remove tag from task: scope="task", action="remove", taskId="abc123", tagName="bug"
  */
-export const manageTagsTool = {
-  name: "manage_tags",
+export const operateTagsTool = {
+  name: "operate_tags",
   description: `Unified tag management for ClickUp workspaces.
 
 SPACE SCOPE - Manage tags in a space:
@@ -151,12 +151,12 @@ DETAIL LEVELS:
 //=============================================================================
 
 /**
- * Main handler for manage_tags tool
+ * Main handler for operate_tags tool
  * Routes to appropriate function based on scope and action
  */
-export async function handleManageTags(params: any) {
+export async function handleOperateTags(params: any) {
   try {
-    logger.debug('handleManageTags called', { scope: params.scope, action: params.action });
+    logger.debug('handleOperateTags called', { scope: params.scope, action: params.action });
 
     const { scope, action } = params;
 
@@ -192,7 +192,7 @@ export async function handleManageTags(params: any) {
 
     return sponsorService.createResponse(result);
   } catch (error: any) {
-    logger.error('Error in handleManageTags', { error: error.message });
+    logger.error('Error in handleOperateTags', { error: error.message });
     return sponsorService.createErrorResponse(error, params);
   }
 }
@@ -709,7 +709,7 @@ async function resolveTaskId(params: {
 /**
  * Tool definition and handler mapping
  */
-export const tagToolDefinition = { definition: manageTagsTool, handler: handleManageTags };
+export const tagToolDefinition = { definition: operateTagsTool, handler: handleOperateTags };
 
 /**
  * Array for easy tool registration (for backward compatibility)

@@ -50,8 +50,8 @@ import {
 } from "./tools/member-tools.js";
 
 import {
-  manageTagsTool,
-  handleManageTags
+  operateTagsTool,
+  handleOperateTags
 } from "./tools/tag-tools.js";
 
 import {
@@ -149,7 +149,7 @@ export function configureServer() {
         // Member tools (1 consolidated tool)
         findMembersTool,
         // Tag tools (1 consolidated tool)
-        manageTagsTool,
+        operateTagsTool,
         // Document tools (3 consolidated tools)
         ...documentModule()
       ].filter(tool => isToolEnabled(tool.name))
@@ -220,8 +220,8 @@ export function configureServer() {
           );
 
         // CONSOLIDATED TAG HANDLERS
-        case "manage_tags":
-          return handleManageTags(params);
+        case "operate_tags":
+          return handleOperateTags(params);
 
         // CONSOLIDATED DOCUMENT HANDLERS
         case "manage_document":

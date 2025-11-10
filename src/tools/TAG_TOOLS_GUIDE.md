@@ -2,12 +2,12 @@
 
 ## Overview
 
-The `manage_tags` tool consolidates 6 individual tag management tools into a single, flexible interface that follows MCP design principles. This tool handles all tag-related operations across ClickUp workspaces with a unified API.
+The `operate_tags` tool consolidates 6 individual tag management tools into a single, flexible interface that follows MCP design principles. This tool handles all tag-related operations across ClickUp workspaces with a unified API.
 
 ## File Location
 - **Implementation**: `src/tools/tag-tools.ts`
-- **Handler**: `handleManageTags()` function
-- **Tool Definition**: `manageTagsTool` constant
+- **Handler**: `handleOperateTags()` function
+- **Tool Definition**: `operateTagsTool` constant
 
 ## Tool Architecture
 
@@ -308,7 +308,7 @@ The tool provides specific error codes for different failure scenarios:
 - **Modular Handlers**: Each operation has its own isolated handler function
 
 ### Key Functions
-1. `handleManageTags()` - Main entry point
+1. `handleOperateTags()` - Main entry point
 2. `handleSpaceTagOperation()` - Routes space scope operations
 3. `handleTaskTagOperation()` - Routes task scope operations
 4. `resolveSpaceId()` - Resolves space ID from name or ID
@@ -324,14 +324,14 @@ The tool provides specific error codes for different failure scenarios:
 
 ## Migration from Individual Tools
 
-The following 6 individual tools are consolidated into `manage_tags`:
+The following 6 individual tools are consolidated into `operate_tags`:
 
-1. `get_space_tags` → `manage_tags` with `scope="space", action="list"`
-2. `create_space_tag` → `manage_tags` with `scope="space", action="create"`
-3. `update_space_tag` → `manage_tags` with `scope="space", action="update"`
-4. `delete_space_tag` → `manage_tags` with `scope="space", action="delete"`
-5. `add_tag_to_task` → `manage_tags` with `scope="task", action="add"`
-6. `remove_tag_from_task` → `manage_tags` with `scope="task", action="remove"`
+1. `get_space_tags` → `operate_tags` with `scope="space", action="list"`
+2. `create_space_tag` → `operate_tags` with `scope="space", action="create"`
+3. `update_space_tag` → `operate_tags` with `scope="space", action="update"`
+4. `delete_space_tag` → `operate_tags` with `scope="space", action="delete"`
+5. `add_tag_to_task` → `operate_tags` with `scope="task", action="add"`
+6. `remove_tag_from_task` → `operate_tags` with `scope="task", action="remove"`
 
 ## MCP Design Principles Applied
 
@@ -363,17 +363,17 @@ The following 6 individual tools are consolidated into `manage_tags`:
 
 ### Direct Invocation (for development)
 ```javascript
-import { handleManageTags } from './src/tools/tag-tools.js';
+import { handleOperateTags } from './src/tools/tag-tools.js';
 
 // List tags
-const result = await handleManageTags({
+const result = await handleOperateTags({
   scope: 'space',
   action: 'list',
   spaceId: '123456'
 });
 
 // Create tag
-const createResult = await handleManageTags({
+const createResult = await handleOperateTags({
   scope: 'space',
   action: 'create',
   spaceId: '123456',

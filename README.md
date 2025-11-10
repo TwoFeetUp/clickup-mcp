@@ -123,7 +123,7 @@ This server provides 15 consolidated tools instead of the original 36:
 
 ### Organization
 - **find_members**: Search workspace members by name/email
-- **manage_tags**: Create, update, delete, or list tags
+- **operate_tags**: Create, update, delete, or list tags
 
 ### Bulk Operations
 - **bulk_create_tasks**: Create multiple tasks efficiently
