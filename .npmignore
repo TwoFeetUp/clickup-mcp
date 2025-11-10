@@ -1,36 +1,19 @@
-# Source
-src/
-.env
-.env.example
-
-# Development configs
-.git/
-.github/
-.gitignore
-.npmrc
-tsconfig.json
-.vscode/
-.idea/
-
-# Logs
+# Log files
 *.log
-npm-debug.log*
+build/*.log
 
-# Dependencies
-node_modules/
+# Test and development files
+playground/
+src_backup_original/
+src_new/
+test-*.js
 
-# Misc
-.DS_Store
-*.swp
-*.swo
-
-# Cursor specific
-.cursor
-.cursorrules
-.cursorignore
-.specstory
-checklist.md
+# Documentation (keep only essential ones)
+*.md
+!README.md
+!LICENSE
 
 # Temporary files
-.tmp/
-.temp/
+*.tmp
+*.temp
+.DS_Store
