@@ -29,6 +29,7 @@ import { findListIDByName } from '../list.js';
 import { workspaceService } from '../../services/shared.js';
 import { isNameMatch } from '../../utils/resolver-utils.js';
 import { Logger } from '../../logger.js';
+import { invalidateWorkspaceCaches, refreshWorkspaceCachesInBackground } from '../../utils/cache-service.js';
 
 // Use shared services instance
 const { task: taskService, list: listService } = clickUpServices;
@@ -69,6 +70,15 @@ function getCachedTaskContext(taskName: string): string | null {
   }
 
   return context.id;
+}
+
+/**
+ * Clear the task context cache
+ * This is useful when refreshing workspace hierarchy to ensure task lookups use fresh data
+ */
+export function clearTaskContextCache(): void {
+  taskContextCache.clear();
+  logger.debug('Task context cache cleared');
 }
 
 //=============================================================================
@@ -618,7 +628,14 @@ export async function createTaskHandler(params) {
     taskData.start_date_time = true;
   }
 
-  return await taskService.createTask(listId, taskData);
+  const result = await taskService.createTask(listId, taskData);
+
+  // Invalidate caches and start background refresh after successful creation
+  invalidateWorkspaceCaches();
+  workspaceService.clearWorkspaceHierarchy();
+  refreshWorkspaceCachesInBackground(workspaceService);
+
+  return result;
 }
 
 
@@ -652,7 +669,14 @@ export async function updateTaskHandler(
   try {
     // Get the task ID using global lookup
     const id = await getTaskId(taskId, taskName, listName, customTaskId);
-    return await taskService.updateTask(id, updateData);
+    const result = await taskService.updateTask(id, updateData);
+
+    // Invalidate caches and start background refresh after successful update
+    invalidateWorkspaceCaches();
+    workspaceService.clearWorkspaceHierarchy();
+    refreshWorkspaceCachesInBackground(workspaceService);
+
+    return result;
   } catch (error) {
     throw new Error(`Failed to update task: ${error instanceof Error ? error.message : String(error)}`);
   }
@@ -664,7 +688,14 @@ export async function updateTaskHandler(
 export async function moveTaskHandler(params) {
   const taskId = await getTaskId(params.taskId, params.taskName, undefined, params.customTaskId, false);
   const listId = await getListId(params.listId, params.listName);
-  return await taskService.moveTask(taskId, listId);
+  const result = await taskService.moveTask(taskId, listId);
+
+  // Invalidate caches and start background refresh after successful move
+  invalidateWorkspaceCaches();
+  workspaceService.clearWorkspaceHierarchy();
+  refreshWorkspaceCachesInBackground(workspaceService);
+
+  return result;
 }
 
 /**
@@ -1082,7 +1113,14 @@ export async function createBulkTasksHandler(params: any) {
   const bulkOptions = parseBulkOptions(options);
 
   // Create tasks - pass arguments in correct order: listId, tasks, options
-  return await bulkService.createTasks(targetListId, formattedTasks, bulkOptions);
+  const result = await bulkService.createTasks(targetListId, formattedTasks, bulkOptions);
+
+  // Invalidate caches and start background refresh after successful bulk creation
+  invalidateWorkspaceCaches();
+  workspaceService.clearWorkspaceHierarchy();
+  refreshWorkspaceCachesInBackground(workspaceService);
+
+  return result;
 }
 
 /**
@@ -1098,7 +1136,14 @@ export async function updateBulkTasksHandler(params: any) {
   const bulkOptions = parseBulkOptions(options);
 
   // Update tasks
-  return await bulkService.updateTasks(tasks, bulkOptions);
+  const result = await bulkService.updateTasks(tasks, bulkOptions);
+
+  // Invalidate caches and start background refresh after successful bulk update
+  invalidateWorkspaceCaches();
+  workspaceService.clearWorkspaceHierarchy();
+  refreshWorkspaceCachesInBackground(workspaceService);
+
+  return result;
 }
 
 /**
@@ -1117,7 +1162,14 @@ export async function moveBulkTasksHandler(params: any) {
   const bulkOptions = parseBulkOptions(options);
 
   // Move tasks
-  return await bulkService.moveTasks(tasks, resolvedTargetListId, bulkOptions);
+  const result = await bulkService.moveTasks(tasks, resolvedTargetListId, bulkOptions);
+
+  // Invalidate caches and start background refresh after successful bulk move
+  invalidateWorkspaceCaches();
+  workspaceService.clearWorkspaceHierarchy();
+  refreshWorkspaceCachesInBackground(workspaceService);
+
+  return result;
 }
 
 /**
@@ -1133,7 +1185,14 @@ export async function deleteBulkTasksHandler(params: any) {
   const bulkOptions = parseBulkOptions(options);
 
   // Delete tasks
-  return await bulkService.deleteTasks(tasks, bulkOptions);
+  const result = await bulkService.deleteTasks(tasks, bulkOptions);
+
+  // Invalidate caches and start background refresh after successful bulk deletion
+  invalidateWorkspaceCaches();
+  workspaceService.clearWorkspaceHierarchy();
+  refreshWorkspaceCachesInBackground(workspaceService);
+
+  return result;
 }
 
 /**
@@ -1142,5 +1201,11 @@ export async function deleteBulkTasksHandler(params: any) {
 export async function deleteTaskHandler(params) {
   const taskId = await getTaskId(params.taskId, params.taskName, params.listName);
   await taskService.deleteTask(taskId);
+
+  // Invalidate caches and start background refresh after successful deletion
+  invalidateWorkspaceCaches();
+  workspaceService.clearWorkspaceHierarchy();
+  refreshWorkspaceCachesInBackground(workspaceService);
+
   return true;
 } 

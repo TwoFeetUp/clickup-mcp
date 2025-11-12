@@ -13,6 +13,9 @@ import { WorkspaceTree, WorkspaceNode } from '../services/clickup/types.js';
 import { Logger } from '../logger.js';
 import { sponsorService } from '../utils/sponsor-service.js';
 import { clickUpServices } from '../services/shared.js';
+import { workspaceCache, cacheService } from '../utils/cache-service.js';
+import { clearContainerCaches } from './container-handlers.js';
+import { clearTaskContextCache } from './task/handlers.js';
 
 // Create a logger for workspace tools
 const logger = new Logger('WorkspaceTool');
@@ -25,7 +28,7 @@ const { workspace: workspaceService } = clickUpServices;
  */
 export const workspaceHierarchyTool: Tool = {
   name: 'get_workspace_hierarchy',
-  description: `Gets complete workspace hierarchy (spaces, folders, lists). No parameters needed. Returns tree structure with names and IDs for navigation.`,
+  description: `Gets complete workspace hierarchy (spaces, folders, lists). Returns tree structure with names and IDs for navigation. Resets all caches - useful after making changes or if not picking up expected results.`,
   inputSchema: {
     type: 'object',
     properties: {}
@@ -34,15 +37,40 @@ export const workspaceHierarchyTool: Tool = {
 
 /**
  * Handler for the get_workspace_hierarchy tool
+ *
+ * This handler always clears all caches before fetching fresh data:
+ * - Workspace hierarchy cache
+ * - WorkspaceCache (members, tags, custom fields)
+ * - Container caches (lists, folders)
+ * - Task context cache
  */
 export async function handleGetWorkspaceHierarchy() {
   try {
-    // Get workspace hierarchy from the workspace service
-    const hierarchy = await workspaceService.getWorkspaceHierarchy();
-    
+    logger.info('Clearing all caches before fetching workspace hierarchy');
+
+    // Clear workspace hierarchy cache in the service
+    workspaceService.clearWorkspaceHierarchy();
+
+    // Clear WorkspaceCache (members, tags, custom fields, etc.)
+    workspaceCache.clear();
+
+    // Clear container caches (lists, folders)
+    clearContainerCaches();
+
+    // Clear task context cache
+    clearTaskContextCache();
+
+    // Clear general cache service (catches any other cached data)
+    cacheService.clear();
+
+    logger.info('All caches cleared, fetching fresh workspace hierarchy');
+
+    // Get workspace hierarchy from the workspace service with force refresh
+    const hierarchy = await workspaceService.getWorkspaceHierarchy(true);
+
     // Generate tree representation
     const treeOutput = formatTreeOutput(hierarchy);
-    
+
     // Use sponsor service to create the response with optional sponsor message
     return sponsorService.createResponse({ hierarchy: treeOutput });
   } catch (error: any) {

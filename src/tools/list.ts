@@ -17,6 +17,7 @@ import { listService, workspaceService } from '../services/shared.js';
 import config from '../config.js';
 import { sponsorService } from '../utils/sponsor-service.js';
 import { Logger } from '../logger.js';
+import { invalidateWorkspaceCaches, refreshWorkspaceCachesInBackground } from '../utils/cache-service.js';
 
 const logger = new Logger('ListTools');
 
@@ -261,7 +262,12 @@ export async function handleCreateList(parameters: any) {
   try {
     // Create the list
     const newList = await listService.createList(targetSpaceId, listData);
-    
+
+    // Invalidate caches and start background refresh
+    invalidateWorkspaceCaches();
+    workspaceService.clearWorkspaceHierarchy();
+    refreshWorkspaceCachesInBackground(workspaceService);
+
     return sponsorService.createResponse({
       id: newList.id,
       name: newList.name,
@@ -334,7 +340,12 @@ export async function handleCreateListInFolder(parameters: any) {
   try {
     // Create the list in the folder
     const newList = await listService.createListInFolder(targetFolderId, listData);
-    
+
+    // Invalidate caches and start background refresh
+    invalidateWorkspaceCaches();
+    workspaceService.clearWorkspaceHierarchy();
+    refreshWorkspaceCachesInBackground(workspaceService);
+
     return sponsorService.createResponse({
       id: newList.id,
       name: newList.name,
@@ -432,7 +443,12 @@ export async function handleUpdateList(parameters: any) {
   try {
     // Update the list
     const updatedList = await listService.updateList(targetListId, updateData);
-    
+
+    // Invalidate caches and start background refresh
+    invalidateWorkspaceCaches();
+    workspaceService.clearWorkspaceHierarchy();
+    refreshWorkspaceCachesInBackground(workspaceService);
+
     return sponsorService.createResponse({
       id: updatedList.id,
       name: updatedList.name,
@@ -475,10 +491,15 @@ export async function handleDeleteList(parameters: any) {
     // Get list details before deletion for confirmation message
     const list = await listService.getList(targetListId);
     const listName = list.name;
-    
+
     // Delete the list
     await listService.deleteList(targetListId);
-    
+
+    // Invalidate caches and start background refresh
+    invalidateWorkspaceCaches();
+    workspaceService.clearWorkspaceHierarchy();
+    refreshWorkspaceCachesInBackground(workspaceService);
+
     return sponsorService.createResponse({
       success: true,
       message: `List "${listName || targetListId}" deleted successfully`

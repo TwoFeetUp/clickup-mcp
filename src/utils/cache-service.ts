@@ -308,3 +308,38 @@ export class WorkspaceCache {
 // Export singleton instances
 export const cacheService = new CacheService();
 export const workspaceCache = new WorkspaceCache();
+
+/**
+ * Invalidate all workspace-related caches after modifications
+ * Call this after creating, updating, or deleting tasks, lists, folders, etc.
+ */
+export function invalidateWorkspaceCaches(): void {
+  logger.info('Invalidating workspace caches after modification');
+
+  // Clear workspace hierarchy cache (will be refreshed on next request)
+  workspaceCache.clear();
+
+  // Clear general caches
+  cacheService.clearPattern(/^(container|hierarchy|members|tags|custom_fields):/);
+
+  logger.debug('Workspace caches invalidated');
+}
+
+/**
+ * Refresh workspace caches in the background after a modification
+ * This ensures the cache is pre-warmed for the next request without blocking the response
+ * @param workspaceService - The workspace service instance to use for refreshing
+ */
+export function refreshWorkspaceCachesInBackground(workspaceService: any): void {
+  // Start background refresh without awaiting
+  (async () => {
+    try {
+      logger.info('Starting background cache refresh after modification');
+      await workspaceService.getWorkspaceHierarchy(true);
+      logger.info('Background cache refresh completed');
+    } catch (error: any) {
+      logger.error('Background cache refresh failed', { error: error.message });
+      // Don't throw - this is a background operation
+    }
+  })();
+}
