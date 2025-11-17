@@ -43,6 +43,21 @@ export interface ClickUpPriority {
 }
 
 /**
+ * Custom task type object as returned by the ClickUp API
+ * Also known as "custom items" in the ClickUp API
+ */
+export interface ClickUpCustomItem {
+  id: number;
+  name: string;
+  name_plural: string | null;
+  description: string | null;
+  avatar: {
+    source: string | null;
+    value: string | null;
+  };
+}
+
+/**
  * Status object as returned by the ClickUp API
  */
 export interface ClickUpStatus {
@@ -170,6 +185,7 @@ export interface ClickUpTask {
   id: string;
   name: string;
   custom_id?: string;
+  custom_item_id: number;
   text_content: string;
   description: string;
   status: ClickUpStatus;
@@ -233,6 +249,8 @@ export interface CreateTaskData {
   tags?: string[];
   status?: string;
   priority?: TaskPriority;
+  task_type?: string;
+  custom_item_id?: number;
   due_date?: number;
   due_date_time?: boolean;
   time_estimate?: number;

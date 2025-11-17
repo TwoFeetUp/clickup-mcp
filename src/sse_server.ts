@@ -27,13 +27,31 @@ import {
   createInputValidationMiddleware
 } from './middleware/security.js';
 import { Logger } from './logger.js';
+import { taskTypeService } from './services/task-type-service.js';
 
 const app = express();
 const logger = new Logger('SSEServer');
 
-export function startSSEServer() {
-  // Configure the unified server first
-  configureServer();
+export async function startSSEServer() {
+  // Initialize task type service first
+  logger.info('Loading custom task types from ClickUp API...');
+  try {
+    await taskTypeService.initialize(configuration.clickupTeamId, configuration.clickupApiKey);
+    const typeCount = taskTypeService.getTypeCount();
+    if (typeCount > 0) {
+      logger.info(`Successfully loaded ${typeCount} custom task types`);
+    } else {
+      logger.info('No custom task types found or service initialization skipped');
+    }
+  } catch (err: any) {
+    logger.warn('Failed to initialize task type service', {
+      message: err.message,
+      note: 'Server will continue but task types will not be available'
+    });
+  }
+
+  // Configure the unified server
+  await configureServer();
 
   // Apply security middleware (all are opt-in via environment variables)
   logger.info('Configuring security middleware', {

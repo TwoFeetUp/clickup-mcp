@@ -15,6 +15,9 @@ import { createClickUpServices } from "./services/clickup/index.js";
 import config from "./config.js";
 import { workspaceHierarchyTool, handleGetWorkspaceHierarchy } from "./tools/workspace.js";
 
+// Task type schema builder
+import { buildManageTaskToolSchema } from "./tools/task/task-type-schema-builder.js";
+
 // Consolidated tools
 import {
   manageTaskTool,
@@ -53,6 +56,11 @@ import {
   operateTagsTool,
   handleOperateTags
 } from "./tools/tag-tools.js";
+
+import {
+  listTaskTypesTool,
+  handleListTaskTypes
+} from "./tools/task-type-tools.js";
 
 import {
   manageDocumentTool,
@@ -137,12 +145,14 @@ export function configureServer() {
       tools: [
         // Workspace
         workspaceHierarchyTool,
-        // Task tools (5 consolidated tools)
-        manageTaskTool,
+        // Task tools (5 consolidated tools) - manageTaskTool uses dynamic schema
+        buildManageTaskToolSchema(),
         searchTasksTool,
         taskCommentsTool,
         taskTimeTrackingTool,
         attachFileToTaskTool,
+        // Task type introspection
+        listTaskTypesTool,
         // Container tools (2 consolidated tools)
         manageContainerTool,
         getContainerTool,
@@ -205,6 +215,10 @@ export function configureServer() {
 
         case "attach_file_to_task":
           return handleAttachFileToTaskConsolidated(params);
+
+        // TASK TYPE INTROSPECTION
+        case "list_task_types":
+          return handleListTaskTypes();
 
         // CONSOLIDATED CONTAINER HANDLERS
         case "manage_container":

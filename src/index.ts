@@ -32,6 +32,7 @@ import config from './config.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { startSSEServer } from './sse_server.js';
+import { taskTypeService } from './services/task-type-service.js';
 
 // Get directory name for module paths
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -59,6 +60,24 @@ async function startStdioServer() {
     arch: process.arch,
   });
 
+  // Initialize task type service (fetch custom task types from ClickUp)
+  info('Loading custom task types from ClickUp API...');
+  try {
+    await taskTypeService.initialize(config.clickupTeamId, config.clickupApiKey);
+    const typeCount = taskTypeService.getTypeCount();
+    if (typeCount > 0) {
+      info(`Successfully loaded ${typeCount} custom task types`);
+    } else {
+      info('No custom task types found or service initialization skipped');
+    }
+  } catch (err: any) {
+    // Log but don't fail - server can operate without custom task types
+    error('Failed to initialize task type service', {
+      message: err.message,
+      note: 'Server will continue but task types will not be available'
+    });
+  }
+
   // Configure the server with all handlers
   info('Configuring server request handlers');
   await configureServer();
@@ -78,7 +97,7 @@ async function main() {
   try {
     if (config.enableSSE) {
       // Start the new SSE server with HTTP Streamable support
-      startSSEServer();
+      await startSSEServer();
     } else {
       // Start the traditional STDIO server
       await startStdioServer();

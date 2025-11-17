@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-11-14
+
+### Added
+- **Custom Task Types support**: Create tasks with custom types using friendly names
+  - New `task_type` parameter in `manage_task` tool (e.g., `task_type: "milestone"`)
+  - Support for all ClickUp custom item types: milestone, form_response, meeting_note, Request, Bug/Issue, Feature, Improvement, New Tool/Product, Research, General Idea, Person
+  - Dynamic dropdown in tool schema showing all available task types for the workspace
+  - Automatic name-to-ID mapping via `TaskTypeService`
+  - New `list_task_types` introspection tool to view all available custom task types
+- **TaskTypeService**: Singleton service for managing custom task type mappings
+  - Fetches custom task types from ClickUp API on initialization
+  - Provides name-to-ID conversion (e.g., "milestone" -> 1)
+  - Caches task types for performance
+- **Dynamic schema generation**: Tool schemas now include enum values populated from API data
+  - Task type dropdown automatically shows all available types
+  - Better user experience with autocomplete and validation
+
+### Technical Details
+- New files:
+  - `src/services/task-type-service.ts`: Task type management service
+  - `src/tools/task/task-type-schema-builder.ts`: Dynamic schema builder
+  - `src/tools/task-type-tools.ts`: Introspection tools
+- Updated files:
+  - `src/index.ts`: Initialize TaskTypeService on startup
+  - `src/server.ts`: Initialize TaskTypeService for SSE server
+  - `src/tools/task/handlers.ts`: Handle task_type parameter in task creation
+  - `src/services/clickup/types.ts`: Add ClickUpCustomItem type
+
 ## [1.4.0] - 2025-11-12
 
 ### Added
@@ -50,6 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[1.5.0]: https://github.com/twofeetup/clickup-mcp/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/twofeetup/clickup-mcp/compare/v1.3.3...v1.4.0
 [1.3.3]: https://github.com/twofeetup/clickup-mcp/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/twofeetup/clickup-mcp/releases/tag/v1.3.2

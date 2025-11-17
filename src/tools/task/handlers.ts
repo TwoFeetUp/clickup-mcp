@@ -13,6 +13,7 @@ import { clickUpServices } from '../../services/shared.js';
 import { BulkService } from '../../services/clickup/bulk.js';
 import { BatchResult } from '../../utils/concurrency-utils.js';
 import { parseDueDate } from '../utils.js';
+import { taskTypeService } from '../../services/task-type-service.js';
 import {
   validateTaskIdentification,
   validateListIdentification,
@@ -181,6 +182,20 @@ async function buildUpdateData(params: any): Promise<UpdateTaskData> {
   if (params.description !== undefined) updateData.description = params.description;
   if (params.markdown_description !== undefined) updateData.markdown_description = params.markdown_description;
   if (params.status !== undefined) updateData.status = params.status;
+
+  // Map task_type (friendly name) to custom_item_id (numeric ID)
+  if (params.task_type !== undefined) {
+    const typeId = taskTypeService.getIdFromName(params.task_type);
+    if (typeId === undefined) {
+      const availableTypes = taskTypeService.getAvailableTypes();
+      const closestMatch = taskTypeService.findClosestMatch(params.task_type);
+      const suggestion = closestMatch ? ` Did you mean "${closestMatch}"?` : '';
+      throw new Error(
+        `Unknown task type: "${params.task_type}". Available types: ${availableTypes.join(', ')}.${suggestion}`
+      );
+    }
+    updateData.custom_item_id = typeId;
+  }
 
   // Use toTaskPriority to properly handle null values and validation
   if (params.priority !== undefined) {
@@ -573,7 +588,8 @@ export async function createTaskHandler(params) {
     tags,
     custom_fields,
     check_required_custom_fields,
-    assignees
+    assignees,
+    task_type
   } = params;
 
   if (!name) throw new Error("Task name is required");
@@ -599,6 +615,21 @@ export async function createTaskHandler(params) {
     resolvedAssignees = await resolveAssignees(assigneesArray);
   }
 
+  // Map task_type (friendly name) to custom_item_id (numeric ID)
+  let custom_item_id = 0; // Default = normal task
+  if (task_type) {
+    const typeId = taskTypeService.getIdFromName(task_type);
+    if (typeId === undefined) {
+      const availableTypes = taskTypeService.getAvailableTypes();
+      const closestMatch = taskTypeService.findClosestMatch(task_type);
+      const suggestion = closestMatch ? ` Did you mean "${closestMatch}"?` : '';
+      throw new Error(
+        `Unknown task type: "${task_type}". Available types: ${availableTypes.join(', ')}.${suggestion}`
+      );
+    }
+    custom_item_id = typeId;
+  }
+
   const taskData: CreateTaskData = {
     name,
     description,
@@ -608,7 +639,8 @@ export async function createTaskHandler(params) {
     tags,
     custom_fields,
     check_required_custom_fields,
-    assignees: resolvedAssignees
+    assignees: resolvedAssignees,
+    custom_item_id
   };
 
   // Only include priority if explicitly provided by the user
