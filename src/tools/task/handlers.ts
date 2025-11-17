@@ -149,23 +149,33 @@ async function resolveAssignees(assignees: (number | string)[]): Promise<number[
 
   // Resolve emails/usernames to user IDs if any
   if (toResolve.length > 0) {
-    try {
-      const result = await handleResolveAssignees({ assignees: toResolve });
-      // The result is wrapped by sponsorService.createResponse, so we need to parse the JSON
-      if (result.content && Array.isArray(result.content) && result.content.length > 0) {
-        const dataText = result.content[0].text;
-        const parsedData = JSON.parse(dataText);
-        if (parsedData.userIds && Array.isArray(parsedData.userIds)) {
-          for (const userId of parsedData.userIds) {
-            if (userId !== null && typeof userId === 'number') {
-              resolved.push(userId);
-            }
+    const result = await handleResolveAssignees({ assignees: toResolve });
+
+    // The result is wrapped by sponsorService.createResponse, so we need to parse the JSON
+    if (result.content && Array.isArray(result.content) && result.content.length > 0) {
+      const dataText = result.content[0].text;
+      const parsedData = JSON.parse(dataText);
+
+      if (parsedData.userIds && Array.isArray(parsedData.userIds)) {
+        // Check if all emails/usernames were successfully resolved
+        const notFound: string[] = [];
+        parsedData.userIds.forEach((userId: any, index: number) => {
+          if (userId === null) {
+            notFound.push(toResolve[index]);
+          } else if (typeof userId === 'number') {
+            resolved.push(userId);
           }
+        });
+
+        // Throw error if any assignees could not be resolved
+        if (notFound.length > 0) {
+          throw new Error(
+            `Failed to resolve assignees: ${notFound.join(', ')}. ` +
+            `Use numeric user IDs or check spelling. ` +
+            `Use find_members tool to find correct user IDs.`
+          );
         }
       }
-    } catch (error) {
-      console.warn('Failed to resolve some assignees:', error.message);
-      // Continue with the IDs we could resolve
     }
   }
 

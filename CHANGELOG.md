@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2025-11-17
+
+### Removed
+- **list_task_types tool**: Removed redundant introspection tool following AI-first design principles
+  - Task types are already visible in dynamic dropdown of `manage_task` tool
+  - Reduces tool count and decision complexity for AI
+  - Aligns with MCP tool consolidation best practices
+
+### Improved
+- **Assignee resolution error handling**: Now throws clear, actionable errors when email/username cannot be resolved
+  - Error message specifies which assignees failed to resolve
+  - Suggests using numeric user IDs or `find_members` tool
+  - Prevents silent failures where assignees weren't assigned
+
+### Technical Details
+- Removed: `src/tools/task-type-tools.ts`
+- Updated: `src/server.ts` (removed tool registration)
+- Updated: `src/tools/task/handlers.ts` (improved error handling in `resolveAssignees()`)
+
 ## [1.5.0] - 2025-11-14
 
 ### Added
@@ -78,6 +97,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[1.5.1]: https://github.com/twofeetup/clickup-mcp/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/twofeetup/clickup-mcp/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/twofeetup/clickup-mcp/compare/v1.3.3...v1.4.0
 [1.3.3]: https://github.com/twofeetup/clickup-mcp/compare/v1.3.2...v1.3.3
