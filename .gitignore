@@ -50,3 +50,6 @@ ssl/
 *.pem
 *.p12
 *.pfx
+
+# Playground - experiments and isolated tests
+playground/

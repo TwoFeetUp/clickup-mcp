@@ -1,130 +1,273 @@
-# ClickUp MCP Server Optimization Project
+# ClickUp MCP Server
 
 ## Overview
+- **Type**: Standard Node.js project (TypeScript)
+- **Stack**: MCP SDK, Express (SSE), Axios, Zod
+- **Architecture**: AI-first MCP server with consolidated tools
+- **Purpose**: High-performance ClickUp integration for AI applications
 
-This project involves optimizing an **existing ClickUp MCP (Model Context Protocol) server** to make it more efficient, performant, and aligned with MCP best practices.
+This CLAUDE.md is the authoritative source for development guidelines.
+Subdirectories contain specialized CLAUDE.md files that extend these rules.
 
-## Goals
+---
 
-We are applying the guidelines and best practices from `mcpguide.md` to improve:
+## Universal Development Rules
 
-1. **Performance**: Making the server faster and more responsive
-2. **Efficiency**: Reducing unnecessary operations and optimizing resource usage
-3. **Compliance**: Ensuring full alignment with MCP protocol specifications
-4. **Reliability**: Improving error handling and result consistency
+### Code Quality (MUST)
+- **MUST** write TypeScript code matching existing patterns in `src/`
+- **MUST** run `npm run build` before committing to verify compilation
+- **MUST** follow AI-first design principles from `MCP_DESIGN_PRINCIPLES.md`
+- **MUST NOT** commit API keys, tokens, or credentials
+- **MUST NOT** hardcode `CLICKUP_API_KEY` or `CLICKUP_TEAM_ID`
 
-## Approach
+### Best Practices (SHOULD)
+- **SHOULD** use existing patterns from `src/services/clickup/base.ts` for API services
+- **SHOULD** consolidate related tools rather than creating many small ones
+- **SHOULD** return rich, contextual results (see `src/utils/response-formatter.ts`)
+- **SHOULD** support natural language dates and flexible task identification
+- **SHOULD** log operations using `Logger` class from `src/logger.ts`
 
-### Applying MCP Best Practices
+### Anti-Patterns (MUST NOT)
+- **MUST NOT** bypass rate limiting in `BaseClickUpService`
+- **MUST NOT** create tools that require AI to chain multiple calls for common intents
+- **MUST NOT** use `any` type without explicit justification in comments
+- **MUST NOT** push directly to main branch without PR review
 
-We're using `mcpguide.md` as our reference guide to:
+### Experimentation (Playground Rule)
+- **MUST** use `playground/` directory for all experiments and direct tool testing
+- **MUST** keep playground code out of `src/` directory
+- **SHOULD** organize playground by concept: `playground/test-*.js`
+- **MAY** make playground as messy as needed while debugging
+- Playground is gitignored - perfect for:
+  - Direct tool invocation testing (see `playground/test-*.js` examples)
+  - API response inspection
+  - Debugging resolver logic
+  - Experimenting with new tool designs
 
-- Implement proper tool schemas with clear input/output definitions
-- Optimize content types (text, structured, resource links, etc.)
-- Improve error handling (protocol errors vs. tool execution errors)
-- Add proper annotations for better context
-- Implement security best practices
+---
 
-### Direct Tool Testing
+## Core Commands
 
-#### What is Direct Testing?
-
-In normal MCP operation, the flow is:
+### Development
+```bash
+npm run build         # Compile TypeScript to build/
+npm run dev           # Watch mode - recompile on changes
+npm start             # Run built server (STDIO transport)
 ```
-Client → JSON-RPC Request → MCP Server → Tool Handler → JSON-RPC Response → Client
+
+### Testing Direct Tool Invocation
+```bash
+# Set credentials and run direct tests
+CLICKUP_API_KEY=pk_xxx CLICKUP_TEAM_ID=xxx node playground/test-*.js
 ```
 
-With **direct testing**, we bypass the protocol layer:
+### Quality Gates (run before PR)
+```bash
+npm run build
+# Then test manually with MCP client or direct invocation
 ```
-Test Script → Tool Handler Function → Direct Result
+
+### Publishing (via GitHub Actions)
+Publishing is handled by the manual GitHub workflow. **Do not run `npm publish` directly.**
+1. Go to Actions > "Build, Tag and Publish"
+2. Select version increment (patch/minor/major)
+3. Run workflow
+
+---
+
+## Project Structure
+
+### Source Code (`src/`)
+- **`index.ts`** - Entry point, handles STDIO/SSE transport selection
+- **`server.ts`** - MCP server configuration, tool registration
+- **`config.ts`** - Environment variable parsing and validation
+- **`logger.ts`** - Logging utilities (respects JSON-RPC communication)
+
+### Services (`src/services/`)
+- **`clickup/base.ts`** - Base service class with rate limiting, error handling
+- **`clickup/workspace.ts`** - Workspace hierarchy and caching
+- **`clickup/task/`** - Task-related services (core, search, comments, etc.)
+- **`shared.ts`** - Service singleton instances
+
+### Tools (`src/tools/`)
+- **`task/consolidated-tools.ts`** - Tool schemas (manage_task, search_tasks, etc.)
+- **`task/consolidated-handlers.ts`** - Handler implementations
+- **`container-tools.ts`** - List/folder management
+- **`member-tools.ts`** - Member search
+- **`tag-tools.ts`** - Tag operations
+- **`document-tools.ts`** - Document management (optional feature)
+
+### Utilities (`src/utils/`)
+- **`cache-service.ts`** - TTL-based workspace hierarchy cache
+- **`date-utils.ts`** - Natural language date parsing
+- **`resolver-utils.ts`** - Entity resolution (task by name, assignee by email)
+- **`response-formatter.ts`** - Response optimization and field selection
+
+### Configuration Files
+- **`MCP_DESIGN_PRINCIPLES.md`** - AI-first design philosophy (**read this first**)
+- **`smithery.yaml`** - Smithery.ai deployment configuration
+- **`Dockerfile`** - Docker build for hosted deployment
+
+### Playground (`playground/`)
+- **Gitignored** - experiments, direct tests, debugging scripts
+- Example: `playground/test-assignee-resolution.js`
+
+---
+
+## Quick Search Commands
+
+### Find Tool Definitions
+```bash
+# Find tool schema
+rg -n "export const.*Tool = \{" src/tools
+
+# Find tool handler
+rg -n "export async function handle" src/tools
+
+# Find tool registration
+rg -n "case \"" src/server.ts
 ```
 
-This means we:
-- Call the actual TypeScript/JavaScript handler functions directly
-- Pass arguments as native objects instead of JSON-RPC params
-- Receive raw results without protocol wrapping
-- Can inspect internal state and intermediate values
+### Find Service Methods
+```bash
+# Find service class
+rg -n "export class.*Service" src/services
 
-#### How We're Doing It
+# Find API endpoint usage
+rg -n "this\.client\.(get|post|put|delete)" src/services
+```
 
-We're using direct invocation scripts (like `test-tool-direct.js`) that:
+### Find Utilities
+```bash
+# Find utility functions
+rg -n "export (function|const)" src/utils
 
-1. **Import the tool handlers directly**:
-   ```javascript
-   import { handleTaskSearch } from './src/tools/task/handlers.js';
-   ```
+# Find cache operations
+rg -n "(get|set|clear).*cache" src/utils
+```
 
-2. **Call functions with test parameters**:
-   ```javascript
-   const result = await handleTaskSearch({
-     query: "test task",
-     limit: 10
-   });
-   ```
+---
 
-3. **Inspect raw outputs** before they're formatted for MCP protocol
+## Security Guidelines
 
-4. **Measure performance** of individual operations:
-   - API call latency
-   - Data transformation time
-   - Memory usage patterns
-   - Error handling behavior
+### Secrets Management
+- **NEVER** commit `CLICKUP_API_KEY` or `CLICKUP_TEAM_ID` to git
+- Use environment variables for credentials
+- `.env` and `.env.*` files are gitignored
+- For testing, pass credentials via command line:
+  ```bash
+  CLICKUP_API_KEY=pk_xxx CLICKUP_TEAM_ID=xxx node build/index.js
+  ```
 
-#### Benefits of Direct Testing
+### Safe Operations
+- Review generated bash commands before execution
+- Confirm before: `npm publish`, git force push, removing files
+- Test changes locally before pushing
 
-This approach allows us to:
+### Rate Limiting
+- ClickUp API: 100 requests/minute (Free Forever plan)
+- Built-in rate limiting in `BaseClickUpService` with automatic backoff
+- Default 600ms spacing between requests
 
-- **Rapid iteration**: Test changes in seconds instead of full server restarts
-- **Precise debugging**: Use debuggers, breakpoints, and console logs at the function level
-- **Performance profiling**: Measure exact execution time without protocol overhead
-- **Edge case testing**: Easily test malformed inputs, edge cases, and error conditions
-- **Regression testing**: Build a suite of direct tests to prevent regressions
-- **Isolation**: Test individual tools without dependencies on the full MCP stack
+---
 
-#### Integration Testing
+## Git Workflow
 
-After validating improvements via direct testing, we:
-1. Verify the tools work correctly through the full MCP protocol
-2. Test with actual MCP clients (like Claude Desktop)
-3. Ensure JSON-RPC formatting is correct
-4. Validate schema compliance and error handling at protocol level
+### Branches
+- `main` - stable, published releases
+- Feature branches: `feature/description` or `fix/description`
 
-## Reference Documentation
+### Commits
+- Use Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`
+- Keep commits focused and atomic
+- Example: `feat: add custom field support to search_tasks`
 
-### Key Documents
+### Versioning
+- **Do not manually edit version numbers** in `package.json`
+- Use GitHub Actions workflow to bump versions
+- Version is synced to `server.ts` automatically during publish
 
-- **`mcpguide.md`**: Official MCP protocol specification and requirements
-- **`MCP_DESIGN_PRINCIPLES.md`**: AI-first design principles and best practices for building efficient MCP servers
-  - Covers the difference between API-first and AI-first design
-  - Tool consolidation strategies
-  - Performance optimization patterns
-  - Schema design best practices
-  - Real-world examples and anti-patterns
+---
 
-### Design Philosophy
+## Available MCP Tools
 
-The optimization work is guided by the **AI-First mindset** rather than traditional API design:
+This server exposes 15 consolidated tools:
 
-- **User Intent First**: Tools designed around what users naturally ask for, not how the API is structured
-- **Reduce Complexity**: Fewer, more powerful tools that handle complete use cases
-- **Natural Language Friendly**: Parameters that match how users think and speak
-- **Rich Contextual Results**: Return data that helps the AI understand and present information
+### Task Management
+| Tool | Description |
+|------|-------------|
+| `manage_task` | Create, update, delete, move, or duplicate tasks |
+| `search_tasks` | Find tasks by ID, list, or workspace-wide filters |
+| `task_comments` | Get or create task comments |
+| `task_time_tracking` | Manage time entries |
+| `attach_file_to_task` | Attach files to tasks |
 
-See `MCP_DESIGN_PRINCIPLES.md` for detailed explanations and examples.
+### Container Management
+| Tool | Description |
+|------|-------------|
+| `manage_container` | Create, update, delete lists/folders |
+| `get_container` | Retrieve container details |
 
-## Current Focus Areas
+### Organization
+| Tool | Description |
+|------|-------------|
+| `find_members` | Search workspace members |
+| `operate_tags` | Create, update, delete, list tags |
+| `get_workspace_hierarchy` | Get full workspace structure |
 
-1. Tool schema optimization (applying AI-first design principles)
-2. Response format standardization (rich, contextual results)
-3. Error handling improvements (clear, actionable messages)
-4. Performance profiling and optimization (minimize API calls, optimize caching)
-5. Resource usage reduction (consolidate tools, batch operations)
-6. Tool consolidation (reduce decision complexity for AI)
+### Document Management (Optional)
+| Tool | Description |
+|------|-------------|
+| `manage_document` | Create, update, delete documents |
+| `manage_document_page` | Manage document pages |
+| `list_documents` | List workspace documents |
 
-## Testing Strategy
+---
 
-- Direct tool invocation for unit-level testing
-- Protocol-compliant testing for integration validation
-- Performance benchmarking before/after optimizations
-- Edge case and error scenario validation
-- AI usability testing (can the AI use tools effectively?)
+## Environment Variables
+
+### Required
+| Variable | Description |
+|----------|-------------|
+| `CLICKUP_API_KEY` | ClickUp API key from Settings > Apps |
+| `CLICKUP_TEAM_ID` | Team/workspace ID from URL |
+
+### Optional
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LOG_LEVEL` | `ERROR` | Logging: TRACE, DEBUG, INFO, WARN, ERROR |
+| `DOCUMENT_SUPPORT` | `false` | Enable document tools |
+| `ENABLE_SSE` | `false` | Use SSE transport instead of STDIO |
+| `SSE_PORT` | `3000` | Port for SSE server |
+| `ENABLED_TOOLS` | (all) | Comma-separated list of tools to enable |
+| `DISABLED_TOOLS` | (none) | Comma-separated list of tools to disable |
+
+---
+
+## Specialized Context
+
+When working in specific directories, refer to their CLAUDE.md:
+- Tool development: [src/tools/CLAUDE.md](src/tools/CLAUDE.md)
+- Service development: [src/services/CLAUDE.md](src/services/CLAUDE.md)
+
+---
+
+## Key Design Principles
+
+Read `MCP_DESIGN_PRINCIPLES.md` for the full philosophy. Summary:
+
+1. **User Intent First** - Design tools around what users ask for, not API structure
+2. **Reduce Decision Complexity** - Fewer, more powerful tools beat many granular ones
+3. **Natural Language Friendly** - Support flexible identification (ID, name, custom ID)
+4. **Rich Contextual Results** - Return data that helps AI understand and present info
+5. **Performance Matters** - Cache, batch, paginate - minimize API calls
+
+### Example: Good vs Bad Tool Design
+```typescript
+// BAD: API-first (too many tools)
+get_task(), update_task(), get_comments(), add_comment()
+
+// GOOD: Intent-first (consolidated)
+manage_task({ action: "update", ... })
+task_comments({ action: "get" | "create", ... })
+```
