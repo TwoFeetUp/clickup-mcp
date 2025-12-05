@@ -143,7 +143,7 @@ export const createBulkTasksTool = {
                     description: "ID of the custom field"
                   },
                   value: {
-                    description: "Value for the custom field. Type depends on the field type."
+                    description: "Value for the custom field. Format depends on field type: drop_down/text/number use raw values; relationship fields (tasks, users, list_relationship) use arrays of IDs which are auto-transformed."
                   }
                 },
                 required: ["id", "value"]
@@ -245,7 +245,7 @@ export const updateBulkTasksTool = {
                     description: "ID of the custom field"
                   },
                   value: {
-                    description: "Value for the custom field. Type depends on the field type."
+                    description: "Value for the custom field. Format depends on field type: drop_down/text/number use raw values; relationship fields (tasks, users, list_relationship) use arrays of IDs which are auto-transformed."
                   }
                 },
                 required: ["id", "value"]

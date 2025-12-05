@@ -239,6 +239,63 @@ export interface ClickUpTask {
 }
 
 /**
+ * Custom field types that require add/rem format for values
+ * These field types use { add: [...], rem: [...] } instead of direct values
+ */
+export const RELATIONSHIP_FIELD_TYPES = ['tasks', 'users', 'list_relationship'] as const;
+export type RelationshipFieldType = typeof RELATIONSHIP_FIELD_TYPES[number];
+
+/**
+ * Value format for relationship-type custom fields (tasks, users, list_relationship)
+ * The ClickUp API requires this format for adding/removing relationships
+ */
+export interface RelationshipFieldValue {
+  add?: string[];
+  rem?: string[];
+}
+
+/**
+ * Type guard to check if a value is already in relationship format
+ */
+export function isRelationshipFormat(value: unknown): value is RelationshipFieldValue {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  // Must have either 'add' or 'rem' property (or both)
+  const hasAdd = 'add' in obj && (obj.add === undefined || Array.isArray(obj.add));
+  const hasRem = 'rem' in obj && (obj.rem === undefined || Array.isArray(obj.rem));
+  return hasAdd || hasRem;
+}
+
+/**
+ * Check if a field type requires relationship format
+ */
+export function isRelationshipFieldType(fieldType: string): fieldType is RelationshipFieldType {
+  return RELATIONSHIP_FIELD_TYPES.includes(fieldType as RelationshipFieldType);
+}
+
+/**
+ * Transform a custom field value to the correct format based on field type
+ * For relationship fields, wraps arrays in { add: [...], rem: [] }
+ */
+export function transformCustomFieldValue(value: unknown, fieldType: string): unknown {
+  // Already in correct format
+  if (isRelationshipFormat(value)) {
+    return value;
+  }
+
+  // Needs transformation for relationship types
+  if (isRelationshipFieldType(fieldType)) {
+    const ids = Array.isArray(value) ? value : [value];
+    return { add: ids, rem: [] };
+  }
+
+  // Pass through unchanged for other types
+  return value;
+}
+
+/**
  * Data for creating a task
  */
 export interface CreateTaskData {

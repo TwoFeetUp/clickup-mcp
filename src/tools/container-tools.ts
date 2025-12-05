@@ -156,6 +156,10 @@ export const getContainerTool = {
       use_cache: {
         type: "boolean",
         description: "Use cached container details if available (default: true)"
+      },
+      include_custom_fields: {
+        type: "boolean",
+        description: "For lists: include custom field definitions with available options (dropdown choices, relationship targets, etc.). Use this to discover what values can be set on tasks. Default: false"
       }
     },
     required: ["type"]
