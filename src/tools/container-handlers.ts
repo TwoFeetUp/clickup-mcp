@@ -371,6 +371,66 @@ async function handleFolderContainer(
 }
 
 /**
+ * Format custom field metadata for LLM consumption
+ * Preserves options and type_config while simplifying structure
+ */
+function formatCustomFieldsForDiscovery(fields: any[]): any[] {
+  return fields.map(field => {
+    const formatted: any = {
+      id: field.id,
+      name: field.name,
+      type: field.type,
+      required: field.required || false
+    };
+
+    // Include type_config options for dropdown fields
+    if (field.type === 'drop_down' && field.type_config?.options) {
+      formatted.options = field.type_config.options.map((opt: any) => ({
+        id: opt.orderindex,
+        name: opt.name,
+        color: opt.color
+      }));
+    }
+
+    // Include type_config for labels (similar to dropdown)
+    if (field.type === 'labels' && field.type_config?.options) {
+      formatted.options = field.type_config.options.map((opt: any) => ({
+        id: opt.id,
+        name: opt.label,
+        color: opt.color
+      }));
+    }
+
+    // Include linked list info for relationship fields
+    if (field.type === 'list_relationship' && field.type_config) {
+      formatted.linked_list = {
+        id: field.type_config.list_id,
+        name: field.type_config.list_name
+      };
+    }
+
+    // Include subcategory info for user fields
+    if (field.type === 'users' && field.type_config) {
+      formatted.include_guests = field.type_config.include_guests || false;
+      formatted.include_team_members = field.type_config.include_team_members || true;
+    }
+
+    // Include currency info for currency fields
+    if (field.type === 'currency' && field.type_config) {
+      formatted.currency_type = field.type_config.currency_type;
+    }
+
+    // Include emoji info for emoji fields
+    if (field.type === 'emoji' && field.type_config) {
+      formatted.code_point = field.type_config.code_point;
+      formatted.count = field.type_config.count;
+    }
+
+    return formatted;
+  });
+}
+
+/**
  * Handler for get_container tool
  */
 export async function handleGetContainer(parameters: any) {
@@ -384,7 +444,8 @@ export async function handleGetContainer(parameters: any) {
     folderName,
     detail_level = 'standard',
     fields,
-    use_cache = true
+    use_cache = true,
+    include_custom_fields = false
   } = parameters;
 
   logger.info(`Retrieving container: type=${type}`);
@@ -395,9 +456,9 @@ export async function handleGetContainer(parameters: any) {
       throw new Error("Invalid container type. Must be 'list' or 'folder'");
     }
 
-    // Check cache first if enabled
+    // Check cache first if enabled (only for basic container info, not custom fields)
     let cacheKey: string | null = null;
-    if (use_cache && id) {
+    if (use_cache && id && !include_custom_fields) {
       cacheKey = type === 'list' ? CACHE_KEYS.LIST(id) : CACHE_KEYS.FOLDER(id);
       const cached = cacheService.get(cacheKey);
       if (cached) {
@@ -424,11 +485,33 @@ export async function handleGetContainer(parameters: any) {
 
     if (type === 'list') {
       result = await handleGetList({ listId: containerId });
+
+      // Fetch custom fields if requested
+      if (include_custom_fields && result && !result.isError) {
+        try {
+          const { task: taskService } = clickUpServices;
+          const customFields = await taskService.getAccessibleCustomFields(containerId);
+
+          // Extract the data from the response
+          const responseData = result.content?.[0]?.text
+            ? JSON.parse(result.content[0].text)
+            : result;
+
+          // Add formatted custom fields
+          responseData.custom_fields = formatCustomFieldsForDiscovery(customFields);
+          responseData.message = `List "${responseData.name}" has ${customFields.length} custom field(s). Use field IDs when setting values on tasks.`;
+
+          return sponsorService.createResponse(responseData);
+        } catch (cfError: any) {
+          logger.warn('Failed to fetch custom fields', { listId: containerId, error: cfError.message });
+          // Return the list without custom fields rather than failing
+        }
+      }
     } else {
       result = await handleGetFolder({ folderId: containerId });
     }
 
-    // Cache the result
+    // Cache the result (only basic container info)
     if (use_cache && cacheKey && result && typeof result === 'object' && result.data) {
       cacheService.set(cacheKey, result.data, CACHE_TTL);
     }

@@ -134,12 +134,12 @@ export const createTaskTool = {
               description: "ID of the custom field"
             },
             value: {
-              description: "Value for the custom field. Type depends on the field type."
+              description: "Value for the custom field. Format depends on field type: drop_down/text/number use raw values; relationship fields (tasks, users, list_relationship) use arrays of IDs which are auto-transformed to {add: [...], rem: []} format."
             }
           },
           required: ["id", "value"]
         },
-        description: "Optional array of custom field values to set on the task. Each object must have an 'id' and 'value' property."
+        description: "Optional array of custom field values. Examples: {id: 'abc', value: 0} for dropdown, {id: 'xyz', value: ['task-id']} for relationships. Relationship fields are automatically formatted."
       },
       check_required_custom_fields: {
         type: "boolean",
@@ -224,12 +224,12 @@ export const updateTaskTool = {
               description: "ID of the custom field"
             },
             value: {
-              description: "Value for the custom field. Type depends on the field type."
+              description: "Value for the custom field. Format depends on field type: drop_down/text/number use raw values; relationship fields (tasks, users, list_relationship) use arrays of IDs which are auto-transformed to {add: [...], rem: []} format."
             }
           },
           required: ["id", "value"]
         },
-        description: "Optional array of custom field values to set on the task. Each object must have an 'id' and 'value' property."
+        description: "Optional array of custom field values. Examples: {id: 'abc', value: 0} for dropdown, {id: 'xyz', value: ['task-id']} for relationships. Relationship fields are automatically formatted."
       },
       assignees: {
         type: "array",

@@ -27,7 +27,7 @@ import {
   DetailedTaskResponse,
   WorkspaceTasksResponse
 } from '../types.js';
-import { CustomFieldValue } from './task-custom-fields.js';
+import { CustomFieldValue, SetCustomFieldResult } from './task-custom-fields.js';
 
 /**
  * Complete TaskService combining all task-related functionality
@@ -144,12 +144,37 @@ export class TaskService extends TaskServiceCore {
 
   // ===== DELEGATED CUSTOM FIELD METHODS =====
 
-  async setCustomFieldValue(taskId: string, fieldId: string, value: any): Promise<boolean> {
-    return this.customFields.setCustomFieldValue(taskId, fieldId, value);
+  /**
+   * Set a single custom field value on a task
+   * Automatically transforms values for relationship field types
+   * @returns Detailed result with success status and verification info
+   */
+  async setCustomFieldValue(
+    taskId: string,
+    fieldId: string,
+    value: any,
+    options?: { skipVerification?: boolean; knownFieldType?: string }
+  ): Promise<SetCustomFieldResult> {
+    return this.customFields.setCustomFieldValue(taskId, fieldId, value, options);
   }
 
-  async setCustomFieldValues(taskId: string, customFields: CustomFieldValue[]): Promise<boolean> {
-    return this.customFields.setCustomFieldValues(taskId, customFields);
+  /**
+   * Set multiple custom field values on a task
+   * @returns Array of results for each field
+   */
+  async setCustomFieldValues(
+    taskId: string,
+    customFields: CustomFieldValue[],
+    options?: { skipVerification?: boolean }
+  ): Promise<SetCustomFieldResult[]> {
+    return this.customFields.setCustomFieldValues(taskId, customFields, options);
+  }
+
+  /**
+   * Get accessible custom fields for a list
+   */
+  async getAccessibleCustomFields(listId: string): Promise<any[]> {
+    return this.customFields.getAccessibleCustomFields(listId);
   }
 
   async getCustomFieldValues(taskId: string): Promise<Record<string, any>> {
