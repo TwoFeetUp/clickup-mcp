@@ -52,21 +52,22 @@ export class TaskServiceCore extends BaseClickUpService {
   private readonly CACHE_TTL = 5 * 60 * 1000;
 
   constructor(
-    apiKey: string, 
-    teamId: string, 
+    apiKey: string,
+    teamId: string,
     baseUrl?: string,
-    workspaceService?: WorkspaceService
+    workspaceService?: WorkspaceService,
+    requestSpacing?: number
   ) {
-    super(apiKey, teamId, baseUrl);
-    
+    super(apiKey, teamId, baseUrl, requestSpacing);
+
     if (workspaceService) {
       this.workspaceService = workspaceService;
       this.logOperation('constructor', { usingSharedWorkspaceService: true });
     }
-    
+
     // Initialize list service for list lookups
-    this.listService = new ListService(apiKey, teamId, baseUrl, this.workspaceService);
-    
+    this.listService = new ListService(apiKey, teamId, baseUrl, this.workspaceService, requestSpacing);
+
     this.logOperation('constructor', { initialized: true });
   }
 

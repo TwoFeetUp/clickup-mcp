@@ -79,6 +79,8 @@ interface Config {
   ssePort: number;
   enableStdio: boolean;
   port?: string;
+  // API rate limiting configuration
+  requestSpacing: number; // Milliseconds between API requests (default: 100ms)
   // Security configuration (opt-in for backwards compatibility)
   enableSecurityFeatures: boolean;
   enableOriginValidation: boolean;
@@ -131,6 +133,8 @@ const configuration: Config = {
   ssePort: parseInteger(envArgs.ssePort || process.env.SSE_PORT, 3000),
   enableStdio: parseBoolean(envArgs.enableStdio || process.env.ENABLE_STDIO, true),
   port: envArgs.port || process.env.PORT || '3231',
+  // API rate limiting - default 100ms (10 req/sec), increase for free plans or reduce for Enterprise
+  requestSpacing: parseInteger(process.env.REQUEST_SPACING, 100),
   // Security configuration (opt-in for backwards compatibility)
   enableSecurityFeatures: parseBoolean(process.env.ENABLE_SECURITY_FEATURES, false),
   enableOriginValidation: parseBoolean(process.env.ENABLE_ORIGIN_VALIDATION, false),

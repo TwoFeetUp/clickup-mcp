@@ -102,10 +102,10 @@ export class BaseClickUpService {
   protected readonly teamId: string;
   protected readonly client: AxiosInstance;
   protected readonly logger: Logger;
-  
-  protected readonly defaultRequestSpacing = 600; // Default milliseconds between requests
-  protected readonly rateLimit = 100; // Maximum requests per minute (Free Forever plan)
-  protected requestSpacing: number; // Current request spacing, can be adjusted
+
+  protected readonly defaultRequestSpacing: number; // Milliseconds between requests (configurable)
+  protected readonly rateLimit = 100; // Maximum requests per minute (adjusts dynamically based on headers)
+  protected requestSpacing: number; // Current request spacing, can be adjusted dynamically
   protected readonly timeout = 65000; // 65 seconds (safely under the 1-minute window)
   protected requestQueue: (() => Promise<any>)[] = [];
   protected processingQueue = false;
@@ -116,11 +116,13 @@ export class BaseClickUpService {
    * @param apiKey - ClickUp API key for authentication
    * @param teamId - ClickUp team ID for targeting the correct workspace
    * @param baseUrl - Optional custom base URL for the ClickUp API
+   * @param requestSpacing - Milliseconds between requests (default: 100ms, increase for free plans)
    */
-  constructor(apiKey: string, teamId: string, baseUrl: string = 'https://api.clickup.com/api/v2') {
+  constructor(apiKey: string, teamId: string, baseUrl: string = 'https://api.clickup.com/api/v2', requestSpacing: number = 100) {
     this.apiKey = apiKey;
     this.teamId = teamId;
-    this.requestSpacing = this.defaultRequestSpacing;
+    this.defaultRequestSpacing = requestSpacing;
+    this.requestSpacing = requestSpacing;
     
     // Create a logger with the actual class name for better context
     const className = this.constructor.name;

@@ -45,6 +45,7 @@ export interface ClickUpServiceConfig {
   apiKey: string;
   teamId: string;
   baseUrl?: string;
+  requestSpacing?: number; // Milliseconds between API requests (default: 100ms)
 }
 
 /**
@@ -69,36 +70,37 @@ const logger = new Logger('ClickUpServices');
  * @returns Object containing all service instances
  */
 export function createClickUpServices(config: ClickUpServiceConfig): ClickUpServices {
-  const { apiKey, teamId, baseUrl } = config;
+  const { apiKey, teamId, baseUrl, requestSpacing = 100 } = config;
 
   // Log start of overall initialization
-  logger.info('Starting ClickUp services initialization', { 
-    teamId, 
-    baseUrl: baseUrl || 'https://api.clickup.com/api/v2' 
+  logger.info('Starting ClickUp services initialization', {
+    teamId,
+    baseUrl: baseUrl || 'https://api.clickup.com/api/v2',
+    requestSpacing
   });
 
   // Create workspace service first since others depend on it
   logger.info('Initializing ClickUp Workspace service');
-  const workspaceService = new WorkspaceService(apiKey, teamId, baseUrl);
+  const workspaceService = new WorkspaceService(apiKey, teamId, baseUrl, requestSpacing);
 
   // Initialize remaining services with workspace dependency
   logger.info('Initializing ClickUp Task service');
-  const taskService = new TaskService(apiKey, teamId, baseUrl, workspaceService);
-  
+  const taskService = new TaskService(apiKey, teamId, baseUrl, workspaceService, requestSpacing);
+
   logger.info('Initializing ClickUp List service');
-  const listService = new ListService(apiKey, teamId, baseUrl, workspaceService);
-  
+  const listService = new ListService(apiKey, teamId, baseUrl, workspaceService, requestSpacing);
+
   logger.info('Initializing ClickUp Folder service');
-  const folderService = new FolderService(apiKey, teamId, baseUrl, workspaceService);
+  const folderService = new FolderService(apiKey, teamId, baseUrl, workspaceService, requestSpacing);
 
   logger.info('Initializing ClickUp Tag service');
-  const tagService = new ClickUpTagService(apiKey, teamId, baseUrl);
+  const tagService = new ClickUpTagService(apiKey, teamId, baseUrl, requestSpacing);
 
   logger.info('Initializing ClickUp Time Tracking service');
-  const timeTrackingService = new TimeTrackingService(apiKey, teamId, baseUrl);
+  const timeTrackingService = new TimeTrackingService(apiKey, teamId, baseUrl, requestSpacing);
 
   logger.info('Initializing ClickUp Document service');
-  const documentService = new DocumentService(apiKey, teamId, baseUrl);
+  const documentService = new DocumentService(apiKey, teamId, baseUrl, requestSpacing);
 
   const services = {
     workspace: workspaceService,

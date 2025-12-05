@@ -31,10 +31,11 @@ export class DocumentService extends BaseClickUpService {
   constructor(
     apiKey: string,
     teamId: string,
-    baseUrl?: string
+    baseUrl?: string,
+    requestSpacing?: number
   ) {
     // Override baseUrl to use v3 API, since Docs are only available in v3
-    super(apiKey, teamId, baseUrl || 'https://api.clickup.com/api/v3');
+    super(apiKey, teamId, baseUrl || 'https://api.clickup.com/api/v3', requestSpacing);
   }
 
   /**

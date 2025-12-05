@@ -24,8 +24,8 @@ import { WorkspaceService } from './workspace.js';
 export class ListService extends BaseClickUpService {
   private workspaceService: WorkspaceService | null = null;
   
-  constructor(apiKey: string, teamId: string, baseUrl?: string, workspaceService?: WorkspaceService) {
-    super(apiKey, teamId, baseUrl);
+  constructor(apiKey: string, teamId: string, baseUrl?: string, workspaceService?: WorkspaceService, requestSpacing?: number) {
+    super(apiKey, teamId, baseUrl, requestSpacing);
     this.workspaceService = workspaceService || null;
   }
 

@@ -16,6 +16,10 @@ import { ClickUpTag, CreateSpaceTagData, SpaceTagsResponse, UpdateSpaceTagData }
  * ClickUp Tag Service class for managing tags
  */
 export class ClickUpTagService extends BaseClickUpService {
+  constructor(apiKey: string, teamId: string, baseUrl?: string, requestSpacing?: number) {
+    super(apiKey, teamId, baseUrl, requestSpacing);
+  }
+
   /**
    * Get all tags in a space
    * @param spaceId - ID of the space to get tags from

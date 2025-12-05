@@ -107,6 +107,10 @@ export interface AddTimeEntryData {
  * Time tracking service for ClickUp
  */
 export class TimeTrackingService extends BaseClickUpService {
+  constructor(apiKey: string, teamId: string, baseUrl?: string, requestSpacing?: number) {
+    super(apiKey, teamId, baseUrl, requestSpacing);
+  }
+
   /**
    * Get all time entries for a task
    * @param taskId ID of the task

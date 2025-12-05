@@ -43,8 +43,8 @@ export class TaskService extends TaskServiceCore {
   public readonly tags: TaskServiceTags;
   public readonly customFields: TaskServiceCustomFields;
 
-  constructor(apiKey: string, teamId: string, baseUrl?: string, workspaceService?: WorkspaceService) {
-    super(apiKey, teamId, baseUrl, workspaceService);
+  constructor(apiKey: string, teamId: string, baseUrl?: string, workspaceService?: WorkspaceService, requestSpacing?: number) {
+    super(apiKey, teamId, baseUrl, workspaceService, requestSpacing);
     this.logOperation('constructor', { initialized: true });
 
     // Initialize composed services with core as dependency
