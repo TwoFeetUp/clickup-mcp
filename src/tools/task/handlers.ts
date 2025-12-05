@@ -30,7 +30,7 @@ import { findListIDByName } from '../list.js';
 import { workspaceService } from '../../services/shared.js';
 import { isNameMatch } from '../../utils/resolver-utils.js';
 import { Logger } from '../../logger.js';
-import { invalidateWorkspaceCaches, refreshWorkspaceCachesInBackground } from '../../utils/cache-service.js';
+// Cache invalidation imports removed - task operations don't change workspace hierarchy
 
 // Use shared services instance
 const { task: taskService, list: listService } = clickUpServices;
@@ -672,10 +672,8 @@ export async function createTaskHandler(params) {
 
   const result = await taskService.createTask(listId, taskData);
 
-  // Invalidate caches and start background refresh after successful creation
-  invalidateWorkspaceCaches();
-  workspaceService.clearWorkspaceHierarchy();
-  refreshWorkspaceCachesInBackground(workspaceService);
+  // Note: Task operations don't change workspace hierarchy (spaces/folders/lists)
+  // so we don't need to invalidate hierarchy cache here - major performance improvement
 
   return result;
 }
@@ -713,10 +711,7 @@ export async function updateTaskHandler(
     const id = await getTaskId(taskId, taskName, listName, customTaskId);
     const result = await taskService.updateTask(id, updateData);
 
-    // Invalidate caches and start background refresh after successful update
-    invalidateWorkspaceCaches();
-    workspaceService.clearWorkspaceHierarchy();
-    refreshWorkspaceCachesInBackground(workspaceService);
+    // Note: Task operations don't change workspace hierarchy - no cache invalidation needed
 
     return result;
   } catch (error) {
@@ -732,10 +727,7 @@ export async function moveTaskHandler(params) {
   const listId = await getListId(params.listId, params.listName);
   const result = await taskService.moveTask(taskId, listId);
 
-  // Invalidate caches and start background refresh after successful move
-  invalidateWorkspaceCaches();
-  workspaceService.clearWorkspaceHierarchy();
-  refreshWorkspaceCachesInBackground(workspaceService);
+  // Note: Moving a task doesn't change workspace hierarchy - no cache invalidation needed
 
   return result;
 }
@@ -1157,10 +1149,7 @@ export async function createBulkTasksHandler(params: any) {
   // Create tasks - pass arguments in correct order: listId, tasks, options
   const result = await bulkService.createTasks(targetListId, formattedTasks, bulkOptions);
 
-  // Invalidate caches and start background refresh after successful bulk creation
-  invalidateWorkspaceCaches();
-  workspaceService.clearWorkspaceHierarchy();
-  refreshWorkspaceCachesInBackground(workspaceService);
+  // Note: Task operations don't change workspace hierarchy - no cache invalidation needed
 
   return result;
 }
@@ -1180,10 +1169,7 @@ export async function updateBulkTasksHandler(params: any) {
   // Update tasks
   const result = await bulkService.updateTasks(tasks, bulkOptions);
 
-  // Invalidate caches and start background refresh after successful bulk update
-  invalidateWorkspaceCaches();
-  workspaceService.clearWorkspaceHierarchy();
-  refreshWorkspaceCachesInBackground(workspaceService);
+  // Note: Task operations don't change workspace hierarchy - no cache invalidation needed
 
   return result;
 }
@@ -1206,10 +1192,7 @@ export async function moveBulkTasksHandler(params: any) {
   // Move tasks
   const result = await bulkService.moveTasks(tasks, resolvedTargetListId, bulkOptions);
 
-  // Invalidate caches and start background refresh after successful bulk move
-  invalidateWorkspaceCaches();
-  workspaceService.clearWorkspaceHierarchy();
-  refreshWorkspaceCachesInBackground(workspaceService);
+  // Note: Task operations don't change workspace hierarchy - no cache invalidation needed
 
   return result;
 }
@@ -1229,10 +1212,7 @@ export async function deleteBulkTasksHandler(params: any) {
   // Delete tasks
   const result = await bulkService.deleteTasks(tasks, bulkOptions);
 
-  // Invalidate caches and start background refresh after successful bulk deletion
-  invalidateWorkspaceCaches();
-  workspaceService.clearWorkspaceHierarchy();
-  refreshWorkspaceCachesInBackground(workspaceService);
+  // Note: Task operations don't change workspace hierarchy - no cache invalidation needed
 
   return result;
 }
@@ -1244,10 +1224,7 @@ export async function deleteTaskHandler(params) {
   const taskId = await getTaskId(params.taskId, params.taskName, params.listName);
   await taskService.deleteTask(taskId);
 
-  // Invalidate caches and start background refresh after successful deletion
-  invalidateWorkspaceCaches();
-  workspaceService.clearWorkspaceHierarchy();
-  refreshWorkspaceCachesInBackground(workspaceService);
+  // Note: Deleting a task doesn't change workspace hierarchy - no cache invalidation needed
 
   return true;
 } 

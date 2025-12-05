@@ -29,14 +29,16 @@ export class FolderService extends BaseClickUpService {
    * @param teamId - ClickUp team ID
    * @param baseUrl - Optional custom API URL
    * @param workspaceService - Optional workspace service for lookups
+   * @param requestSpacing - Milliseconds between requests
    */
   constructor(
     apiKey: string,
     teamId: string,
     baseUrl?: string,
-    workspaceService?: WorkspaceService
+    workspaceService?: WorkspaceService,
+    requestSpacing?: number
   ) {
-    super(apiKey, teamId, baseUrl);
+    super(apiKey, teamId, baseUrl, requestSpacing);
     this.workspaceService = workspaceService || null;
   }
 

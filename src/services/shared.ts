@@ -27,7 +27,8 @@ function getClickUpServices(): ClickUpServices {
     // Create the services instance
     clickUpServicesInstance = createClickUpServices({
       apiKey: config.clickupApiKey,
-      teamId: config.clickupTeamId
+      teamId: config.clickupTeamId,
+      requestSpacing: config.requestSpacing
     });
     
     // Log what services were initialized with more clarity

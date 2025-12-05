@@ -35,13 +35,15 @@ export class WorkspaceService extends BaseClickUpService {
    * @param apiKey - ClickUp API key
    * @param teamId - ClickUp team ID
    * @param baseUrl - Optional custom API URL
+   * @param requestSpacing - Milliseconds between requests
    */
   constructor(
     apiKey: string,
     teamId: string,
-    baseUrl?: string
+    baseUrl?: string,
+    requestSpacing?: number
   ) {
-    super(apiKey, teamId, baseUrl);
+    super(apiKey, teamId, baseUrl, requestSpacing);
   }
 
   /**
