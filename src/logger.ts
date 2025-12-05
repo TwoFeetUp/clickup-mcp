@@ -8,22 +8,30 @@
  * writing logs to only the log file to avoid interfering with JSON-RPC.
  */
 
-import { createWriteStream } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { createWriteStream, mkdirSync, existsSync } from 'fs';
+import { join } from 'path';
+import { tmpdir } from 'os';
 import config, { LogLevel } from './config.js';
-
-// Get the directory name of the current module
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Current process ID for logging
 const pid = process.pid;
 
-// Create a write stream for logging - use a fixed filename in the build directory
+// Create log directory in temp folder (writable location, not in npm cache)
+const logDir = join(tmpdir(), 'clickup-mcp');
+if (!existsSync(logDir)) {
+  try {
+    mkdirSync(logDir, { recursive: true });
+  } catch {
+    // Ignore errors creating log directory
+  }
+}
+
+// Create a write stream for logging in temp directory
 const logFileName = 'server.log';
-const logStream = createWriteStream(join(__dirname, logFileName), { flags: 'w' });
+const logPath = join(logDir, logFileName);
+const logStream = createWriteStream(logPath, { flags: 'w' });
 // Write init message to log file only
-logStream.write(`Logging initialized to ${join(__dirname, logFileName)}\n`);
+logStream.write(`Logging initialized to ${logPath}\n`);
 
 // Use the configured log level from config.ts
 const configuredLevel = config.logLevel;
