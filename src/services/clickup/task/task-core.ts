@@ -485,8 +485,8 @@ export class TaskServiceCore extends BaseClickUpService {
       // Then update custom fields if provided
       if (custom_fields && Array.isArray(custom_fields) && custom_fields.length > 0) {
         // Use the setCustomFieldValues method from TaskService
-        // This will transform relationship field values and verify updates
-        const customFieldResults = await (this as any).setCustomFieldValues(taskId, custom_fields);
+        // Skip verification to avoid extra API calls (1 per field)
+        const customFieldResults = await (this as any).setCustomFieldValues(taskId, custom_fields, { skipVerification: true });
 
         // Log any failed custom field updates
         const failed = customFieldResults?.filter?.((r: any) => !r.success);
@@ -498,8 +498,7 @@ export class TaskServiceCore extends BaseClickUpService {
           });
         }
 
-        // Fetch the task again to get the updated version with custom fields
-        return await this.getTask(taskId);
+        // Return the already-updated task (don't fetch again to save API call)
       }
       
       return updatedTask;
