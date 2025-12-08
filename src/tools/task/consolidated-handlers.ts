@@ -312,12 +312,30 @@ export async function handleSearchTasks(params: any) {
 
     if (list_ids || folder_ids || space_ids || params.tags || params.statuses || assigneeIds ||
         params.date_created_gt || params.date_created_lt || params.date_updated_gt || params.date_updated_lt ||
-        params.due_date_gt || params.due_date_lt) {
+        params.due_date_gt || params.due_date_lt || params.overdue) {
 
       // Map assignee_ids to assignees for the handler
       const searchParams = { ...params };
       if (assigneeIds) {
         searchParams.assignees = assigneeIds;
+      }
+
+      // Handle overdue convenience filter (sets defaults, explicit params override)
+      if (searchParams.overdue) {
+        if (searchParams.due_date_lt === undefined) {
+          searchParams.due_date_lt = Date.now().toString();
+        }
+        if (searchParams.subtasks === undefined) {
+          searchParams.subtasks = true;
+        }
+        if (searchParams.include_closed === undefined) {
+          searchParams.include_closed = false;
+        }
+        logger.info('Applied overdue filter', {
+          due_date_lt: searchParams.due_date_lt,
+          subtasks: searchParams.subtasks,
+          include_closed: searchParams.include_closed
+        });
       }
 
       // Auto-convert date strings to timestamps

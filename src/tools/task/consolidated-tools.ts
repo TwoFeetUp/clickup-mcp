@@ -219,6 +219,10 @@ export const searchTasksTool = {
         type: "string",
         description: "Tasks due before this date"
       },
+      overdue: {
+        type: "boolean",
+        description: "Filter for overdue tasks (due_date < now). Automatically includes subtasks and excludes closed tasks. Can be combined with other filters."
+      },
       // Filtering options
       custom_fields: {
         type: "array",
