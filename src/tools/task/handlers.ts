@@ -511,6 +511,12 @@ export async function getTaskHandler(params) {
  * Get task ID from various identifiers - uses the consolidated findTask function
  */
 export async function getTaskId(taskId?: string, taskName?: string, listName?: string, customTaskId?: string, requireId?: boolean, includeSubtasks?: boolean): Promise<string> {
+  // Fast path: if taskId is provided directly, return it without API call
+  // The subsequent operation (update, delete, etc.) will validate existence
+  if (taskId && !includeSubtasks) {
+    return taskId;
+  }
+
   // Check task context cache first if we have a task name
   if (taskName && !taskId && !customTaskId) {
     const cachedId = getCachedTaskContext(taskName);
