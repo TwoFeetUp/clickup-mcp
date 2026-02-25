@@ -41,7 +41,7 @@ Add this to your Claude Desktop config file:
       "command": "npx",
       "args": [
         "-y",
-        "@twofeetup/clickup-mcp@latest"
+        "@sjotie/clickup-mcp@latest"
       ],
       "env": {
         "CLICKUP_API_KEY": "your-api-key-here",
