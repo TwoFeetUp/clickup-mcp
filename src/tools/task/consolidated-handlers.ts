@@ -39,6 +39,56 @@ import { sponsorService } from '../../utils/sponsor-service.js';
 const logger = new Logger('ConsolidatedHandlers');
 const { task: taskService } = clickUpServices;
 
+/** Relationship field types that the ClickUp API cannot filter server-side */
+const RELATIONSHIP_FIELD_TYPES = ['list_relationship', 'tasks', 'users'];
+
+/**
+ * Post-filter tasks by relationship-type custom fields that the ClickUp API
+ * cannot filter server-side. For non-relationship field types, the API filter
+ * is trusted and tasks pass through.
+ */
+function filterByRelationshipCustomFields(
+  tasks: any[],
+  customFieldFilters?: Array<{ id: string; value: any }>
+): any[] {
+  if (!customFieldFilters || !Array.isArray(customFieldFilters) || customFieldFilters.length === 0) {
+    return tasks;
+  }
+
+  const beforeCount = tasks.length;
+  const filtered = tasks.filter(task => {
+    const taskCustomFields = Array.isArray(task.custom_fields) ? task.custom_fields : [];
+
+    return customFieldFilters.every(filter => {
+      const taskField = taskCustomFields.find((f: any) => f.id === filter.id);
+      if (!taskField) return false;
+
+      // Only post-filter relationship types — other types are filtered by the API
+      if (RELATIONSHIP_FIELD_TYPES.includes(taskField.type)) {
+        const fieldValues = Array.isArray(taskField.value)
+          ? taskField.value.map((v: any) => v.id || v)
+          : [];
+        const filterValues = Array.isArray(filter.value)
+          ? filter.value
+          : [filter.value];
+        return filterValues.some((fv: any) => fieldValues.includes(fv));
+      }
+
+      return true;
+    });
+  });
+
+  if (filtered.length !== beforeCount) {
+    logger.info('Applied client-side relationship field filtering', {
+      before: beforeCount,
+      after: filtered.length,
+      filterCount: customFieldFilters.length
+    });
+  }
+
+  return filtered;
+}
+
 //=============================================================================
 // DATE CONVERSION HELPER
 //=============================================================================
@@ -208,8 +258,80 @@ export async function handleManageTask(params: any) {
         const minimalDuplicate = buildMinimalSuccessResponse('duplicate', dupResult, params);
         return sponsorService.createResponse(minimalDuplicate);
 
+      case 'add_dependency': {
+        // Add dependency requires task identification and target task ID
+        if (!params.taskId && !params.taskName && !params.customTaskId) {
+          throw new Error('Task identification required: provide taskId, taskName, or customTaskId');
+        }
+        if (!params.depends_on_task_id) {
+          throw new Error('depends_on_task_id is required for add_dependency action. Use search_tasks to find task IDs.');
+        }
+        const resolvedTaskId = await getTaskId(params.taskId, params.taskName, params.listName, params.customTaskId);
+        await taskService.addDependency(resolvedTaskId, params.depends_on_task_id);
+        return sponsorService.createResponse({
+          success: true,
+          message: `Dependency added: task ${resolvedTaskId} now depends on (waits for) task ${params.depends_on_task_id}`,
+          task_id: resolvedTaskId,
+          depends_on_task_id: params.depends_on_task_id
+        });
+      }
+
+      case 'remove_dependency': {
+        // Remove dependency requires task identification and target task ID
+        if (!params.taskId && !params.taskName && !params.customTaskId) {
+          throw new Error('Task identification required: provide taskId, taskName, or customTaskId');
+        }
+        if (!params.depends_on_task_id) {
+          throw new Error('depends_on_task_id is required for remove_dependency action. Use search_tasks to find task IDs.');
+        }
+        const resolvedTaskId = await getTaskId(params.taskId, params.taskName, params.listName, params.customTaskId);
+        await taskService.removeDependency(resolvedTaskId, params.depends_on_task_id);
+        return sponsorService.createResponse({
+          success: true,
+          message: `Dependency removed: task ${resolvedTaskId} no longer depends on task ${params.depends_on_task_id}`,
+          task_id: resolvedTaskId,
+          depends_on_task_id: params.depends_on_task_id
+        });
+      }
+
+      case 'add_link': {
+        // Add link requires task identification and target task ID
+        if (!params.taskId && !params.taskName && !params.customTaskId) {
+          throw new Error('Task identification required: provide taskId, taskName, or customTaskId');
+        }
+        if (!params.link_to_task_id) {
+          throw new Error('link_to_task_id is required for add_link action. Use search_tasks to find task IDs.');
+        }
+        const resolvedTaskId = await getTaskId(params.taskId, params.taskName, params.listName, params.customTaskId);
+        await taskService.addLink(resolvedTaskId, params.link_to_task_id);
+        return sponsorService.createResponse({
+          success: true,
+          message: `Link added between task ${resolvedTaskId} and task ${params.link_to_task_id} (bidirectional)`,
+          task_id: resolvedTaskId,
+          link_to_task_id: params.link_to_task_id
+        });
+      }
+
+      case 'remove_link': {
+        // Remove link requires task identification and target task ID
+        if (!params.taskId && !params.taskName && !params.customTaskId) {
+          throw new Error('Task identification required: provide taskId, taskName, or customTaskId');
+        }
+        if (!params.link_to_task_id) {
+          throw new Error('link_to_task_id is required for remove_link action. Use search_tasks to find task IDs.');
+        }
+        const resolvedTaskId = await getTaskId(params.taskId, params.taskName, params.listName, params.customTaskId);
+        await taskService.removeLink(resolvedTaskId, params.link_to_task_id);
+        return sponsorService.createResponse({
+          success: true,
+          message: `Link removed between task ${resolvedTaskId} and task ${params.link_to_task_id}`,
+          task_id: resolvedTaskId,
+          link_to_task_id: params.link_to_task_id
+        });
+      }
+
       default:
-        throw new Error(`Invalid action: ${action}. Must be one of: create, update, delete, move, duplicate`);
+        throw new Error(`Invalid action: ${action}. Must be one of: create, update, delete, move, duplicate, add_dependency, remove_dependency, add_link, remove_link`);
     }
   } catch (error) {
     logger.error(`Error handling manage_task action: ${action}`, { error: (error as Error).message });
@@ -349,8 +471,11 @@ export async function handleSearchTasks(params: any) {
       const workspaceTasks = await getWorkspaceTasksHandler(taskService, searchParams);
 
       // Extract tasks array from response
-      const tasks = Array.isArray(workspaceTasks) ? workspaceTasks :
+      const rawTasks = Array.isArray(workspaceTasks) ? workspaceTasks :
                    workspaceTasks.tasks || workspaceTasks.summaries || [];
+
+      // Post-filter for relationship custom fields (ClickUp API ignores these)
+      const tasks = filterByRelationshipCustomFields(rawTasks, params.custom_fields);
 
       // Apply pagination
       const { items, pagination } = paginate(tasks, offset, limit);
@@ -390,8 +515,11 @@ export async function handleSearchTasks(params: any) {
     });
 
     // Extract tasks array from response
-    const tasks = Array.isArray(workspaceTasks) ? workspaceTasks :
+    const rawDefaultTasks = Array.isArray(workspaceTasks) ? workspaceTasks :
                  workspaceTasks.tasks || workspaceTasks.summaries || [];
+
+    // Post-filter for relationship custom fields (ClickUp API ignores these)
+    const tasks = filterByRelationshipCustomFields(rawDefaultTasks, params.custom_fields);
 
     // Apply pagination
     const { items, pagination } = paginate(tasks, offset, limit);

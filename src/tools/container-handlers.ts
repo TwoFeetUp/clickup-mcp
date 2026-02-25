@@ -371,6 +371,18 @@ async function handleFolderContainer(
 }
 
 /**
+ * Format status metadata for LLM consumption
+ * Drops internal IDs, keeps name/type/color that are useful for AI
+ */
+function formatStatusesForDiscovery(statuses: any[]): any[] {
+  return statuses.map(status => ({
+    name: status.status,
+    type: status.type,
+    color: status.color
+  }));
+}
+
+/**
  * Format custom field metadata for LLM consumption
  * Preserves options and type_config while simplifying structure
  */
@@ -445,7 +457,8 @@ export async function handleGetContainer(parameters: any) {
     detail_level = 'standard',
     fields,
     use_cache = true,
-    include_custom_fields = false
+    include_custom_fields = false,
+    include_statuses = false
   } = parameters;
 
   logger.info(`Retrieving container: type=${type}`);
@@ -456,9 +469,10 @@ export async function handleGetContainer(parameters: any) {
       throw new Error("Invalid container type. Must be 'list' or 'folder'");
     }
 
-    // Check cache first if enabled (only for basic container info, not custom fields)
+    // Check cache first if enabled (only for basic container info, not custom fields or statuses)
+    const needsStatuses = type === 'list' && (include_statuses || detail_level === 'detailed');
     let cacheKey: string | null = null;
-    if (use_cache && id && !include_custom_fields) {
+    if (use_cache && id && !include_custom_fields && !needsStatuses) {
       cacheKey = type === 'list' ? CACHE_KEYS.LIST(id) : CACHE_KEYS.FOLDER(id);
       const cached = cacheService.get(cacheKey);
       if (cached) {
@@ -484,29 +498,57 @@ export async function handleGetContainer(parameters: any) {
     let result: any;
 
     if (type === 'list') {
-      result = await handleGetList({ listId: containerId });
-
-      // Fetch custom fields if requested
-      if (include_custom_fields && result && !result.isError) {
+      // When statuses or custom fields are needed, build an enriched response
+      if (needsStatuses || include_custom_fields) {
         try {
-          const { task: taskService } = clickUpServices;
-          const customFields = await taskService.getAccessibleCustomFields(containerId);
+          // Get raw list data directly from service to access statuses
+          const { list: listServiceInstance, task: taskService } = clickUpServices;
+          const rawList = await listServiceInstance.getList(containerId);
 
-          // Extract the data from the response
-          const responseData = result.content?.[0]?.text
-            ? JSON.parse(result.content[0].text)
-            : result;
+          // Build base response data
+          const responseData: any = {
+            id: rawList.id,
+            name: rawList.name,
+            content: rawList.content,
+            space: {
+              id: rawList.space.id,
+              name: rawList.space.name
+            },
+            url: `https://app.clickup.com/${config.clickupTeamId}/v/l/${rawList.id}`
+          };
 
-          // Add formatted custom fields
-          responseData.custom_fields = formatCustomFieldsForDiscovery(customFields);
-          responseData.message = `List "${responseData.name}" has ${customFields.length} custom field(s). Use field IDs when setting values on tasks.`;
+          const messages: string[] = [];
+
+          // Include statuses when requested or detail_level is "detailed"
+          if (needsStatuses && rawList.statuses) {
+            responseData.statuses = formatStatusesForDiscovery(rawList.statuses);
+            responseData.override_statuses = rawList.override_statuses;
+            messages.push(`List "${rawList.name}" has ${rawList.statuses.length} task status(es). Use exact status names (lowercase) when updating task status.`);
+          }
+
+          // Include custom fields when requested
+          if (include_custom_fields) {
+            try {
+              const customFields = await taskService.getAccessibleCustomFields(containerId);
+              responseData.custom_fields = formatCustomFieldsForDiscovery(customFields);
+              messages.push(`List "${rawList.name}" has ${customFields.length} custom field(s). Use field IDs when setting values on tasks.`);
+            } catch (cfError: any) {
+              logger.warn('Failed to fetch custom fields', { listId: containerId, error: cfError.message });
+            }
+          }
+
+          if (messages.length > 0) {
+            responseData.message = messages.join(' ');
+          }
 
           return sponsorService.createResponse(responseData);
-        } catch (cfError: any) {
-          logger.warn('Failed to fetch custom fields', { listId: containerId, error: cfError.message });
-          // Return the list without custom fields rather than failing
+        } catch (enrichError: any) {
+          logger.warn('Failed to build enriched list response, falling back to standard', { listId: containerId, error: enrichError.message });
+          // Fall through to standard handleGetList
         }
       }
+
+      result = await handleGetList({ listId: containerId });
     } else {
       result = await handleGetFolder({ folderId: containerId });
     }
