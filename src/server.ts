@@ -66,6 +66,11 @@ import {
   handleListDocuments
 } from "./tools/document-tools.js";
 
+import {
+  applyTemplateTool,
+  handleApplyTemplate
+} from "./tools/template-tools.js";
+
 import { Logger } from "./logger.js";
 import { clickUpServices } from "./services/shared.js";
 import { sponsorService } from "./utils/sponsor-service.js";
@@ -112,6 +117,12 @@ export const server = new Server(
       tools: {},
       prompts: {},
     },
+    instructions: `Manage ClickUp tasks, lists, folders, documents, and team members.
+
+Use when: user asks about tasks, todos, projects, lists, folders,
+workspace, documents, team members, assignees, time tracking, comments.
+
+Synonyms: task/todo/ticket, list/board, folder/project, workspace/team.`,
   }
 );
 
@@ -153,6 +164,8 @@ export function configureServer() {
         findMembersTool,
         // Tag tools (1 consolidated tool)
         operateTagsTool,
+        // Template tools (1 consolidated tool)
+        applyTemplateTool,
         // Document tools (3 consolidated tools)
         ...documentModule()
       ].filter(tool => isToolEnabled(tool.name))
@@ -162,8 +175,8 @@ export function configureServer() {
 
   // Register CallTool handler with proper logging
   logger.info("Registering tool handlers", {
-    toolCount: 9,
-    categories: ["workspace", "task", "container", "tag", "member", "document"]
+    toolCount: 10,
+    categories: ["workspace", "task", "container", "tag", "template", "member", "document"]
   });
 
   server.setRequestHandler(CallToolRequestSchema, async (req) => {
@@ -225,6 +238,10 @@ export function configureServer() {
         // CONSOLIDATED TAG HANDLERS
         case "operate_tags":
           return handleOperateTags(params);
+
+        // TEMPLATE HANDLER
+        case "apply_template":
+          return handleApplyTemplate(params);
 
         // CONSOLIDATED DOCUMENT HANDLERS
         case "manage_document":

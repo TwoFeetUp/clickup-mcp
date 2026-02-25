@@ -554,10 +554,12 @@ async function getListId(listId?: string, listName?: string): Promise<string> {
  * Extract and build task filters from parameters
  */
 function buildTaskFilters(params: any): TaskFilters {
-  const { subtasks, statuses, page, order_by, reverse } = params;
+  const { subtasks, include_subtasks, include_closed, statuses, page, order_by, reverse } = params;
   const filters: TaskFilters = {};
 
   if (subtasks !== undefined) filters.subtasks = subtasks;
+  if (include_subtasks !== undefined) filters.include_subtasks = include_subtasks;
+  if (include_closed !== undefined) filters.include_closed = include_closed;
   if (statuses !== undefined) filters.statuses = statuses;
   if (page !== undefined) filters.page = page;
   if (order_by !== undefined) filters.order_by = order_by;

@@ -717,6 +717,86 @@ export class TaskServiceCore extends BaseClickUpService {
   }
 
   /**
+   * Add a dependency between two tasks (task depends on another task)
+   * @param taskId The ID of the dependent task
+   * @param dependsOnTaskId The ID of the task it depends on (waiting for)
+   * @returns The API response
+   */
+  async addDependency(taskId: string, dependsOnTaskId: string): Promise<any> {
+    this.logOperation('addDependency', { taskId, dependsOnTaskId });
+
+    try {
+      return await this.makeRequest(async () => {
+        const response = await this.client.post(`/task/${taskId}/dependency`, {
+          depends_on: dependsOnTaskId
+        });
+        return response.data;
+      });
+    } catch (error) {
+      throw this.handleError(error, `Failed to add dependency: task ${taskId} depends on ${dependsOnTaskId}`);
+    }
+  }
+
+  /**
+   * Remove a dependency between two tasks
+   * @param taskId The ID of the dependent task
+   * @param dependsOnTaskId The ID of the task it depends on
+   * @returns The API response
+   */
+  async removeDependency(taskId: string, dependsOnTaskId: string): Promise<any> {
+    this.logOperation('removeDependency', { taskId, dependsOnTaskId });
+
+    try {
+      return await this.makeRequest(async () => {
+        const response = await this.client.delete(`/task/${taskId}/dependency`, {
+          params: { depends_on: dependsOnTaskId }
+        });
+        return response.data;
+      });
+    } catch (error) {
+      throw this.handleError(error, `Failed to remove dependency: task ${taskId} depends on ${dependsOnTaskId}`);
+    }
+  }
+
+  /**
+   * Add a bidirectional link between two tasks
+   * @param taskId The ID of the first task
+   * @param linksToTaskId The ID of the task to link to
+   * @returns The API response
+   */
+  async addLink(taskId: string, linksToTaskId: string): Promise<any> {
+    this.logOperation('addLink', { taskId, linksToTaskId });
+
+    try {
+      return await this.makeRequest(async () => {
+        const response = await this.client.post(`/task/${taskId}/link/${linksToTaskId}`);
+        return response.data;
+      });
+    } catch (error) {
+      throw this.handleError(error, `Failed to add link between tasks ${taskId} and ${linksToTaskId}`);
+    }
+  }
+
+  /**
+   * Remove a bidirectional link between two tasks
+   * @param taskId The ID of the first task
+   * @param linksToTaskId The ID of the linked task to remove
+   * @returns The API response
+   */
+  async removeLink(taskId: string, linksToTaskId: string): Promise<any> {
+    this.logOperation('removeLink', { taskId, linksToTaskId });
+
+    try {
+      return await this.makeRequest(async () => {
+        const response = await this.client.delete(`/task/${taskId}/link/${linksToTaskId}`);
+        return response.data;
+      });
+    } catch (error) {
+      throw this.handleError(error, `Failed to remove link between tasks ${taskId} and ${linksToTaskId}`);
+    }
+  }
+
+  /**
    * Try to get a task ID from the name cache
    * @param taskName The name of the task
    * @param listId Optional list ID for context

@@ -15,13 +15,159 @@
  */
 
 import { CreateDocumentData, DocumentPagesOptions, UpdateDocumentPageData } from '../services/clickup/types.js';
-import { clickUpServices, workspaceService } from '../services/shared.js';
+import { clickUpServices, listService, taskService, workspaceService } from '../services/shared.js';
 import { sponsorService } from '../utils/sponsor-service.js';
 import { Logger } from '../logger.js';
 import config from '../config.js';
+import { findListIDByName } from './list.js';
 
 const logger = new Logger('DocumentTools');
 const { document: documentService } = clickUpServices;
+const CLIENT_LIST_NAME = 'All Clients';
+
+type LinkedTaskRef = {
+  taskId?: string;
+  taskName?: string;
+  customTaskId?: string;
+  listId?: string;
+  listName?: string;
+};
+
+type ResolvedLinkedTask = {
+  id: string;
+  name: string;
+  url?: string;
+  listId?: string;
+  listName?: string;
+};
+
+const linkedTaskRefSchema = {
+  type: 'object',
+  properties: {
+    taskId: {
+      type: 'string',
+      description: 'Task ID (preferred when available)'
+    },
+    taskName: {
+      type: 'string',
+      description: 'Task name (use with listName for fast lookup)'
+    },
+    customTaskId: {
+      type: 'string',
+      description: 'Custom task ID (e.g., DEV-123)'
+    },
+    listId: {
+      type: 'string',
+      description: 'List ID to scope the task lookup'
+    },
+    listName: {
+      type: 'string',
+      description: 'List name to scope the task lookup'
+    }
+  },
+  additionalProperties: false
+};
+
+const normalizeName = (value: string) => value.trim().toLowerCase();
+
+async function resolveLinkedTaskRef(
+  ref: LinkedTaskRef,
+  options: { label: string; enforceClientList?: boolean }
+): Promise<ResolvedLinkedTask> {
+  if (!ref.taskId && !ref.taskName && !ref.customTaskId) {
+    throw new Error(`${options.label} requires taskId, taskName, or customTaskId`);
+  }
+
+  let listId = ref.listId;
+  let listName = ref.listName;
+
+  if (options.enforceClientList) {
+    if (listName && normalizeName(listName) !== normalizeName(CLIENT_LIST_NAME)) {
+      throw new Error(`${options.label} must reference list "${CLIENT_LIST_NAME}"`);
+    }
+    listName = listName ?? CLIENT_LIST_NAME;
+
+    if (listId) {
+      const list = await listService.getList(listId);
+      if (normalizeName(list.name) !== normalizeName(CLIENT_LIST_NAME)) {
+        throw new Error(`${options.label} listId does not match "${CLIENT_LIST_NAME}"`);
+      }
+      listName = list.name;
+    }
+  }
+
+  if (!listId && listName) {
+    const listInfo = await findListIDByName(workspaceService, listName);
+    if (!listInfo) {
+      throw new Error(`${options.label} list "${listName}" not found`);
+    }
+    listId = listInfo.id;
+    listName = listInfo.name;
+  }
+
+  let task;
+  if (ref.taskId) {
+    task = await taskService.getTask(ref.taskId);
+  } else if (ref.customTaskId) {
+    task = await taskService.getTaskByCustomId(ref.customTaskId, listId);
+  } else if (ref.taskName) {
+    if (!listId) {
+      throw new Error(`${options.label} requires listName or listId when using taskName`);
+    }
+    task = await taskService.findTaskByName(listId, ref.taskName);
+  }
+
+  if (!task) {
+    throw new Error(`${options.label} task not found`);
+  }
+
+  if (options.enforceClientList && listId && task.list?.id && task.list.id !== listId) {
+    throw new Error(`${options.label} task is not in list "${CLIENT_LIST_NAME}"`);
+  }
+
+  return {
+    id: task.id,
+    name: task.name,
+    url: task.url,
+    listId: task.list?.id,
+    listName: task.list?.name
+  };
+}
+
+function attachLinkedTaskMetadata(
+  result: any,
+  linkedClient?: ResolvedLinkedTask,
+  linkedTask?: ResolvedLinkedTask
+): any {
+  if (!linkedClient && !linkedTask) {
+    return result;
+  }
+
+  const metadata: any = {};
+  if (linkedClient) {
+    metadata.linked_client = {
+      taskId: linkedClient.id,
+      taskName: linkedClient.name,
+      listId: linkedClient.listId,
+      listName: linkedClient.listName,
+      url: linkedClient.url
+    };
+  }
+  if (linkedTask) {
+    metadata.linked_task = {
+      taskId: linkedTask.id,
+      taskName: linkedTask.name,
+      listId: linkedTask.listId,
+      listName: linkedTask.listName,
+      url: linkedTask.url
+    };
+  }
+
+  return {
+    ...result,
+    ...metadata
+  };
+}
 
 //=============================================================================
 // TOOL DEFINITIONS
@@ -151,6 +297,13 @@ HIERARCHY:
 - Pages can have sub-pages using parent_page_id
 - Use max_page_depth to control retrieval depth (-1 for unlimited)
 
+LINKING:
+- linked_client: Task reference scoped to the "All Clients" list (taskId, taskName, or customTaskId)
+- linked_task: Optional task reference (taskId, taskName, or customTaskId)
+- If name is omitted, linked_client (or linked_task) name is used for the page title
+- Overarching client doc (current): 2kypy1k9-15455 (Client info)
+- Not locked: linked_* is optional, and this tool still works for any document/page
+
 DETAIL LEVELS:
 - minimal: id, name, content_text only
 - standard: adds created, updated, content_format (default)
@@ -206,6 +359,14 @@ DETAIL LEVELS:
       max_page_depth: {
         type: 'number',
         description: 'Maximum depth for page hierarchy (-1 for unlimited, list action only)'
+      },
+      linked_client: {
+        ...linkedTaskRefSchema,
+        description: `Client task reference (defaults to list "${CLIENT_LIST_NAME}")`
+      },
+      linked_task: {
+        ...linkedTaskRefSchema,
+        description: 'Optional task reference for linking a page to a task'
       },
       detail_level: {
         type: 'string',
@@ -346,21 +507,62 @@ export async function handleManageDocument(params: any): Promise<any> {
  */
 export async function handleManageDocumentPage(params: any): Promise<any> {
   try {
-    const { action, documentId, pageId, pageIds, name, sub_title, content, parent_page_id, content_edit_mode, content_format, max_page_depth, detail_level = 'standard' } = params;
+    const {
+      action,
+      documentId,
+      pageId,
+      pageIds,
+      name,
+      sub_title,
+      content,
+      parent_page_id,
+      content_edit_mode,
+      content_format,
+      max_page_depth,
+      linked_client,
+      linked_task,
+      detail_level = 'standard'
+    } = params;
 
     if (!action || !documentId) {
       return sponsorService.createErrorResponse(new Error('Action and documentId parameters are required'));
     }
 
     let result: any;
+    let resolvedLinkedClient: ResolvedLinkedTask | undefined;
+    let resolvedLinkedTask: ResolvedLinkedTask | undefined;
+    const shouldResolveLinks = action === 'create' || action === 'update';
+
+    if (shouldResolveLinks && linked_client) {
+      resolvedLinkedClient = await resolveLinkedTaskRef(linked_client, {
+        label: 'linked_client',
+        enforceClientList: true
+      });
+    }
+
+    if (shouldResolveLinks && linked_task) {
+      resolvedLinkedTask = await resolveLinkedTaskRef(linked_task, {
+        label: 'linked_task'
+      });
+    }
+
+    const resolvedName = name ?? resolvedLinkedClient?.name ?? resolvedLinkedTask?.name;
+
+    if (resolvedLinkedClient && name && name !== resolvedLinkedClient.name) {
+      logger.warn('linked_client name mismatch', {
+        documentId,
+        name,
+        linkedClientName: resolvedLinkedClient.name
+      });
+    }
 
     switch (action) {
       case 'create':
-        result = await handlePageCreate(documentId, name, content, sub_title, parent_page_id);
+        result = await handlePageCreate(documentId, resolvedName, content, sub_title, parent_page_id);
         break;
 
       case 'update':
-        result = await handlePageUpdate(documentId, pageId, name, sub_title, content, content_edit_mode, content_format);
+        result = await handlePageUpdate(documentId, pageId, resolvedName, sub_title, content, content_edit_mode, content_format);
         break;
 
       case 'get':
@@ -375,7 +577,9 @@ export async function handleManageDocumentPage(params: any): Promise<any> {
         return sponsorService.createErrorResponse(new Error(`Invalid action: ${action}. Must be create, update, get, or list.`));
     }
 
-    return sponsorService.createResponse(result);
+    return sponsorService.createResponse(
+      attachLinkedTaskMetadata(result, resolvedLinkedClient, resolvedLinkedTask)
+    );
   } catch (error: any) {
     logger.error('Error in handleManageDocumentPage', { error: error.message });
     return sponsorService.createErrorResponse(error, params);

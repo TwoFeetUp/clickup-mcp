@@ -17,13 +17,13 @@
  */
 export const manageTaskTool = {
   name: "manage_task",
-  description: "Modify tasks with action-based routing. Actions: create (new task), update (modify fields), delete (remove), move (to different list), duplicate (copy to another list). Flexible task identification: taskId (preferred), taskName, or customTaskId. Supports all task fields including priority, dates, assignees, custom fields, and tags.",
+  description: "Modify tasks with action-based routing. Actions: create (new task), update (modify fields), delete (remove), move (to different list), duplicate (copy to another list), add_dependency (task A waits for task B), remove_dependency, add_link (bidirectional link between tasks), remove_link. Flexible task identification: taskId (preferred), taskName, or customTaskId. Supports all task fields including priority, dates, assignees, custom fields, and tags.",
   inputSchema: {
     type: "object",
     properties: {
       action: {
         type: "string",
-        enum: ["create", "update", "delete", "move", "duplicate"],
+        enum: ["create", "update", "delete", "move", "duplicate", "add_dependency", "remove_dependency", "add_link", "remove_link"],
         description: "REQUIRED: Operation to perform on the task"
       },
       // Task Identification (required for update/delete/move/duplicate)
@@ -116,6 +116,15 @@ export const manageTaskTool = {
       check_required_custom_fields: {
         type: "boolean",
         description: "For create: validate all required custom fields are set before saving"
+      },
+      // Dependency/Link action fields
+      depends_on_task_id: {
+        type: "string",
+        description: "For add_dependency/remove_dependency: Task ID that this task depends on (is waiting for). Must be an explicit task ID."
+      },
+      link_to_task_id: {
+        type: "string",
+        description: "For add_link/remove_link: Task ID to link to (bidirectional). Must be an explicit task ID."
       },
       // Move/Duplicate action fields
       targetListId: {

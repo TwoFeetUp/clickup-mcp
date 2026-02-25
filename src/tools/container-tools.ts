@@ -160,6 +160,10 @@ export const getContainerTool = {
       include_custom_fields: {
         type: "boolean",
         description: "For lists: include custom field definitions with available options (dropdown choices, relationship targets, etc.). Use this to discover what values can be set on tasks. Default: false"
+      },
+      include_statuses: {
+        type: "boolean",
+        description: "For lists: include available task statuses with names and colors. Use to discover valid status values before updating tasks. Default: false"
       }
     },
     required: ["type"]

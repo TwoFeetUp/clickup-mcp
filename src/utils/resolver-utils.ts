@@ -11,6 +11,14 @@ import { clickUpServices } from '../services/shared.js';
 import { findListIDByName } from '../tools/list.js';
 
 /**
+ * Strip common punctuation (hyphens, dots, underscores) and collapse whitespace
+ * for fuzzy comparison. E.g. "E-Mail Automation" → "email automation"
+ */
+function stripPunctuation(str: string): string {
+  return str.replace(/[-._]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+/**
  * Result of a name match operation including the quality of the match
  */
 interface NameMatchResult {
@@ -80,11 +88,25 @@ export function isNameMatch(actualName: string, searchName: string): NameMatchRe
   }
   
   if (actualNameWithoutEmoji.toLowerCase() === searchNameWithoutEmoji.toLowerCase()) {
-    return { 
-      isMatch: true, 
-      score: 70, 
+    return {
+      isMatch: true,
+      score: 70,
       exactMatch: false,
-      reason: 'Case-insensitive match after removing emojis' 
+      reason: 'Case-insensitive match after removing emojis'
+    };
+  }
+
+  // 3b. Match after normalizing punctuation (hyphens, dots, underscores)
+  // This handles cases like "E-Mail Automation" matching "email automation"
+  const actualNoPunct = stripPunctuation(actualNameWithoutEmoji.toLowerCase());
+  const searchNoPunct = stripPunctuation(searchNameWithoutEmoji.toLowerCase());
+
+  if (actualNoPunct === searchNoPunct) {
+    return {
+      isMatch: true,
+      score: 65,
+      exactMatch: false,
+      reason: 'Match after stripping punctuation'
     };
   }
 
@@ -103,14 +125,33 @@ export function isNameMatch(actualName: string, searchName: string): NameMatchRe
   }
   
   if (lowerSearch.includes(lowerActual)) {
-    return { 
-      isMatch: true, 
-      score: 50, 
+    return {
+      isMatch: true,
+      score: 50,
       exactMatch: false,
-      reason: 'Actual name found as substring in search term' 
+      reason: 'Actual name found as substring in search term'
     };
   }
-  
+
+  // 4b. Substring matches after punctuation normalization
+  if (actualNoPunct.includes(searchNoPunct)) {
+    return {
+      isMatch: true,
+      score: 55,
+      exactMatch: false,
+      reason: 'Search term (punctuation-normalized) found as substring in actual name'
+    };
+  }
+
+  if (searchNoPunct.includes(actualNoPunct)) {
+    return {
+      isMatch: true,
+      score: 45,
+      exactMatch: false,
+      reason: 'Actual name (punctuation-normalized) found as substring in search term'
+    };
+  }
+
   // 5. Fuzzy emoji-less matches (lowest quality)
   const lowerActualNoEmoji = actualNameWithoutEmoji.toLowerCase();
   const lowerSearchNoEmoji = searchNameWithoutEmoji.toLowerCase();
