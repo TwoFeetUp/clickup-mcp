@@ -181,7 +181,8 @@ export class TaskServiceCore extends BaseClickUpService {
       status: task.status?.status,
       priority: this.extractPriorityValue(task),
       due_date: task.due_date ? Number(task.due_date) : undefined,
-      assignees: task.assignees?.map(a => a.id) || []
+      assignees: task.assignees?.map(a => a.id) || [],
+      custom_item_id: task.custom_item_id,
     };
   }
 

@@ -87,37 +87,37 @@ export function clearTaskContextCache(): void {
 //=============================================================================
 
 /**
- * Parse time estimate string into minutes
- * Supports formats like "2h 30m", "150m", "2.5h"
+ * Parse time estimate string into milliseconds (ClickUp API unit).
+ * Supports formats like "2h 30m", "150m", "2.5h", or raw milliseconds as number.
  */
 function parseTimeEstimate(timeEstimate: string | number): number {
-  // If it's already a number, return it directly
+  // If it's already a number, treat as milliseconds (API unit)
   if (typeof timeEstimate === 'number') {
     return timeEstimate;
   }
 
   if (!timeEstimate || typeof timeEstimate !== 'string') return 0;
 
-  // If it's just a number as string, parse it
+  // If it's just digits, treat as milliseconds
   if (/^\d+$/.test(timeEstimate)) {
     return parseInt(timeEstimate, 10);
   }
 
-  let totalMinutes = 0;
+  let totalMs = 0;
 
   // Extract hours
   const hoursMatch = timeEstimate.match(/(\d+\.?\d*)h/);
   if (hoursMatch) {
-    totalMinutes += parseFloat(hoursMatch[1]) * 60;
+    totalMs += parseFloat(hoursMatch[1]) * 60 * 60 * 1000;
   }
 
   // Extract minutes
   const minutesMatch = timeEstimate.match(/(\d+)m/);
   if (minutesMatch) {
-    totalMinutes += parseInt(minutesMatch[1], 10);
+    totalMs += parseInt(minutesMatch[1], 10) * 60 * 1000;
   }
 
-  return Math.round(totalMinutes); // Return minutes
+  return Math.round(totalMs);
 }
 
 /**
@@ -236,16 +236,14 @@ async function buildUpdateData(params: any): Promise<UpdateTaskData> {
     }
   }
 
-  // Handle time estimate if provided - convert from string to minutes
+  // Handle time estimate if provided - convert from string to milliseconds (ClickUp API unit)
   if (params.time_estimate !== undefined) {
-    // Log the time estimate for debugging
-    console.log(`Original time_estimate: ${params.time_estimate}, typeof: ${typeof params.time_estimate}`);
+    updateData.time_estimate = parseTimeEstimate(params.time_estimate);
+  }
 
-    // Parse and convert to number in minutes
-    const minutes = parseTimeEstimate(params.time_estimate);
-
-    console.log(`Converted time_estimate: ${minutes}`);
-    updateData.time_estimate = minutes;
+  // Handle parent if provided - reparent the task
+  if (params.parent !== undefined) {
+    updateData.parent = params.parent;
   }
 
   // Handle custom fields if provided

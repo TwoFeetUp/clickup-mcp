@@ -212,7 +212,7 @@ export const updateTaskTool = {
       },
       time_estimate: {
         type: "string",
-        description: "Time estimate for the task. For best compatibility with the ClickUp API, use a numeric value in minutes (e.g., '150' for 2h 30m)"
+        description: "Time estimate in milliseconds (ClickUp API unit), or human-readable: '2h 30m', '1.5h', '45m'. Examples: 3600000 = 1 hour, '2h 30m' = 9000000ms"
       },
       custom_fields: {
         type: "array",

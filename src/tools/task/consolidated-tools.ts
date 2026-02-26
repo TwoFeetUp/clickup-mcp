@@ -80,7 +80,7 @@ export const manageTaskTool = {
       },
       parent: {
         type: "string",
-        description: "Parent task ID for creating subtasks (create action only)"
+        description: "Parent task ID. For create: sets parent (creates subtask). For update: reparents the task. Use null to remove parent."
       },
       tags: {
         type: "array",
@@ -111,7 +111,7 @@ export const manageTaskTool = {
       },
       time_estimate: {
         type: "string",
-        description: "Time estimate: '2h 30m', '150m', '2.5h', or minutes as number"
+        description: "Time estimate in milliseconds (ClickUp API unit), or human-readable: '2h 30m', '1.5h', '45m'. Examples: 3600000 = 1 hour, '2h 30m' = 9000000ms"
       },
       check_required_custom_fields: {
         type: "boolean",
