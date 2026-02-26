@@ -148,6 +148,7 @@ function buildMinimalSuccessResponse(action: string, result: any, params?: any):
       if (params.startDate !== undefined) updatedFields.start_date = result.start_date;
       if (params.assignees !== undefined) updatedFields.assignees = result.assignees?.length || 0;
       if (params.tags !== undefined) updatedFields.tags = result.tags?.length || 0;
+      if (params.parent !== undefined) updatedFields.parent = result.parent;
 
       return {
         success: true,

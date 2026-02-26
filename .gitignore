@@ -10,6 +10,7 @@ out/
 # Environment variables
 .env
 .env.*
+.mcp.json
 .env.local
 .env.development
 .env.production
