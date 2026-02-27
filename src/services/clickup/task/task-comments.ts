@@ -15,6 +15,56 @@
 import { TaskServiceCore } from './task-core.js';
 import { ClickUpComment } from '../types.js';
 
+interface CommentRichTextPart {
+  text?: string;
+  type?: string;
+  user?: { id: number };
+  attributes?: Record<string, any>;
+}
+
+/**
+ * Parse comment text for @mention patterns and convert to ClickUp rich text format.
+ *
+ * Supported patterns:
+ *   <@94722742>           — Slack-style with user ID
+ *   <@94722742|Thomas>    — Slack-style with display name
+ *   @94722742             — Plain @userId (5+ digits to avoid false positives)
+ */
+function parseCommentWithMentions(text: string): { comment_text: string } | { comment: CommentRichTextPart[] } {
+  const mentionPattern = /<@(\d+)(?:\|[^>]*)?>|(?<!\S)@(\d{5,})(?!\d)/g;
+
+  const mentions: { start: number; end: number; userId: number }[] = [];
+  let match;
+  while ((match = mentionPattern.exec(text)) !== null) {
+    mentions.push({
+      start: match.index,
+      end: match.index + match[0].length,
+      userId: parseInt(match[1] || match[2], 10),
+    });
+  }
+
+  if (mentions.length === 0) {
+    return { comment_text: text };
+  }
+
+  const parts: CommentRichTextPart[] = [];
+  let cursor = 0;
+
+  for (const mention of mentions) {
+    if (mention.start > cursor) {
+      parts.push({ text: text.slice(cursor, mention.start) });
+    }
+    parts.push({ type: 'tag', user: { id: mention.userId } });
+    cursor = mention.end;
+  }
+
+  if (cursor < text.length) {
+    parts.push({ text: text.slice(cursor) });
+  }
+
+  return { comment: parts };
+}
+
 /**
  * Comments functionality for the TaskService
  *
@@ -75,13 +125,10 @@ export class TaskServiceComments {
     (this.core as any).logOperation('createTaskComment', { taskId, commentText, notifyAll, assignee });
 
     try {
-      const payload: {
-        comment_text: string;
-        notify_all: boolean;
-        assignee?: number;
-      } = {
-        comment_text: commentText,
-        notify_all: notifyAll
+      const parsed = parseCommentWithMentions(commentText);
+      const payload: Record<string, any> = {
+        ...parsed,
+        notify_all: notifyAll,
       };
 
       if (assignee) {

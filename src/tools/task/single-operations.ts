@@ -461,7 +461,7 @@ export const createTaskCommentTool = {
       },
       commentText: {
         type: "string",
-        description: "REQUIRED: Text content of the comment to create."
+        description: "REQUIRED: Text content of the comment. Use @userId (e.g. @94722742) to tag people."
       },
       notifyAll: {
         type: "boolean",
