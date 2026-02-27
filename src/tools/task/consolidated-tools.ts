@@ -344,7 +344,7 @@ export const taskCommentsTool = {
       // Create action parameters
       commentText: {
         type: "string",
-        description: "REQUIRED for create: Comment text. Supports @ mentions for user IDs."
+        description: "REQUIRED for create: Comment text. Use @userId (e.g. @94722742) to tag people."
       },
       notifyAll: {
         type: "boolean",
