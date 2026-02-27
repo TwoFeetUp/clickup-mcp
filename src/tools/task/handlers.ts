@@ -605,7 +605,8 @@ export async function createTaskHandler(params) {
     custom_fields,
     check_required_custom_fields,
     assignees,
-    task_type
+    task_type,
+    time_estimate
   } = params;
 
   if (!name) throw new Error("Task name is required");
@@ -662,6 +663,11 @@ export async function createTaskHandler(params) {
   // Only include priority if explicitly provided by the user
   if (priority !== undefined) {
     taskData.priority = priority;
+  }
+
+  // Add time estimate if specified - convert from string to milliseconds (ClickUp API unit)
+  if (time_estimate !== undefined) {
+    taskData.time_estimate = parseTimeEstimate(time_estimate);
   }
 
   // Add due date if specified
