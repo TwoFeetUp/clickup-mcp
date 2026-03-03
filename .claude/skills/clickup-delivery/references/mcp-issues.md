@@ -69,3 +69,28 @@ Laatste update: 26 feb 2026
 - **Les**: Builds verhuizen tussen lijsten — altijd via client link of task ID zoeken, niet via lijst
 - **Mitigatie**: De `/manage-task` command zoekt via client → builds relationship, niet via lijst
 - **Type**: Workflow | **Status**: Gemitigeerd door skill/command
+
+### 11. ⚠️ KRITIEK: Move-actie verliest subtasks, relaties en metadata — 3 maart 2026
+- **Gevonden**: `manage_task({ action: "move" })` op build "Email automation" (86c62vkxh) van Client Review → Building
+- **Probleem**: Move is intern een delete + recreate. De `extractTaskData()` kopieert NIET:
+  - **Subtasks** — volledige milestone + 4 subtaken verdwenen (86c6x7827, 86c7nkmt6, 86c8ex9da, 86c8ex9fj, 86c8fxqnn)
+  - **Custom field relaties** — Client link (All Clients → LHT) weg
+  - **Checklists** — checklist met resolved items weg
+  - **Dependencies** — dependency naar 86c79pzmz weg
+  - **Watchers** — 5 watchers → alleen creator
+  - **Time spent** — 11.445.152ms (3+ uur) → 0
+  - **Progress** — 50% → 0%
+  - **Linked tasks** — allemaal weg
+  - **Locations** — Building locatie-referentie weg
+- **Origineel task ID**: `86c62vkxh` — **verwijderd, niet meer te vinden** (ook niet via archived)
+- **Nieuw task ID**: `86c8k2a3z` — kale kopie zonder history
+- **Impact**: **DATAVERLIES** — subtasks met uren, status en feedback zijn onherstelbaar verloren via API
+- **Root cause**: `extractTaskData()` in `task-core.ts` kopieert alleen basisvelden (name, description, status, assignees, priority, dates, tags, custom_item_id). Mist: subtasks, custom_fields values, checklists, dependencies, watchers, time_spent, linked_tasks.
+- **Relatie met #9**: Issue 9 fixte alleen `custom_item_id`. De rest van de data wordt nog steeds niet meegenomen.
+- **Vereiste fix**:
+  1. **Optie A (ideaal)**: Gebruik ClickUp API `PUT /task/{id}` met `list` parameter als die bestaat, in plaats van delete+recreate
+  2. **Optie B (fallback)**: `extractTaskData()` uitbreiden met subtasks (recursief), custom_fields, checklists, dependencies, watchers, time_entries, linked_tasks
+  3. **Optie C (minimaal)**: Move blokkeren voor tasks met subtasks en waarschuwing tonen
+- **Workaround**: Verplaats taken HANDMATIG in ClickUp UI totdat dit gefixt is
+- **Herstelactie nodig**: Build "Email automation" (LHT) moet handmatig hersteld worden in ClickUp — subtasks, relaties, uren opnieuw invoeren
+- **Type**: Bug (kritiek) | **Prioriteit**: URGENT | **Effort**: Medium-groot
