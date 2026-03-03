@@ -604,7 +604,7 @@ export class TaskServiceCore extends BaseClickUpService {
 
       await this.makeRequest(async () => {
         await this.client.put(
-          `/api/v3/workspaces/${this.teamId}/tasks/${taskId}/home_list/${destinationListId}`,
+          `https://api.clickup.com/api/v3/workspaces/${this.teamId}/tasks/${taskId}/home_list/${destinationListId}`,
           movePayload
         );
       });
