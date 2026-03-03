@@ -458,7 +458,7 @@ export class TaskServiceCore extends BaseClickUpService {
       }
 
       // First update the standard fields
-      const updatedTask = await this.makeRequest(async () => {
+      await this.makeRequest(async () => {
         const response = await this.client.put<ClickUpTask | string>(
           `/task/${taskId}`,
           fieldsToSend
@@ -499,10 +499,11 @@ export class TaskServiceCore extends BaseClickUpService {
           });
         }
 
-        // Return the already-updated task (don't fetch again to save API call)
       }
-      
-      return updatedTask;
+
+      // Always return a fresh task snapshot; PUT responses can be partial and
+      // may not reflect derived fields (e.g. assignees/custom field values) consistently.
+      return await this.getTask(taskId);
     } catch (error) {
       throw this.handleError(error, `Failed to update task ${taskId}`);
     }
@@ -542,26 +543,79 @@ export class TaskServiceCore extends BaseClickUpService {
     this.logOperation('moveTask', { taskId, destinationListId, operation: 'start' });
     
     try {
-      // First, get task and validate destination list
+      // Validate source task and destination list first
       const [sourceTask, _] = await Promise.all([
         this.validateTaskExists(taskId),
         this.validateListExists(destinationListId)
       ]);
 
-      // Extract task data for creating the new task
-      const taskData = this.extractTaskData(sourceTask);
-      
-      // Create the task in the new list
-      const newTask = await this.createTask(destinationListId, taskData);
-      
-      // Delete the original task
-      await this.deleteTask(taskId);
-      
-      // Update the cache
-      this.validationCache.tasks.delete(taskId);
-      this.validationCache.tasks.set(newTask.id, {
+      // Use the native ClickUp v3 move endpoint to preserve task identity/history.
+      // We request custom field migration to avoid field loss when moving across lists.
+      const movePayload: any = {
+        move_custom_fields: true
+      };
+
+      // Strict status handling: if source status ID is not available in the destination list,
+      // we require a deterministic name match; otherwise move fails explicitly.
+      const destinationList = await this.listService.getList(destinationListId);
+      const sourceStatusId = sourceTask.status?.id;
+      const sourceStatusName = sourceTask.status?.status?.toLowerCase();
+
+      if (!sourceStatusId || !sourceStatusName) {
+        throw new ClickUpServiceError(
+          `Cannot move task ${taskId}: source task is missing status metadata`,
+          ErrorCode.VALIDATION
+        );
+      }
+
+      if (!destinationList?.statuses?.length) {
+        throw new ClickUpServiceError(
+          `Cannot move task ${taskId}: destination list ${destinationListId} has no readable statuses`,
+          ErrorCode.VALIDATION
+        );
+      }
+
+      const destinationHasSourceStatus = destinationList.statuses.some(
+        status => status.id === sourceStatusId
+      );
+
+      if (!destinationHasSourceStatus) {
+        const matchingStatuses = destinationList.statuses.filter(
+          status => status.status?.toLowerCase() === sourceStatusName
+        );
+
+        if (matchingStatuses.length === 1 && matchingStatuses[0]?.id) {
+          movePayload.status_mappings = [{
+            source_status: sourceStatusId,
+            destination_status: matchingStatuses[0].id
+          }];
+        } else if (matchingStatuses.length > 1) {
+          throw new ClickUpServiceError(
+            `Cannot move task ${taskId}: ambiguous status mapping for "${sourceTask.status.status}" in destination list ${destinationListId}`,
+            ErrorCode.VALIDATION
+          );
+        } else {
+          throw new ClickUpServiceError(
+            `Cannot move task ${taskId}: no compatible status "${sourceTask.status.status}" in destination list ${destinationListId}`,
+            ErrorCode.VALIDATION
+          );
+        }
+      }
+
+      await this.makeRequest(async () => {
+        await this.client.put(
+          `/api/v3/workspaces/${this.teamId}/tasks/${taskId}/home_list/${destinationListId}`,
+          movePayload
+        );
+      });
+
+      // Re-fetch task after move to return full, current state.
+      const movedTask = await this.getTask(taskId);
+
+      // Update cache with latest task snapshot.
+      this.validationCache.tasks.set(taskId, {
         validatedAt: Date.now(),
-        task: newTask
+        task: movedTask
       });
 
       const totalTime = Date.now() - startTime;
@@ -570,10 +624,10 @@ export class TaskServiceCore extends BaseClickUpService {
         destinationListId, 
         operation: 'complete',
         timing: { totalTime },
-        newTaskId: newTask.id
+        movedTaskId: movedTask.id
       });
 
-      return newTask;
+      return movedTask;
     } catch (error) {
       // Log failure
       this.logOperation('moveTask', { 
@@ -830,4 +884,3 @@ export class TaskServiceCore extends BaseClickUpService {
     this.logger.debug('Cached task name to ID mapping', { taskName, taskId, listId });
   }
 }
-

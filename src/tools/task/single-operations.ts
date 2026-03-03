@@ -250,7 +250,7 @@ export const updateTaskTool = {
  */
 export const moveTaskTool = {
   name: "move_task",
-  description: `Moves task to different list. Use taskId + (listId/listName) preferred, or taskName + sourceListName + (listId/listName). WARNING: Task statuses may reset if destination list has different status options.`,
+  description: `Moves task to different list using ClickUp's native move endpoint. Use taskId + (listId/listName) preferred, or taskName + sourceListName + (listId/listName). If source status cannot be mapped deterministically to destination statuses, the move fails explicitly.`,
   inputSchema: {
     type: "object",
     properties: {

@@ -276,7 +276,7 @@ export const updateBulkTasksTool = {
  */
 export const moveBulkTasksTool = {
   name: "move_bulk_tasks",
-  description: `Moves multiple tasks to one list. For each task: use taskId (preferred) or taskName + listName. Target list: use targetListId/Name. Configure batch size/concurrency via options. WARNING: Task statuses may reset, taskName needs listName.`,
+  description: `Moves multiple tasks to one list using ClickUp's native move endpoint. For each task: use taskId (preferred) or taskName + listName. Target list: use targetListId/Name. Configure batch size/concurrency via options. If a source status cannot be mapped deterministically, the task move fails explicitly.`,
   inputSchema: {
     type: "object",
     properties: {
