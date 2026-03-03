@@ -35,6 +35,7 @@ import { formatResponse, paginate, normalizeArray } from '../../utils/response-f
 import { TaskService } from '../../services/clickup/task/task-service.js';
 import { clickUpServices } from '../../services/shared.js';
 import { sponsorService } from '../../utils/sponsor-service.js';
+import { taskTypeService } from '../../services/task-type-service.js';
 
 const logger = new Logger('ConsolidatedHandlers');
 const { task: taskService } = clickUpServices;
@@ -146,16 +147,44 @@ function buildMinimalSuccessResponse(action: string, result: any, params?: any):
       if (params.priority !== undefined) updatedFields.priority = result.priority;
       if (params.dueDate !== undefined) updatedFields.due_date = result.due_date;
       if (params.startDate !== undefined) updatedFields.start_date = result.start_date;
-      if (params.assignees !== undefined) updatedFields.assignees = result.assignees?.length || 0;
+      if (params.time_estimate !== undefined) updatedFields.time_estimate_ms = result.time_estimate ?? null;
+      if (params.assignees !== undefined) {
+        const assigneeNames = Array.isArray(result.assignees)
+          ? result.assignees
+              .map((a: any) => a?.username || a?.email || (a?.id !== undefined ? String(a.id) : null))
+              .filter((name: string | null): name is string => Boolean(name))
+          : [];
+        updatedFields.assignees = assigneeNames.length;
+        updatedFields.assignee_names = assigneeNames;
+      }
       if (params.tags !== undefined) updatedFields.tags = result.tags?.length || 0;
       if (params.parent !== undefined) updatedFields.parent = result.parent;
 
-      return {
+      const response: any = {
         success: true,
         id: result.id,
         name: result.name,
         updated_fields: updatedFields
       };
+
+      if (params.time_estimate !== undefined) {
+        const taskTypeName = typeof result.custom_item_id === 'number'
+          ? taskTypeService.getNameFromId(result.custom_item_id)
+          : undefined;
+        const isMilestone = (taskTypeName || '').toLowerCase() === 'milestone';
+        const changedLevel = isMilestone ? 'milestone' : 'task';
+
+        response.build_time_estimate_check = {
+          required: true,
+          changed_level: changedLevel,
+          task_type: taskTypeName || null,
+          message: `${changedLevel === 'milestone' ? 'Milestone' : 'Task'} time estimate changed. Check whether the parent Build time estimate should be adjusted or can stay unchanged.`,
+          parent_task_id: result.parent ?? null,
+          recommended_action: "Review parent Build estimate and decide: update it or keep it unchanged."
+        };
+      }
+
+      return response;
 
     case 'delete':
       // AI needs: confirmation message

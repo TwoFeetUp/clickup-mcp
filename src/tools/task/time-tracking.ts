@@ -146,7 +146,7 @@ export const addTimeEntryTool = {
       },
       duration: {
         type: "string",
-        description: "Duration of the time entry. Format as 'Xh Ym' (e.g., '1h 30m') or just minutes (e.g., '90m')."
+        description: "Duration of the time entry. Supports '4h', '1h 30m', '90m', '2.5h', '4 hr', '14400000ms', and numeric values (small=minutes, large=milliseconds)."
       },
       description: {
         type: "string",
@@ -230,7 +230,8 @@ export async function handleGetTaskTimeEntries(params: any) {
       return sponsorService.createErrorResponse(result.error?.message || "Failed to get time entries");
     }
 
-    const timeEntries = result.data || [];
+    const rawTimeEntries = result.data || [];
+    const timeEntries = normalizeTimeEntries(rawTimeEntries);
 
     // Format the response
     return sponsorService.createResponse({
@@ -260,6 +261,100 @@ export async function handleGetTaskTimeEntries(params: any) {
     logger.error("Error getting task time entries", error);
     return sponsorService.createErrorResponse((error as Error).message || "An unknown error occurred");
   }
+}
+
+/**
+ * Parse loose timestamp/duration values into milliseconds.
+ * Accepts numbers, numeric strings, and returns null for invalid values.
+ */
+function toMilliseconds(value: any): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  const numeric = typeof value === 'number' ? value : Number(String(value).trim());
+  if (!Number.isFinite(numeric)) return null;
+  return Math.round(numeric);
+}
+
+function normalizeTags(tags: any): string[] {
+  if (!tags) return [];
+  if (!Array.isArray(tags)) return [];
+  return tags
+    .map(tag => {
+      if (typeof tag === 'string') return tag;
+      if (tag && typeof tag === 'object') return tag.name || tag.tag || null;
+      return null;
+    })
+    .filter((tag): tag is string => Boolean(tag));
+}
+
+/**
+ * Normalize ClickUp time entry responses.
+ * Handles both:
+ * - flat entries (id/start/end/duration)
+ * - grouped entries (user/time/intervals[])
+ */
+function normalizeTimeEntries(rawEntries: any[]): any[] {
+  if (!Array.isArray(rawEntries)) return [];
+
+  const normalized: any[] = [];
+
+  for (const entry of rawEntries) {
+    // Newer/grouped response shape: { user, time, intervals: [...] }
+    if (Array.isArray(entry?.intervals) && entry.intervals.length > 0) {
+      for (const interval of entry.intervals) {
+        const startMs = toMilliseconds(interval?.start);
+        const endMs = toMilliseconds(interval?.end);
+
+        let durationMs =
+          toMilliseconds(interval?.duration) ??
+          toMilliseconds(interval?.time) ??
+          toMilliseconds(entry?.duration) ??
+          toMilliseconds(entry?.time);
+
+        if ((durationMs === null || durationMs <= 0) && startMs !== null && endMs !== null) {
+          durationMs = Math.max(0, endMs - startMs);
+        } else if ((durationMs === null || durationMs <= 0) && startMs !== null && endMs === null) {
+          durationMs = Math.max(0, Date.now() - startMs);
+        }
+
+        normalized.push({
+          id: interval?.id || `${entry?.user?.id || 'user'}-${startMs || Date.now()}`,
+          description: interval?.description || entry?.description || "",
+          start: startMs !== null ? new Date(startMs).toISOString() : null,
+          end: endMs !== null ? new Date(endMs).toISOString() : null,
+          duration: durationMs || 0,
+          billable: Boolean(interval?.billable ?? entry?.billable),
+          tags: normalizeTags(interval?.tags ?? entry?.tags),
+          user: entry?.user || null,
+          task: entry?.task || null
+        });
+      }
+      continue;
+    }
+
+    // Flat response shape: { id, start, end, duration, ... }
+    const startMs = toMilliseconds(entry?.start);
+    const endMs = toMilliseconds(entry?.end);
+    let durationMs =
+      toMilliseconds(entry?.duration) ??
+      toMilliseconds(entry?.time);
+
+    if ((durationMs === null || durationMs <= 0) && startMs !== null && endMs !== null) {
+      durationMs = Math.max(0, endMs - startMs);
+    } else if ((durationMs === null || durationMs <= 0) && startMs !== null && endMs === null) {
+      durationMs = Math.max(0, Date.now() - startMs);
+    }
+
+    normalized.push({
+      ...entry,
+      id: entry?.id || `${entry?.user?.id || 'user'}-${startMs || Date.now()}`,
+      start: startMs !== null ? new Date(startMs).toISOString() : (entry?.start || null),
+      end: endMs !== null ? new Date(endMs).toISOString() : (entry?.end || null),
+      duration: durationMs || 0,
+      tags: normalizeTags(entry?.tags)
+    });
+  }
+
+  return normalized;
 }
 
 /**
@@ -412,7 +507,7 @@ export async function handleAddTimeEntry(params: any) {
     // Parse duration
     const durationMs = parseDuration(params.duration);
     if (durationMs === 0) {
-      return sponsorService.createErrorResponse("Invalid duration format. Use 'Xh Ym' format (e.g., '1h 30m') or just minutes (e.g., '90m').");
+      return sponsorService.createErrorResponse("Invalid duration format. Use examples like '4h', '1h 30m', '90m', '2.5h', '14400000ms', or numeric values.");
     }
 
     // Prepare request data
@@ -576,41 +671,58 @@ function formatDuration(durationMs: number): string {
 /**
  * Parse duration string to milliseconds
  */
-function parseDuration(durationString: string): number {
-  if (!durationString) return 0;
-  
-  // Clean the input and handle potential space issues
-  const cleanDuration = durationString.trim().toLowerCase().replace(/\s+/g, ' ');
-  
-  // Handle simple minute format like "90m"
-  if (/^\d+m$/.test(cleanDuration)) {
-    const minutes = parseInt(cleanDuration.replace('m', ''), 10);
-    return minutes * 60 * 1000;
+function parseDuration(durationInput: string | number): number {
+  if (durationInput === undefined || durationInput === null) return 0;
+
+  // Numeric input: small values = minutes, large values = milliseconds
+  // (prevents accidental interpretation of ms payloads as minutes)
+  if (typeof durationInput === 'number') {
+    if (!Number.isFinite(durationInput) || durationInput <= 0) return 0;
+    if (durationInput >= 60000) return Math.round(durationInput); // assume ms
+    return Math.round(durationInput * 60 * 1000);
   }
-  
-  // Handle simple hour format like "2h"
-  if (/^\d+h$/.test(cleanDuration)) {
-    const hours = parseInt(cleanDuration.replace('h', ''), 10);
-    return hours * 60 * 60 * 1000;
+
+  const cleanDuration = String(durationInput).trim().toLowerCase().replace(/\s+/g, ' ');
+  if (!cleanDuration) return 0;
+
+  // Compact forms like "1h30m" -> "1h 30m"
+  const normalized = cleanDuration.replace(/(\d)([a-z])/g, '$1 $2');
+
+  // Numeric string: small values = minutes, large values = milliseconds
+  if (/^\d+(\.\d+)?$/.test(normalized)) {
+    const value = parseFloat(normalized);
+    if (!(value > 0)) return 0;
+    if (value >= 60000) return Math.round(value); // assume ms
+    return Math.round(value * 60 * 1000);
   }
-  
-  // Handle combined format like "1h 30m"
-  const combinedPattern = /^(\d+)h\s*(?:(\d+)m)?$|^(?:(\d+)h\s*)?(\d+)m$/;
-  const match = cleanDuration.match(combinedPattern);
-  
-  if (match) {
-    const hours = parseInt(match[1] || match[3] || '0', 10);
-    const minutes = parseInt(match[2] || match[4] || '0', 10);
-    return (hours * 60 * 60 + minutes * 60) * 1000;
+
+  // Parse tokens like "4h", "4 hr", "4hours", "30m", "2.5h", "14400000ms"
+  const tokenPattern = /(\d+(?:[.,]\d+)?)\s*(ms|msec|msecs|millisecond|milliseconds|h|hr|hrs|hour|hours|m|min|mins|minute|minutes)\b/g;
+  let totalMs = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = tokenPattern.exec(normalized)) !== null) {
+    const rawValue = match[1].replace(',', '.');
+    const value = parseFloat(rawValue);
+    if (!Number.isFinite(value) || value <= 0) continue;
+
+    const unit = match[2];
+    if (unit.startsWith('h')) {
+      totalMs += value * 60 * 60 * 1000;
+    } else if (unit === 'ms' || unit.startsWith('msec') || unit.startsWith('millisecond')) {
+      totalMs += value;
+    } else {
+      totalMs += value * 60 * 1000;
+    }
   }
-  
-  // Try to parse as just a number of minutes
-  const justMinutes = parseInt(cleanDuration, 10);
-  if (!isNaN(justMinutes)) {
-    return justMinutes * 60 * 1000;
-  }
-  
-  return 0;
+
+  if (totalMs <= 0) return 0;
+
+  // Reject strings with unknown trailing content (e.g. "4h xyz")
+  const stripped = normalized.replace(tokenPattern, '').replace(/\s+/g, '').trim();
+  if (stripped.length > 0) return 0;
+
+  return Math.round(totalMs);
 }
 
 // Export all time tracking tools
