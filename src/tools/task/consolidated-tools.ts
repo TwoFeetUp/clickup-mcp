@@ -421,7 +421,7 @@ export const taskTimeTrackingTool = {
       },
       duration: {
         type: "string",
-        description: "For add_entry: duration in 'Xh Ym' format (e.g., '1h 30m') or minutes (e.g., '90m')"
+        description: "For add_entry: duration supports '4h', '1h 30m', '90m', '2.5h', '14400000ms', and numeric values (small=minutes, large=milliseconds)"
       },
       // Delete entry parameter
       timeEntryId: {
