@@ -156,17 +156,41 @@ export class TaskServiceSearch {
     try {
       (this.core as any).logOperation('getWorkspaceTasks', { filters });
 
-      const params = (this.core as any).buildTaskFilterParams(filters);
-      const response = await (this.core as any).makeRequest(async () => {
-        return await (this.core as any).client.get(`/team/${(this.core as any).teamId}/task`, {
-          params
-        });
-      });
+      // When no specific page is requested, auto-paginate to fetch all results
+      // Safety limit: max 5 pages (500 tasks) to avoid excessive API calls
+      const autoPaginate = filters.page === undefined || filters.page === null;
+      const maxPages = 5;
+      let allTasks: any[] = [];
+      let currentPage = filters.page || 0;
+      let hasMore = true;
 
-      const tasks = response.data.tasks;
-      const totalCount = tasks.length; // Note: This is just the current page count
-      const hasMore = totalCount === 100; // ClickUp returns max 100 tasks per page
-      const nextPage = (filters.page || 0) + 1;
+      while (hasMore && (autoPaginate ? (currentPage - (filters.page || 0)) < maxPages : true)) {
+        const params = (this.core as any).buildTaskFilterParams({ ...filters, page: currentPage });
+        const response = await (this.core as any).makeRequest(async () => {
+          return await (this.core as any).client.get(`/team/${(this.core as any).teamId}/task`, {
+            params
+          });
+        });
+
+        const pageTasks = response.data.tasks;
+        allTasks = allTasks.concat(pageTasks);
+        hasMore = pageTasks.length === 100; // ClickUp returns max 100 per page
+        currentPage++;
+
+        (this.core as any).logOperation('getWorkspaceTasks', {
+          page: currentPage - 1,
+          tasksInPage: pageTasks.length,
+          totalSoFar: allTasks.length,
+          hasMore,
+          autoPaginate
+        });
+
+        // If not auto-paginating, only fetch the requested page
+        if (!autoPaginate) break;
+      }
+
+      const totalCount = allTasks.length;
+      const nextPage = currentPage;
 
       // Return summary format only if explicitly requested
       // Note: With optimized response formatting (minimal/standard levels),
@@ -174,14 +198,15 @@ export class TaskServiceSearch {
       const shouldUseSummary = filters.detail_level === 'summary';
 
       (this.core as any).logOperation('getWorkspaceTasks', {
-        totalTasks: tasks.length,
+        totalTasks: allTasks.length,
         usingDetailedFormat: !shouldUseSummary,
-        requestedFormat: filters.detail_level || 'auto'
+        requestedFormat: filters.detail_level || 'auto',
+        pagesFetched: currentPage - (filters.page || 0)
       });
 
       if (shouldUseSummary) {
         return {
-          summaries: tasks.map(task => ({
+          summaries: allTasks.map(task => ({
             id: task.id,
             name: task.name,
             status: task.status.status,
@@ -205,7 +230,7 @@ export class TaskServiceSearch {
       }
 
       return {
-        tasks,
+        tasks: allTasks,
         total_count: totalCount,
         has_more: hasMore,
         next_page: nextPage
@@ -682,19 +707,22 @@ export class TaskServiceSearch {
           
           if (isMatch) {
             matchesFound++;
-            // Get list context information
-            const listContext = listContextMap.get(taskSummary.list.id);
-            
-            if (listContext) {
-              // Store task summary and context with match score
-              initialMatches.push({
-                id: taskSummary.id,
-                task: taskSummary,
-                listContext,
-                matchScore: matchResult.score,
-                matchReason: matchResult.reason || 'unknown'
-              });
-            }
+            // Get list context information, with fallback for personal/non-hierarchy lists
+            const listContext = listContextMap.get(taskSummary.list.id) || {
+              listId: taskSummary.list.id,
+              listName: taskSummary.list.name || 'Personal List',
+              spaceId: 'personal',
+              spaceName: 'Personal'
+            };
+
+            // Store task summary and context with match score
+            initialMatches.push({
+              id: taskSummary.id,
+              task: taskSummary,
+              listContext,
+              matchScore: matchResult.score,
+              matchReason: matchResult.reason || 'unknown'
+            });
           }
         }
         
