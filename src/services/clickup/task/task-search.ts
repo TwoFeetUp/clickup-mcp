@@ -707,15 +707,14 @@ export class TaskServiceSearch {
           
           if (isMatch) {
             matchesFound++;
-            // Get list context information, with fallback for personal/non-hierarchy lists
-            const listContext = listContextMap.get(taskSummary.list.id) || {
+            // Build list context from task data, enriched by hierarchy when available
+            // Task data is the primary source — hierarchy only adds folder/space context
+            const hierarchyContext = listContextMap.get(taskSummary.list.id);
+            const listContext = hierarchyContext || {
               listId: taskSummary.list.id,
-              listName: taskSummary.list.name || 'Personal List',
-              spaceId: 'personal',
-              spaceName: 'Personal'
+              listName: taskSummary.list.name || 'Unknown'
             };
 
-            // Store task summary and context with match score
             initialMatches.push({
               id: taskSummary.id,
               task: taskSummary,
@@ -765,20 +764,18 @@ export class TaskServiceSearch {
                 id: match.listContext.listId,
                 name: match.listContext.listName
               },
-              folder: match.listContext.folderId ? {
-                id: match.listContext.folderId,
-                name: match.listContext.folderName
-              } : undefined,
-              space: {
-                id: match.listContext.spaceId,
-                name: match.listContext.spaceName
-              }
+              ...(match.listContext.folderId && {
+                folder: { id: match.listContext.folderId, name: match.listContext.folderName }
+              }),
+              ...(match.listContext.spaceId && {
+                space: { id: match.listContext.spaceId, name: match.listContext.spaceName }
+              })
             };
           }
-          
+
           return match.task;
         }
-        
+
         // Handle the exact match case - if there's an exact or very good match, prefer it over others
         // This is our key improvement to prefer exact matches over update time
         const bestMatchScore = initialMatches[0].matchScore;
@@ -802,43 +799,34 @@ export class TaskServiceSearch {
                     id: match.listContext.listId,
                     name: match.listContext.listName
                   },
-                  folder: match.listContext.folderId ? {
-                    id: match.listContext.folderId,
-                    name: match.listContext.folderName
-                  } : undefined,
-                  space: {
-                    id: match.listContext.spaceId,
-                    name: match.listContext.spaceName
-                  }
+                  ...(match.listContext.folderId && {
+                    folder: { id: match.listContext.folderId, name: match.listContext.folderName }
+                  }),
+                  ...(match.listContext.spaceId && {
+                    space: { id: match.listContext.spaceId, name: match.listContext.spaceName }
+                  })
                 };
               }
               return match.task;
             }
 
-            // Otherwise, get the full details
+            // Otherwise, get the full details — getTask() returns real list/folder/space data
             const fullTask = await this.core.getTask(exactMatches[0].id);
-            
+
             if (includeListContext) {
               const match = exactMatches[0];
-              // Enhance task with context information
-              (fullTask as any).list = {
-                ...fullTask.list,
-                name: match.listContext.listName
-              };
-              
-              if (match.listContext.folderId) {
-                (fullTask as any).folder = {
-                  id: match.listContext.folderId,
-                  name: match.listContext.folderName
-                };
+              // Enrich with hierarchy data only if available (getTask already has the real data)
+              if (match.listContext.listName) {
+                (fullTask as any).list = { ...fullTask.list, name: match.listContext.listName };
               }
-              
-              (fullTask as any).space = {
-                id: match.listContext.spaceId,
-                name: match.listContext.spaceName
-              };
+              if (match.listContext.folderId) {
+                (fullTask as any).folder = { id: match.listContext.folderId, name: match.listContext.folderName };
+              }
+              if (match.listContext.spaceId) {
+                (fullTask as any).space = { id: match.listContext.spaceId, name: match.listContext.spaceName };
+              }
             }
-            
+
             return fullTask;
           }
         }
@@ -899,42 +887,22 @@ export class TaskServiceSearch {
             message: "Failed to get detailed task information"
           });
           
-          // If detailed fetch fails, use the summaries with context info
-          // This fallback ensures we still return something useful
+          // If detailed fetch fails, use the summaries with available context
+          const enrichWithContext = (match: any) => ({
+            ...match.task,
+            list: { id: match.listContext.listId, name: match.listContext.listName },
+            ...(match.listContext.folderId && {
+              folder: { id: match.listContext.folderId, name: match.listContext.folderName }
+            }),
+            ...(match.listContext.spaceId && {
+              space: { id: match.listContext.spaceId, name: match.listContext.spaceName }
+            })
+          });
+
           if (allowMultipleMatches) {
-            return initialMatches.map(match => ({
-              ...match.task,
-              list: {
-                id: match.listContext.listId,
-                name: match.listContext.listName
-              },
-              folder: match.listContext.folderId ? {
-                id: match.listContext.folderId,
-                name: match.listContext.folderName
-              } : undefined,
-              space: {
-                id: match.listContext.spaceId,
-                name: match.listContext.spaceName
-              }
-            }));
+            return initialMatches.map(enrichWithContext);
           } else {
-            // For single result, return the first match (best match score)
-            const match = initialMatches[0];
-            return {
-              ...match.task,
-              list: {
-                id: match.listContext.listId,
-                name: match.listContext.listName
-              },
-              folder: match.listContext.folderId ? {
-                id: match.listContext.folderId,
-                name: match.listContext.folderName
-              } : undefined,
-              space: {
-                id: match.listContext.spaceId,
-                name: match.listContext.spaceName
-              }
-            };
+            return enrichWithContext(initialMatches[0]);
           }
         }
         
