@@ -54,3 +54,6 @@ ssl/
 
 # Playground - experiments and isolated tests
 playground/
+
+# Claude Code local settings (may contain secrets)
+.claude/settings.local.json
