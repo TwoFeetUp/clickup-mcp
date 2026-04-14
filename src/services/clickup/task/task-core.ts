@@ -121,7 +121,7 @@ export class TaskServiceCore extends BaseClickUpService {
       filters.list_ids.forEach(id => params.append('list_ids[]', id));
     }
     if (filters.folder_ids && filters.folder_ids.length > 0) {
-      filters.folder_ids.forEach(id => params.append('folder_ids[]', id));
+      filters.folder_ids.forEach(id => params.append('project_ids[]', id));
     }
     if (filters.space_ids && filters.space_ids.length > 0) {
       filters.space_ids.forEach(id => params.append('space_ids[]', id));
